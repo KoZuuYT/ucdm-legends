@@ -65,7 +65,9 @@ class UpdateTask:
 
     def start_check(self) -> None:
         if not self.enabled:
-            self.state, self.message = "none", "Atualização automática não configurada"
+            off = "/" in self.cfg.get("repo", "") and not self.cfg.get("enabled")
+            self.state, self.message = "none", ("Atualizações automáticas desativadas" if off
+                                               else "Atualização automática não configurada")
             return
         self._run(self._check)
 
@@ -129,7 +131,7 @@ class UpdateTask:
         if exe.exists():
             cmd = [str(exe)]
         else:
-            cmd = [sys.executable, str(st / "installer" / "installer.py")]
+            cmd = [sys.executable, str(st / "installer" / "ucdm_installer.py")]
         cmd += ["--apply", str(st), "--target", str(install_dir()), "--wait-pid", str(os.getpid()), "--relaunch"]
         rt.launch_detached(cmd, paths.UPDATE_DIR)
         return True

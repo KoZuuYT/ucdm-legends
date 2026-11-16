@@ -50,18 +50,22 @@ def main() -> int:
         for f in ("main.py", "requirements.txt"):
             shutil.copy2(ROOT / f, stage / f)
     else:
-        inst_src = ROOT / "installer" / "installer.py"
+        inst_src = ROOT / "installer" / "ucdm_installer.py"
         if args.repo:   # embute o repositório real no instalador
             patched = BUILD / "installer_entry.py"   # build/ fica 1 nível abaixo da raiz, como installer/
             patched.parent.mkdir(parents=True, exist_ok=True)
             patched.write_text(inst_src.read_text(encoding="utf-8").replace(
                 'DEFAULT_REPO = "KoZuuYT/ucdm-legends"', f'DEFAULT_REPO = "{args.repo}"'), encoding="utf-8")
             inst_src = patched
+        icon = ROOT / "installer" / "art" / "icon.ico"
         run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir", "--windowed",
-             "--name", "UCDM", "--distpath", str(DIST), "--workpath", str(BUILD / "game"),
+             "--icon", str(icon), "--exclude-module", "tkinter", "--exclude-module", "numpy", "--name", "UCDM", "--distpath", str(DIST), "--workpath", str(BUILD / "game"),
              "--specpath", str(BUILD), "--paths", str(ROOT), "--collect-submodules", "minigames",
              "--collect-submodules", "scenes", str(ROOT / "main.py")])
-        run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--console",
+        sep = ";" if sys.platform == "win32" else ":"
+        run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
+             "--icon", str(icon), "--add-data", f"{ROOT / 'installer' / 'art'}{sep}art",
+             "--hidden-import", "installer.gui", "--hidden-import", "installer.setup_core",
              "--name", "UCDM-Installer", "--distpath", str(DIST), "--workpath", str(BUILD / "inst"),
              "--specpath", str(BUILD), "--paths", str(ROOT), str(inst_src)])
         shutil.copy2(DIST / f"UCDM-Installer{exe}", stage / f"UCDM-Installer{exe}")

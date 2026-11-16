@@ -144,6 +144,27 @@ class GameTest(unittest.TestCase):
         p.set_block(True, now=12.0)
         self.assertIn(p.receive(unb, e, now=12.01).outcome, ("hit", "crit"))
 
+    def test_main_loop_keeps_first_scene(self):
+        """Regressão v0.1.0: com dt real o 1º quadro não tem passo de lógica e o jogo fechava sozinho."""
+        from core.scene import Scene
+        g = self.game
+
+        class Probe(Scene):
+            draws = 0
+
+            def draw(self, surf):
+                Probe.draws += 1
+
+        g.scenes.stack.clear()
+        g.headless, g.shutdown = False, lambda: None   # dt real, sem pygame.quit()
+        try:
+            g.run(Probe(g), max_frames=5)
+        finally:
+            g.headless = True
+            del g.shutdown
+        self.assertEqual(Probe.draws, 5)
+        self.assertIsInstance(g.scenes.current, Probe)
+
     def test_scenes_smoke(self):
         from minigames import REGISTRY
         from scenes.arena import ArenaScene
@@ -160,6 +181,47 @@ class GameTest(unittest.TestCase):
         sel = CharacterSelectScene(self.game, new_game=False)
         self._run(sel, 120, (pygame.K_DOWN,))
         self.assertLess(sel.drawn, 60)   # culling: nunca desenha os 160
+
+
+class SettingsAndInstallerTest(unittest.TestCase):
+    def test_settings_override_game_config(self):
+        import json
+        from core import config, paths
+        paths.SETTINGS_FILE.write_text(json.dumps({"display": {"fullscreen": True, "fps_cap": 0}}), encoding="utf-8")
+        try:
+            cfg = config.load("game", reload=True)
+            self.assertTrue(cfg["display"]["fullscreen"])
+            self.assertEqual(cfg["display"]["fps_cap"], 0)
+            self.assertEqual(cfg["display"]["width"], 1280)          # resto do game.json intacto
+            paths.SETTINGS_FILE.write_text("{quebrado", encoding="utf-8")
+            self.assertFalse(config.load("game", reload=True)["display"]["fullscreen"])   # ignora arquivo ruim
+        finally:
+            paths.SETTINGS_FILE.unlink(missing_ok=True)
+            config.load("game", reload=True)
+
+    def test_installer_core(self):
+        import json
+        from installer import setup_core as sc
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            self.assertIsNone(sc.validate_dir(str(d / "UCDM")))
+            self.assertIsNotNone(sc.validate_dir("relativo/UCDM"))
+            (d / "ocupada").mkdir()
+            (d / "ocupada" / "foto.jpg").write_text("x")
+            self.assertIsNotNone(sc.validate_dir(str(d / "ocupada")))     # não instala em pasta com outras coisas
+            (d / "jogo").mkdir()
+            (d / "jogo" / "version.json").write_text('{"version": "0.1.0"}')
+            self.assertIsNone(sc.validate_dir(str(d / "jogo")))             # reinstalar por cima é ok
+            self.assertEqual(sc.installed_version(d / "jogo"), "0.1.0")
+            with self.assertRaises(ValueError):
+                sc.uninstall(d / "ocupada", False, log=lambda m: None)    # nunca apaga pasta que não é do jogo
+            self.assertTrue((d / "ocupada" / "foto.jpg").exists())
+        sc.save_settings({"display": {"vsync": False}})
+        sc.save_settings({"audio": {"music_volume": 0.1}})
+        saved = json.loads((sc.user_dir() / "settings.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved, {"display": {"vsync": False}, "audio": {"music_volume": 0.1}})
+        self.assertEqual(sc.load_settings()["display"]["fps_cap"], 144)
+        (sc.user_dir() / "settings.json").unlink()
 
 
 if __name__ == "__main__":

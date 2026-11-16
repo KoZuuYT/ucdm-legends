@@ -7,9 +7,47 @@
 """
 import argparse
 import sys
+import traceback
+
+
+def _setup_logging() -> None:
+    """No .exe (sem console) stdout/stderr não existem: tudo vai para logs/game.log."""
+    from core import paths
+    paths.ensure_user_dirs()
+    if paths.FROZEN or sys.stdout is None:
+        log = open(paths.LOG_DIR / "game.log", "w", encoding="utf-8", buffering=1, errors="replace")
+        sys.stdout = sys.stderr = log
+
+
+def _report_crash(exc: BaseException) -> None:
+    from core import paths
+    text = "".join(traceback.format_exception(exc))
+    path = paths.LOG_DIR / "crash.log"
+    try:
+        paths.LOG_DIR.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    except OSError:
+        pass
+    print(text, file=sys.stderr)
+    if sys.platform == "win32" and paths.FROZEN:
+        import ctypes
+        msg = (f"O jogo encontrou um erro e precisou fechar.\n\n{type(exc).__name__}: {exc}\n\n"
+               f"Detalhes salvos em:\n{path}")
+        ctypes.windll.user32.MessageBoxW(None, msg, "UCDM Legends", 0x10)
 
 
 def main(argv: list[str] | None = None) -> int:
+    _setup_logging()
+    try:
+        return _main(argv)
+    except SystemExit:
+        raise
+    except BaseException as e:  # noqa: BLE001 — qualquer erro vira crash.log + aviso
+        _report_crash(e)
+        return 1
+
+
+def _main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="UCDM Legends")
     ap.add_argument("--skip-update", action="store_true")
     ap.add_argument("--scene", default=None)

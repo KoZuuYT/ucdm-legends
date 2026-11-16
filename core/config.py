@@ -4,6 +4,8 @@ Todo balanceamento (atributos, inimigos, mini-games) vem de assets/data/.
 Mods podem sobrescrever qualquer chave: o arquivo
 <USER_DIR>/mods/<nome_do_mod>/data/<arquivo>.json é mesclado (deep merge)
 por cima do oficial, em ordem alfabética de nome de mod.
+Por último, <USER_DIR>/settings.json (preferências do jogador: tela, áudio,
+updates) é mesclado por cima de game.json.
 """
 import json
 from pathlib import Path
@@ -57,6 +59,11 @@ def load(name: str, *, reload: bool = False) -> Any:
             over = _find(mod / "data", name)
             if over:
                 data = deep_merge(data, _read(over))
+    if name == "game" and paths.SETTINGS_FILE.is_file():
+        try:
+            data = deep_merge(data, _read(paths.SETTINGS_FILE))
+        except (OSError, ValueError) as e:   # settings corrompido não pode impedir o jogo de abrir
+            print(f"[config] settings.json ignorado: {e}")
     _cache[name] = data
     return data
 

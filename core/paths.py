@@ -34,8 +34,10 @@ USER_DIR = Path(os.environ.get("UCDM_USER_DIR", _user_dir()))
 SAVE_DIR = USER_DIR / "saves"
 MODS_DIR = USER_DIR / "mods"          # mods/<qualquer>/assets/... sobrepõe assets oficiais
 UPDATE_DIR = USER_DIR / "update"      # downloads e staging do auto-update
+LOG_DIR = USER_DIR / "logs"           # game.log / crash.log
+SETTINGS_FILE = USER_DIR / "settings.json"   # preferências do jogador (escritas pelo instalador)
 
 
 def ensure_user_dirs() -> None:
-    for d in (USER_DIR, SAVE_DIR, MODS_DIR, UPDATE_DIR):
+    for d in (USER_DIR, SAVE_DIR, MODS_DIR, UPDATE_DIR, LOG_DIR):
         d.mkdir(parents=True, exist_ok=True)

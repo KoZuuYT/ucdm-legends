@@ -79,10 +79,19 @@ class SceneManager:
             if self.current:
                 self.current.resume()
 
-    # --- loop -----------------------------------------------------------------------
-    def update(self, dt: float) -> None:
+    def flush(self) -> None:
+        """Aplica já as operações pendentes (sem fade)."""
         while self._pending:
             self._pending.pop(0)()
+
+    @property
+    def busy(self) -> bool:
+        """Há troca de cena enfileirada ou em andamento?"""
+        return bool(self._pending) or self._fade_dir != 0
+
+    # --- loop -----------------------------------------------------------------------
+    def update(self, dt: float) -> None:
+        self.flush()
         if self._fade_dir:
             self._fade += self._fade_dir * dt / self.FADE_TIME
             if self._fade >= 1 and self._fade_dir > 0:

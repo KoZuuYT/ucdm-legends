@@ -40,14 +40,15 @@ class Game:
         self.profile = None  # entities.progression.Profile, definido no menu
 
         self.tick_rate = disp.get("tick_rate", 60)
-        self.fps_cap = disp.get("fps_cap", 144)
-        self.show_debug = False
+        self.fps_cap = disp.get("fps_cap", 144) or 0   # 0 = sem limite
+        self.show_debug = bool(disp.get("show_fps", False))
         self.running = False
         self.time = 0.0
         self.fps = 0.0
 
     def run(self, first_scene: Scene, *, max_frames: int | None = None) -> None:
         self.scenes.push(first_scene)
+        self.scenes.flush()   # a 1ª cena entra antes do 1º quadro (senão a pilha parece vazia)
         clock = pygame.time.Clock()
         step = 1.0 / self.tick_rate
         acc = 0.0
@@ -93,7 +94,7 @@ class Game:
             frames += 1
             if max_frames is not None and frames >= max_frames:
                 self.running = False
-            if not self.scenes.stack:
+            if not self.scenes.stack and not self.scenes.busy:
                 self.running = False
         self.shutdown()
 

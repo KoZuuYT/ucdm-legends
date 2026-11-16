@@ -12,6 +12,8 @@ class Display:
                  vsync: bool = True, headless: bool = False) -> None:
         self.width, self.height = width, height
         pygame.display.set_caption(title)
+        if not headless:
+            self._set_icon()
         flags = 0 if headless else (pygame.SCALED | pygame.RESIZABLE)
         if fullscreen and not headless:
             flags |= pygame.FULLSCREEN
@@ -20,6 +22,16 @@ class Display:
         except pygame.error:  # alguns drivers não aceitam vsync
             self.surface = pygame.display.set_mode((width, height), flags)
         self.rect = self.surface.get_rect()
+
+    @staticmethod
+    def _set_icon() -> None:
+        from core import paths
+        icon = paths.ASSETS_DIR / "sprites" / "ui" / "icon.png"
+        try:
+            if icon.is_file():
+                pygame.display.set_icon(pygame.image.load(str(icon)))
+        except pygame.error:
+            pass
 
     # --- conversões de coordenadas ------------------------------------------------
     def window_size(self) -> tuple[int, int]:
