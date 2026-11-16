@@ -123,9 +123,10 @@ class HubScene(Scene):
         p = self.game.profile
         self.scenery.draw(surf, self.t)
         ch = roster.character(p.character)
-        img = a.image_h(ch["sprite"], 300)
+        flip = ch.get("faces", -1) != 1                  # a arte olha para `faces`; queremos olhar para a direita
+        img = a.image_h(ch["sprite"], 300, flip)
         if img.get_width() > 340:
-            img = a.image_h(ch["sprite"], int(300 * 340 / img.get_width()))
+            img = a.image_h(ch["sprite"], int(300 * 340 / img.get_width()), flip)
         surf.blit(img, img.get_rect(midbottom=(220, 620 + 4 * math.sin(self.t * 2))))
 
         # painel de atributos

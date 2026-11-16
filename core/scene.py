@@ -14,6 +14,10 @@ if TYPE_CHECKING:
 class Scene:
     #: se True, a cena de baixo ainda é desenhada (útil para pop-ups/pausa)
     transparent = False
+    #: True = usa o canvas inteiro (janela larga: arena, menu). False = layout fixo 1280x720 centralizado
+    wide = False
+    #: escurecimento (0-255) aplicado às laterais quando um overlay de layout fixo está sobre uma cena larga
+    dim_alpha = 0
 
     def __init__(self, game: "Game") -> None:
         self.game = game
@@ -27,6 +31,9 @@ class Scene:
     # loop
     def update(self, dt: float) -> None: ...
     def draw(self, surf: pygame.Surface) -> None: ...
+
+    def on_resize(self, canvas_w: int) -> None:
+        """A largura lógica do canvas mudou (só cenas `wide` precisam reagir)."""
 
     def on_focus_lost(self) -> None:
         """A janela perdeu o foco (cenas de jogo abrem a pausa aqui)."""
@@ -96,6 +103,19 @@ class SceneManager:
         """Há troca de cena enfileirada ou em andamento?"""
         return bool(self._pending) or self._fade_dir != 0
 
+    BASE_W = 1280
+
+    def origin_x(self, canvas_w: int) -> int:
+        """Deslocamento horizontal da cena atual (layout fixo é centralizado quando o canvas é mais largo)."""
+        cur = self.current
+        if cur is None or cur.wide:
+            return 0
+        return max(0, (canvas_w - self.BASE_W) // 2)
+
+    def on_resize(self, canvas_w: int) -> None:
+        for s in self.stack:
+            s.on_resize(canvas_w)
+
     # --- loop -----------------------------------------------------------------------
     def update(self, dt: float) -> None:
         self.flush()
@@ -117,10 +137,50 @@ class SceneManager:
         start = len(self.stack) - 1
         while start > 0 and self.stack[start].transparent:
             start -= 1
+        W, H = surf.get_size()
+        ox = max(0, (W - self.BASE_W) // 2)
         for scene in self.stack[max(start, 0):]:
-            scene.draw(surf)
+            if scene.wide or ox == 0:
+                scene.draw(surf)
+                continue
+            scene.draw(surf.subsurface((ox, 0, self.BASE_W, H)))      # layout fixo centralizado
+            self._fill_margins(surf, ox, scene)
         if self._fade > 0:
             self._draw_transition(surf, min(self._fade, 1.0))
+
+    def _fill_margins(self, surf: pygame.Surface, ox: int, scene: Scene) -> None:
+        """Laterais de uma cena de layout fixo: overlay escurece; cena opaca estica a própria borda (sem preto)."""
+        W, H = surf.get_size()
+        right = W - ox - self.BASE_W
+        if scene.transparent:
+            if scene.dim_alpha:
+                shade = self._margin_shade(max(ox, right), H, scene.dim_alpha)
+                surf.blit(shade, (0, 0), (0, 0, ox, H))
+                if right > 0:
+                    surf.blit(shade, (W - right, 0), (0, 0, right, H))
+            return
+        pygame.transform.scale(surf.subsurface((ox, 0, 1, H)), (ox, H), surf.subsurface((0, 0, ox, H)))
+        if right > 0:
+            pygame.transform.scale(surf.subsurface((ox + self.BASE_W - 1, 0, 1, H)), (right, H),
+                                   surf.subsurface((W - right, 0, right, H)))
+        shade = self._margin_shade(max(ox, right), H, 70)             # um pouco mais escuro: fica claro que é "fora"
+        surf.blit(shade, (0, 0), (0, 0, ox, H))
+        if right > 0:
+            surf.blit(shade, (W - right, 0), (0, 0, right, H))
+
+    _shade_cache: dict = {}
+
+    @classmethod
+    def _margin_shade(cls, w: int, h: int, alpha: int) -> pygame.Surface:
+        key = (w, h, alpha)
+        s = cls._shade_cache.get(key)
+        if s is None:
+            if len(cls._shade_cache) > 8:
+                cls._shade_cache.clear()
+            s = pygame.Surface((max(1, w), h), pygame.SRCALPHA)
+            s.fill((0, 0, 0, alpha))
+            cls._shade_cache[key] = s
+        return s
 
     def _draw_transition(self, surf: pygame.Surface, k: float) -> None:
         w, h = surf.get_size()

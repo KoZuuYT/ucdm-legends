@@ -111,7 +111,7 @@ class CharacterSelectScene(Scene):
                         self.index = i
 
     def draw(self, surf: pygame.Surface) -> None:
-        surf.fill((26, 28, 40))
+        ui.backdrop(surf, self.t, animate=not self.game.feedback.reduce_motion)
         assets = self.game.assets
         ui.text(surf, assets.font(44), "Escolha seu lutador", (GRID_X, 30), ui.ACCENT)
         clip = pygame.Rect(GRID_X, GRID_Y, COLS * CELL_W, GRID_H)

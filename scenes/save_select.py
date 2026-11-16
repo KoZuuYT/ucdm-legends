@@ -76,9 +76,7 @@ class SaveSelectScene(Scene):
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
         a = self.game.assets
-        surf.fill((22, 24, 36))
-        for i in range(0, W, 64):      # grade sutil de fundo
-            pygame.draw.line(surf, (28, 30, 44), (i, 0), (i, H))
+        ui.backdrop(surf, self.t, animate=not self.game.feedback.reduce_motion)
         ui.text(surf, a.font(54), "Seus saves", (W // 2, 50), ui.ACCENT, "midtop")
         for i, b in enumerate(self.menu.buttons[:3]):          # cartões entram em sequência
             k = ease_out_back(min(1.0, max(0.0, (self.t - i * 0.07) / 0.3)))
@@ -96,6 +94,7 @@ class SaveSelectScene(Scene):
 class SlotMenu(Scene):
     """Ações de um slot (modal)."""
     transparent = True
+    dim_alpha = 160
     GRACE = 0.2
 
     def __init__(self, game, index: int, summary: dict | None) -> None:

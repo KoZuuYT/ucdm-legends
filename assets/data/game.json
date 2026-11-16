@@ -35,17 +35,16 @@
       "backspace"
     ],
     "attack": [
-      "j",
-      "z"
+      "mouse1",
+      "j"
     ],
     "block": [
-      "k",
-      "x"
+      "f",
+      "k"
     ],
     "dodge": [
-      "l",
-      "c",
-      "left shift"
+      "left shift",
+      "l"
     ]
   },
   "audio": {
@@ -146,7 +145,8 @@
   "gameplay": {
     "difficulty": "normal",
     "extended_warning": false,
-    "auto_pause": true
+    "auto_pause": true,
+    "battle_intro": true
   },
   "feedback": {},
   "language": "pt-BR",

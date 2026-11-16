@@ -12,6 +12,23 @@ import pygame
 
 DIRECTIONS = ("left", "right", "up", "down")
 
+_PRETTY = {"mouse1": "MOUSE ESQ.", "mouse2": "MOUSE DIR.", "mouse3": "MOUSE MEIO", "left shift": "SHIFT",
+           "right shift": "SHIFT DIR.", "left ctrl": "CTRL", "right ctrl": "CTRL DIR.", "return": "ENTER",
+           "space": "ESPAÇO", "left": "SETA ESQ.", "right": "SETA DIR.", "up": "SETA CIMA", "down": "SETA BAIXO",
+           "escape": "ESC", "backspace": "BACKSPACE", "tab": "TAB"}
+
+
+def pretty_key(name: str) -> str:
+    """Nome legível de uma tecla/botão para mostrar ao jogador ("left shift" -> "SHIFT")."""
+    return _PRETTY.get(name, name.upper())
+
+
+def _mouse_button(name: str) -> int | None:
+    """"mouse1" -> 1 (botão esquerdo). Outros nomes -> None (são teclas)."""
+    if name.startswith("mouse") and name[5:].isdigit():
+        return int(name[5:])
+    return None
+
 # Gamepad (layout Xbox/SDL): A confirma/ataca, B esquiva, X defende, Y ataca, LB defende, RB esquiva, Start/Back voltam.
 GAMEPAD_BUTTONS = {0: ("confirm", "attack"), 1: ("dodge",), 2: ("block",), 3: ("attack",), 4: ("block",),
                    5: ("dodge",), 6: ("back",), 7: ("back",)}
@@ -39,11 +56,16 @@ class VirtualButton:
 class InputManager:
     SWIPE_MIN_DIST = 60      # px lógicos
     SWIPE_MAX_TIME = 0.35    # s
-    TAP_MAX_DIST = 24        # px lógicos
+    TAP_MAX_DIST = 24        # px lógicos (toque)
+    CLICK_MAX_DIST = 48      # px lógicos (mouse: clique com a mão levemente "escorregando" ainda vale)
 
     def __init__(self, display, bindings: dict[str, list[str]]) -> None:
         self.display = display
         self._key_to_actions: dict[int, list[str]] = {}
+        self._mouse_to_actions: dict[int, list[str]] = {}
+        self.origin_x = 0                    # deslocamento da cena atual (layout fixo centralizado na janela larga)
+        self.moved = False                   # o mouse se mexeu neste frame (foco por hover)
+        self.mouse_seen = False              # já houve movimento/clique de mouse (liga o hover visual)
         self.bindings: dict[str, list[str]] = {}
         self._pads: dict[int, "pygame.joystick.JoystickType"] = {}    # mantém os controles vivos
         self._pad_dirs: dict[str, set[str]] = {"hat": set(), "stick": set()}
@@ -68,8 +90,13 @@ class InputManager:
         """(Re)monta o mapa tecla -> ações. Nome de tecla inválido é ignorado, nunca derruba o jogo."""
         self.bindings = {a: list(k) for a, k in bindings.items()}
         self._key_to_actions = {}
+        self._mouse_to_actions = {}
         for action, keys in self.bindings.items():
             for name in keys:
+                btn = _mouse_button(name)
+                if btn is not None:
+                    self._mouse_to_actions.setdefault(btn, []).append(action)
+                    continue
                 try:
                     code = pygame.key.key_code(name)
                 except ValueError:
@@ -119,20 +146,23 @@ class InputManager:
                 surf.blit(t, t.get_rect(center=b.rect.center))
 
     # --- ciclo por frame ------------------------------------------------------------
-    def begin_frame(self, now: float) -> None:
+    def set_time(self, now: float) -> None:
         self._time = now
+
+    def begin_frame(self, now: float) -> None:
+        """Início de frame "completo": marca o tempo e descarta as entradas pendentes (usado em testes)."""
+        self._time = now
+        self.consume_step()
+
+    def consume_step(self) -> None:
+        """Descarta as entradas de "evento" (pressed/released/taps...). O loop do jogo chama isto DEPOIS de um
+        passo de lógica ter visto as entradas; se o frame não teve passo (renderização mais rápida que os 60 Hz
+        da lógica), elas ficam para o próximo frame — antes eram perdidas, e o clique/tecla "não pegava"."""
         self._pressed.clear()
         self._released.clear()
         self.taps.clear()
         self.text_input.clear()
-        self.wheel = 0
-        self.drag_delta.update(0, 0)
-
-    def consume_step(self) -> None:
-        """Eventos de um frame só valem no 1º passo de lógica (o loop pode dar vários)."""
-        self._pressed.clear()
-        self._released.clear()
-        self.taps.clear()
+        self.moved = False
         self.wheel = 0
         self.drag_delta.update(0, 0)
 
@@ -150,6 +180,16 @@ class InputManager:
         """Ação instantânea (swipe): pressionada e solta no mesmo frame."""
         self._pressed.add(action)
         self._released.add(action)
+
+    def _pos(self, pos) -> tuple[float, float]:
+        """Posição do mouse (pixels da janela) convertida para as coordenadas da cena atual."""
+        conv = getattr(self.display, "window_to_virtual", None)
+        x, y = conv(*pos) if conv else pos
+        return (x - self.origin_x, y)
+
+    def _touch_pos(self, nx: float, ny: float) -> tuple[float, float]:
+        x, y = self.display.normalized_to_virtual(nx, ny)
+        return (x - self.origin_x, y)
 
     def _pointer_down(self, pid: int, pos, touch: bool) -> None:
         self.touch_mode = touch
@@ -184,6 +224,10 @@ class InputManager:
         dx, dy = pos[0] - p.start[0], pos[1] - p.start[1]
         dt = self._time - p.start_time
         dist = max(abs(dx), abs(dy))
+        if not p.touch:
+            if dist <= self.CLICK_MAX_DIST:
+                self.taps.append(pos)
+            return
         if dt <= self.SWIPE_MAX_TIME and dist >= self.SWIPE_MIN_DIST:
             if abs(dx) > abs(dy):
                 self._pulse("right" if dx > 0 else "left")
@@ -256,20 +300,31 @@ class InputManager:
                 self._release(a)
         elif t == pygame.TEXTINPUT:
             self.text_input.append(event.text)
-        elif t == pygame.MOUSEBUTTONDOWN and event.button == 1 and not getattr(event, "touch", False):
-            self._pointer_down(-1, event.pos, False)
-        elif t == pygame.MOUSEBUTTONUP and event.button == 1 and not getattr(event, "touch", False):
-            self._pointer_up(-1, event.pos)
+        elif t == pygame.MOUSEBUTTONDOWN and not getattr(event, "touch", False):
+            if self.capture:                      # tela de rebind: o botão do mouse vira a tecla
+                self.captured = f"mouse{event.button}"
+                return
+            for a in self._mouse_to_actions.get(event.button, ()):
+                self._press(a)
+            if event.button == 1:
+                self.mouse_seen = True
+                self._pointer_down(-1, self._pos(event.pos), False)
+        elif t == pygame.MOUSEBUTTONUP and not getattr(event, "touch", False):
+            for a in self._mouse_to_actions.get(event.button, ()):
+                self._release(a)
+            if event.button == 1:
+                self._pointer_up(-1, self._pos(event.pos))
         elif t == pygame.MOUSEMOTION and not getattr(event, "touch", False):
-            self._pointer_move(-1, event.pos)
+            self.moved = self.mouse_seen = True
+            self._pointer_move(-1, self._pos(event.pos))
         elif t == pygame.MOUSEWHEEL:
             self.wheel += event.y
         elif t == pygame.FINGERDOWN:
-            self._pointer_down(event.finger_id, self.display.normalized_to_virtual(event.x, event.y), True)
+            self._pointer_down(event.finger_id, self._touch_pos(event.x, event.y), True)
         elif t == pygame.FINGERMOTION:
-            self._pointer_move(event.finger_id, self.display.normalized_to_virtual(event.x, event.y))
+            self._pointer_move(event.finger_id, self._touch_pos(event.x, event.y))
         elif t == pygame.FINGERUP:
-            self._pointer_up(event.finger_id, self.display.normalized_to_virtual(event.x, event.y))
+            self._pointer_up(event.finger_id, self._touch_pos(event.x, event.y))
         elif t == pygame.WINDOWFOCUSLOST:
             for a in list(self._held):
                 self._release(a)

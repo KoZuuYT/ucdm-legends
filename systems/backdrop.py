@@ -48,6 +48,8 @@ def build(theme: str, size: tuple[int, int], ground_y: int, assets=None) -> pyga
     key = (theme, size, ground_y)
     if key in _cache:
         return _cache[key]
+    if len(_cache) > 8:          # arrastar a borda da janela gera muitos tamanhos: não deixa o cache crescer
+        _cache.clear()
     if assets is not None and assets.resolve(f"sprites/backgrounds/{theme}.png"):
         surf = pygame.transform.smoothscale(assets.image(f"sprites/backgrounds/{theme}.png"), size).convert()
     else:
@@ -73,6 +75,8 @@ def _layers(theme: str, size: tuple[int, int], ground_y: int):
     key = (theme, size, ground_y)
     got = _layer_cache.get(key)
     if got is None:
+        if len(_layer_cache) > 8:
+            _layer_cache.clear()
         t = THEMES.get(theme, THEMES["meadow"])
         w, h = size
         sky = _gradient(size, *t["sky"])

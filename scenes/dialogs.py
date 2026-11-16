@@ -13,6 +13,7 @@ from systems.tween import ease_out_back
 
 class _Modal(Scene):
     transparent = True
+    dim_alpha = 160
     GRACE = 0.25           # ignora a tecla que abriu o diálogo
 
     def __init__(self, game, size: tuple[int, int]) -> None:

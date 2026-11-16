@@ -211,7 +211,7 @@ class RebindTest(unittest.TestCase):
         self.assertIsNone(err)
         self.assertNotIn("z", new["attack"])
         self.assertEqual(new["block"][0], "z")
-        self.assertEqual(self.base["attack"], ["j", "z"])             # original não é mutado
+        self.assertEqual(self.base["attack"], ["mouse1", "j"])        # original não é mutado
 
     def test_cannot_leave_other_action_without_key(self):
         b = {"attack": ["j"], "block": ["k"]}
@@ -345,7 +345,7 @@ class GameFlowTest(unittest.TestCase):
         o._finish_capture("h")
         self.assertEqual(g.input.bindings["attack"][0], "h")
         o._reset_keys()
-        self.assertEqual(g.input.bindings["attack"], ["j", "z"])
+        self.assertEqual(g.input.bindings["attack"], ["mouse1", "j"])
 
     def test_arena_with_feedback_and_options(self):
         from scenes.arena import ArenaScene

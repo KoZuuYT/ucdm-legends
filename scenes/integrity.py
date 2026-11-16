@@ -12,6 +12,7 @@ from systems.tween import ease_out_back
 
 class IntegrityOverlay(Scene):
     transparent = True
+    dim_alpha = 170
     GRACE = 0.2
 
     def __init__(self, game) -> None:

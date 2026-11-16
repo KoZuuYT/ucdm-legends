@@ -43,14 +43,17 @@ def build_player(profile: Profile, x: float, y: float) -> Fighter:
 def build_enemy(edef: dict, x: float, y: float) -> Fighter:
     f = config.load("balance")["fighter"]
     ch = character(edef["character"])
-    return Fighter(
+    fighter = Fighter(
         ch["name"], ch["sprite"], x, y,
         hp=edef["hp"], damage=edef["damage"], stamina=edef.get("stamina", 100),
         stamina_regen=edef.get("stamina_regen", f["stamina_regen"]),
-        block_reduction=edef.get("block_reduction", 0.6), parry_window=0.0,
+        block_reduction=edef.get("block_reduction", 0.6), parry_window=edef.get("ai", {}).get("parry_window", 0.0),
         crit_chance=edef.get("crit_chance", 0.05), crit_mult=f["crit_mult"],
         dodge_cost=edef.get("dodge_cost", 25),
         attacks=[AttackDef.from_cfg(a) for a in edef["attacks"]],
         facing=-1, reach=edef.get("reach", 190), height=edef.get("height", 230),
         sprite_faces=ch.get("faces", -1), stagger_resist=edef.get("stagger_resist", 0.3),
     )
+    fighter.max_poise = fighter.poise = float(edef.get("poise", edef["hp"] * 0.45))
+    fighter.armor = float(edef.get("armor", 0.45))
+    return fighter

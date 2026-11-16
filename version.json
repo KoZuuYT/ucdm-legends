@@ -1,4 +1,4 @@
 {
-  "version": "0.3.0",
-  "notes": "Mais conteúdo visual e de qualidade de vida. Fundos com camadas em movimento e partículas ambiente, miniaturas e cartões animados na seleção de personagem, ícones de atributo e zoom no nocaute. Sons com variação de tom. Opções novas: idioma (Português e English), tamanho do texto, alto contraste, paleta para daltonismo, modo de baixo desempenho e controle/gamepad. Botão Treinar de novo no hub, aviso de atualização com o jogo aberto, novidades da versão no menu, verificação e reparo dos arquivos do jogo e cópia das informações do sistema."
+  "version": "0.4.0",
+  "notes": "Combate que premia reagir: esquiva perfeita e parry abrem contra-ataque, inimigos têm armadura que precisa ser quebrada, atacar sem parar causa fadiga e os inimigos leem o spam. Entrada animada nas lutas, personagens com animações e efeitos (agachar, esticar, rastros, escudo de energia, arco de corte) e feedback de ataque, defesa e dano bem mais claro. Botões animados com hover, clique e brilho, menus e HUD redesenhados. Teclas padrão: botão esquerdo do mouse ataca, F defende e Shift esquiva. A janela agora é redimensionável sem barras pretas. Corrige cliques e teclas que às vezes não eram registrados e o sentido em que alguns personagens olhavam."
 }

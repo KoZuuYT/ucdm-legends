@@ -10,6 +10,7 @@ from network.updater import UpdateTask, can_self_update
 
 
 class BootScene(Scene):
+    wide = True
     MIN_TIME = 0.6
     CHECK_TIMEOUT = 10.0
 
@@ -57,7 +58,7 @@ class BootScene(Scene):
 
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
-        surf.fill((18, 20, 30))
+        ui.backdrop(surf, self.t)
         a = self.game.assets
         ui.text(surf, a.font(64), self.game.cfg["title"], (W // 2, H // 2 - 120), ui.ACCENT, "center")
         msg = self.task.message or "Iniciando..."

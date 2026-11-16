@@ -11,6 +11,7 @@ from systems.tween import ease_out_cubic
 
 class PauseOverlay(Scene):
     transparent = True
+    dim_alpha = 150
     GRACE = 0.2
 
     def __init__(self, game, on_quit: Callable[[], None]) -> None:

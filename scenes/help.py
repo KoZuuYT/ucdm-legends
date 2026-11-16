@@ -2,6 +2,7 @@
 import pygame
 
 from core import ui
+from core.i18n import tr
 from core.scene import Scene
 from systems.tween import ease_out_back
 
@@ -13,6 +14,7 @@ def _keys(game, action: str) -> str:
 
 class _Panel(Scene):
     transparent = True
+    dim_alpha = 170
     GRACE = 0.2
 
     def __init__(self, game, size=(960, 560)) -> None:
@@ -52,11 +54,11 @@ class HelpOverlay(_Panel):
     def _combat(self) -> list[str]:
         return [
             "PARRY: defenda no instante exato do golpe. O inimigo fica atordoado!",
-            "Defender no tempo errado reduz o dano, mas gasta estamina.",
-            "Aviso vermelho (!!): golpe imbloqueável. Esquive!",
-            "Esquivar gasta estamina; sem estamina você fica vulnerável.",
-            "Combos: aperte atacar de novo logo após um golpe.",
-            "Crítico (dourado) causa dano dobrado. Foco aumenta a chance.",
+            "ESQUIVA PERFEITA: esquive no último instante. Ela e o PARRY abrem um CONTRA-ATAQUE (crítico garantido).",
+            "Vermelho (!!): imbloqueável, esquive. Laranja: quebra a guarda, aparar ou esquive.",
+            "Inimigos têm ARMADURA: golpes comuns fazem pouco dano. Parry, esquiva perfeita e contra-ataque a quebram.",
+            "Atacar sem parar causa FADIGA (menos dano) e gasta estamina. O inimigo aprende e se defende.",
+            "Segurar a guarda gasta estamina. Esquivar no tempo certo devolve estamina e rende bônus de ouro.",
         ]
 
     def _progress(self) -> list[str]:
@@ -103,10 +105,16 @@ class HelpOverlay(_Panel):
         ui.panel(surf, pr, (20, 22, 32, 245))
         ui.text(surf, a.font(24, bold=False), "TUTORIAL", (pr.x + 30, pr.y + 20), (170, 170, 180))
         ui.text(surf, a.font(48), self.titles[self.page], (pr.centerx, pr.y + 50), ui.ACCENT, "midtop")
-        y = pr.y + 140
+        y = pr.y + 130
+        font = a.font(24, bold=False)
         for line in self.pages[self.page]():
-            ui.text(surf, a.font(26, bold=False), line, (pr.x + 50, y))
-            y += 46
+            if not line:
+                y += 16
+                continue
+            for j, part in enumerate(ui.wrap_text(font, tr(line), pr.w - 110)):
+                ui.text(surf, font, part, (pr.x + 50 + (28 if j else 0), y))
+                y += 30
+            y += 12
         for i in range(len(self.pages)):
             pygame.draw.circle(surf, ui.ACCENT if i == self.page else (90, 90, 110), (pr.centerx + (i - 1) * 26, pr.bottom - 64), 7)
         last = self.page == len(self.pages) - 1

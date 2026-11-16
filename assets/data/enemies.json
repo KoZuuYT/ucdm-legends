@@ -18,7 +18,9 @@
         "cooldown": [
           1.4,
           2.4
-        ]
+        ],
+        "read_spam": 0.1,
+        "riposte": 0.1
       },
       "attacks": [
         {
@@ -29,7 +31,9 @@
           "damage_mult": 1.0,
           "stamina_cost": 10
         }
-      ]
+      ],
+      "armor": 0.75,
+      "poise": 21
     },
     {
       "id": "applenite",
@@ -48,7 +52,9 @@
         "cooldown": [
           1.1,
           2.0
-        ]
+        ],
+        "read_spam": 0.25,
+        "riposte": 0.25
       },
       "attacks": [
         {
@@ -58,8 +64,20 @@
           "recover": 0.45,
           "damage_mult": 1.0,
           "stamina_cost": 10
+        },
+        {
+          "name": "pancada pesada",
+          "windup": 0.85,
+          "active": 0.1,
+          "recover": 0.7,
+          "damage_mult": 1.5,
+          "stamina_cost": 14,
+          "guard_break": true,
+          "weight": 1
         }
-      ]
+      ],
+      "armor": 0.6,
+      "poise": 42
     },
     {
       "id": "speedon",
@@ -78,7 +96,9 @@
         "cooldown": [
           0.6,
           1.3
-        ]
+        ],
+        "read_spam": 0.35,
+        "riposte": 0.3
       },
       "attacks": [
         {
@@ -88,7 +108,8 @@
           "recover": 0.35,
           "damage_mult": 0.8,
           "stamina_cost": 8,
-          "weight": 3
+          "weight": 3,
+          "chain": 1
         },
         {
           "name": "investida",
@@ -100,7 +121,9 @@
           "unblockable": true,
           "weight": 1
         }
-      ]
+      ],
+      "armor": 0.5,
+      "poise": 59
     },
     {
       "id": "anker",
@@ -119,7 +142,11 @@
         "cooldown": [
           1.2,
           2.2
-        ]
+        ],
+        "read_spam": 0.4,
+        "riposte": 0.35,
+        "parry_skill": 0.2,
+        "parry_window": 0.11
       },
       "attacks": [
         {
@@ -140,8 +167,20 @@
           "stamina_cost": 25,
           "unblockable": true,
           "weight": 1
+        },
+        {
+          "name": "casco",
+          "windup": 0.8,
+          "active": 0.1,
+          "recover": 0.7,
+          "damage_mult": 1.4,
+          "stamina_cost": 14,
+          "guard_break": true,
+          "weight": 1
         }
-      ]
+      ],
+      "armor": 0.42,
+      "poise": 104
     },
     {
       "id": "megonha",
@@ -160,7 +199,11 @@
         "cooldown": [
           0.8,
           1.6
-        ]
+        ],
+        "read_spam": 0.45,
+        "riposte": 0.45,
+        "parry_skill": 0.25,
+        "parry_window": 0.12
       },
       "attacks": [
         {
@@ -170,7 +213,8 @@
           "recover": 0.35,
           "damage_mult": 0.9,
           "stamina_cost": 8,
-          "weight": 3
+          "weight": 3,
+          "chain": 1
         },
         {
           "name": "voadora",
@@ -181,8 +225,20 @@
           "stamina_cost": 20,
           "unblockable": true,
           "weight": 1
+        },
+        {
+          "name": "gancho",
+          "windup": 0.6,
+          "active": 0.1,
+          "recover": 0.55,
+          "damage_mult": 1.3,
+          "stamina_cost": 14,
+          "guard_break": true,
+          "weight": 1
         }
-      ]
+      ],
+      "armor": 0.4,
+      "poise": 117
     },
     {
       "id": "electrobrute",
@@ -201,7 +257,11 @@
         "cooldown": [
           0.9,
           1.7
-        ]
+        ],
+        "read_spam": 0.45,
+        "riposte": 0.5,
+        "parry_skill": 0.3,
+        "parry_window": 0.13
       },
       "attacks": [
         {
@@ -211,7 +271,8 @@
           "recover": 0.45,
           "damage_mult": 1.0,
           "stamina_cost": 10,
-          "weight": 3
+          "weight": 3,
+          "chain": 1
         },
         {
           "name": "descarga",
@@ -222,8 +283,20 @@
           "stamina_cost": 25,
           "unblockable": true,
           "weight": 1
+        },
+        {
+          "name": "golpe de choque",
+          "windup": 0.65,
+          "active": 0.1,
+          "recover": 0.55,
+          "damage_mult": 1.4,
+          "stamina_cost": 14,
+          "guard_break": true,
+          "weight": 1
         }
-      ]
+      ],
+      "armor": 0.38,
+      "poise": 179
     },
     {
       "id": "phoenix",
@@ -242,7 +315,11 @@
         "cooldown": [
           0.5,
           1.2
-        ]
+        ],
+        "read_spam": 0.5,
+        "riposte": 0.5,
+        "parry_skill": 0.3,
+        "parry_window": 0.12
       },
       "attacks": [
         {
@@ -252,7 +329,8 @@
           "recover": 0.3,
           "damage_mult": 0.8,
           "stamina_cost": 8,
-          "weight": 4
+          "weight": 4,
+          "chain": 2
         },
         {
           "name": "mergulho flamejante",
@@ -263,8 +341,20 @@
           "stamina_cost": 22,
           "unblockable": true,
           "weight": 1
+        },
+        {
+          "name": "garra incandescente",
+          "windup": 0.55,
+          "active": 0.1,
+          "recover": 0.5,
+          "damage_mult": 1.4,
+          "stamina_cost": 14,
+          "guard_break": true,
+          "weight": 1
         }
-      ]
+      ],
+      "armor": 0.36,
+      "poise": 197
     },
     {
       "id": "winter_monarch",
@@ -283,7 +373,11 @@
         "cooldown": [
           0.6,
           1.3
-        ]
+        ],
+        "read_spam": 0.6,
+        "riposte": 0.6,
+        "parry_skill": 0.5,
+        "parry_window": 0.16
       },
       "attacks": [
         {
@@ -293,7 +387,8 @@
           "recover": 0.35,
           "damage_mult": 0.9,
           "stamina_cost": 8,
-          "weight": 3
+          "weight": 3,
+          "chain": 1
         },
         {
           "name": "nevasca",
@@ -312,9 +407,12 @@
           "recover": 0.5,
           "damage_mult": 1.4,
           "stamina_cost": 14,
-          "weight": 2
+          "weight": 2,
+          "guard_break": true
         }
-      ]
+      ],
+      "armor": 0.34,
+      "poise": 350
     }
   ]
 }

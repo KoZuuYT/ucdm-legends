@@ -21,6 +21,7 @@ def _read_version() -> str:
 
 
 class MenuScene(Scene):
+    wide = True
     def __init__(self, game) -> None:
         super().__init__(game)
         self.t = 0.0
@@ -30,8 +31,11 @@ class MenuScene(Scene):
         self.parade = random.sample(chars, k=min(7, len(chars)))
         self._build()
 
+    def on_resize(self, canvas_w: int) -> None:
+        self._build()
+
     def _build(self) -> None:
-        W = self.game.display.width
+        W = self.game.display.canvas_w
         focus = self.menu.focus if hasattr(self, "menu") else 0
         buttons = []
         y = 330
@@ -105,16 +109,35 @@ class MenuScene(Scene):
             return self._ask_quit()
         self.menu.update(self.game.input)
 
+    def _title_shine(self, surf: pygame.Surface, rect: pygame.Rect, title: str) -> None:
+        """Faixa de luz que atravessa as letras do título de tempos em tempos (só dentro do desenho do texto)."""
+        if self.game.feedback.reduce_motion or self.game.low_perf:
+            return
+        p = (self.t % 4.5) / 1.2                              # 1,2 s de brilho a cada 4,5 s
+        if p > 1.0:
+            return
+        head = ui._heading(self.game.assets.font(96), title, ui.ACCENT)
+        mask = ui._remember(("shinemask", head.get_size(), title), lambda: pygame.mask.from_surface(head, 80).to_surface(
+            setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0)))
+        band = ui._sheen()
+        tmp = pygame.Surface(head.get_size(), pygame.SRCALPHA)
+        sc = pygame.transform.smoothscale(band, (band.get_width() * 2, head.get_height()))
+        tmp.blit(sc, (-sc.get_width() + p * (head.get_width() + sc.get_width() * 2), 0))
+        tmp.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+        surf.blit(tmp, (rect.x - 4, rect.y - 4), special_flags=pygame.BLEND_RGB_ADD)
+
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
         self.scenery.draw(surf, self.t)
         for i, c in enumerate(self.parade):
             x = 90 + i * (W - 180) / max(1, len(self.parade) - 1)
             y = 640 + 8 * math.sin(self.t * 3 + i)
-            img = self.game.assets.image_h(c["sprite"], 150)
+            look = 1 if x < W / 2 else -1                      # cada um olha para o centro
+            img = self.game.assets.image_h(c["sprite"], 150, look != c.get("faces", -1))
             surf.blit(img, img.get_rect(midbottom=(x, y)))
         title = self.game.cfg["title"]
-        ui.text(surf, self.game.assets.font(96), title, (W // 2, 110 + 6 * math.sin(self.t * 2)), ui.ACCENT, "midtop")
+        tr_ = ui.text(surf, self.game.assets.font(96), title, (W // 2, 110 + 6 * math.sin(self.t * 2)), ui.ACCENT, "midtop")
+        self._title_shine(surf, tr_, title)
         ui.text(surf, self.game.assets.font(26), "Treine. Lute. Evolua.", (W // 2, 230), anchor="midtop")
         if self.game.update_notice:
             from network.updater import can_self_update

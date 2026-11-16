@@ -91,7 +91,6 @@ class OptionsScene(Scene):
                 Row("Tela cheia", "bool", "display.fullscreen"),
                 Row("Limite de FPS", "choice", "display.fps_cap", choices=[(v, "Ilimitado" if v == 0 else str(v))
                                                                           for v in FPS_CHOICES]),
-                Row("VSync", "bool", "display.vsync", note="vale ao reiniciar o jogo"),
                 Row("Contador de FPS", "bool", "display.show_fps", note="também no F3"),
                 Row("Modo de baixo desempenho", "bool", "performance.low_mode",
                     note="menos partículas, sem animações de fundo"),
@@ -121,6 +120,7 @@ class OptionsScene(Scene):
                 Row("Dificuldade", "choice", "gameplay.difficulty", choices=list(DIFFICULTY),
                     note="muda dano do inimigo e janela de parry"),
                 Row("Pausar ao perder o foco", "bool", "gameplay.auto_pause"),
+                Row("Introdução da batalha", "bool", "gameplay.battle_intro", note="entrada animada e contagem 3-2-1"),
                 Row("Idioma", "choice", "language", choices=langs, note="textos sem tradução ficam em português"),
                 Row("Avisar de atualizações com o jogo aberto", "bool", "update.background_check"),
                 Row("Verificar arquivos do jogo", "action", action=self._integrity),
@@ -310,19 +310,16 @@ class OptionsScene(Scene):
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
         a = self.game.assets
-        surf.fill((22, 24, 36))
+        ui.backdrop(surf, self.t, animate=not self.game.feedback.reduce_motion)
         ui.text(surf, a.font(54), "Opções", (W // 2, 40), ui.ACCENT, "midtop")
         for i, rect in enumerate(self._tab_rects()):
             sel = i == self.tab
-            pygame.draw.rect(surf, (90, 80, 46) if sel else (44, 46, 62), rect, border_radius=10)
-            pygame.draw.rect(surf, ui.ACCENT if (sel and self.in_tabs) else (120, 120, 140), rect,
-                             3 if (sel and self.in_tabs) else 1, border_radius=10)
+            ui.row(surf, rect, focused=sel and self.in_tabs, active=sel)
             ui.text(surf, a.font(22), TABS[i], rect.center, ui.WHITE if sel else (180, 180, 190), "center")
         small = a.font(18, bold=False)
         for i, r in enumerate(self.rows):
             focused = i == self.focus and not self.in_tabs
-            pygame.draw.rect(surf, (60, 56, 40) if focused else (34, 36, 50), r.rect, border_radius=10)
-            pygame.draw.rect(surf, ui.ACCENT if focused else (70, 72, 90), r.rect, 2 if focused else 1, border_radius=10)
+            ui.row(surf, r.rect, focused=focused)
             lab = ui.text(surf, a.font(26), r.label, (r.rect.x + 18, r.rect.centery), anchor="midleft")
             if r.note:
                 ui.text(surf, small, r.note, (lab.right + 14, r.rect.centery), (170, 170, 180), "midleft", False)

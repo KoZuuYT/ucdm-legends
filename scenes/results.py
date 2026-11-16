@@ -10,6 +10,7 @@ from systems.tween import ease_out_back
 
 class ResultsOverlay(Scene):
     transparent = True
+    dim_alpha = 150
 
     def __init__(self, game, title: str, lines: list[str], on_close: Callable[[], None],
                  color=ui.ACCENT) -> None:

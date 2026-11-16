@@ -247,7 +247,6 @@ class InstallerApp:
             "desktop": tk.BooleanVar(value=True), "start_menu": tk.BooleanVar(value=True),
             "register": tk.BooleanVar(value=sys.platform == "win32"), "launch": tk.BooleanVar(value=True),
             "fullscreen": tk.BooleanVar(value=bool(d.get("fullscreen"))),
-            "vsync": tk.BooleanVar(value=bool(d.get("vsync", True))),
             "fps_cap": tk.StringVar(value=str(d.get("fps_cap", 144) or 0)),
             "show_fps": tk.BooleanVar(value=bool(d.get("show_fps"))),
             "music": tk.DoubleVar(value=float(a.get("music_volume", 0.5))),
@@ -553,8 +552,6 @@ class InstallerApp:
         row("Volume dos efeitos", lambda r: Slider(r, self.v["sfx"], px))
         c2 = card(self.body, px)
         c2.pack(fill="x", pady=(px(12), 0))
-        Toggle(c2, "Sincronização vertical (VSync)", "Evita cortes na imagem. Desligue se sentir atraso.",
-               self.v["vsync"], px).pack(fill="x", pady=px(4))
         Toggle(c2, "Mostrar FPS na tela", "Contador de desempenho (F3 no jogo).", self.v["show_fps"], px).pack(
             fill="x", pady=px(4))
         Toggle(c2, "Atualizações automáticas", "Baixa e instala versões novas ao abrir o jogo.",
@@ -562,7 +559,7 @@ class InstallerApp:
 
     def settings(self) -> dict:
         v = self.v
-        return {"display": {"fullscreen": bool(v["fullscreen"].get()), "vsync": v["vsync"].get(),
+        return {"display": {"fullscreen": bool(v["fullscreen"].get()),
                             "fps_cap": int(v["fps_cap"].get()), "show_fps": v["show_fps"].get()},
                 "audio": {"music_volume": round(v["music"].get(), 2), "sfx_volume": round(v["sfx"].get(), 2)},
                 "update": {"enabled": v["auto_update"].get()}}
@@ -580,7 +577,7 @@ class InstallerApp:
             ("Atalhos", ", ".join(n for k, n in (("desktop", "Área de Trabalho"), ("start_menu", "Menu Iniciar"))
                                   if v[k].get()) or "nenhum"),
             ("Tela", f"{'Tela cheia' if v['fullscreen'].get() else 'Janela'} • "
-                     f"{'sem limite de FPS' if fps == '0' else fps + ' FPS'} • VSync {'ligado' if v['vsync'].get() else 'desligado'}"),
+                     f"{'sem limite de FPS' if fps == '0' else fps + ' FPS'}"),
             ("Áudio", f"Música {int(v['music'].get() * 100)}% • Efeitos {int(v['sfx'].get() * 100)}%"),
             ("Atualizações", "automáticas" if v["auto_update"].get() else "manuais (pelo instalador)"),
         ]

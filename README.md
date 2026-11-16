@@ -18,24 +18,46 @@ python main.py
 | **Esc** | pausa (treino/arena) e volta nas telas |
 
 ## Controles
-| Ação | Teclado | Toque |
-|---|---|---|
-| Direções (treinos) | Setas / WASD | Deslizar ou botões na tela |
-| Atacar / Defender (segurar) / Esquivar | J / K / L (ou Z / X / C, Shift) | Botões ATK / DEF / ESQ |
-| Mira (treino de Foco) | Mouse | Tocar no alvo |
+| Ação | Padrão | Alternativa | Toque |
+|---|---|---|---|
+| Mover | A / D | Setas | Botões na tela |
+| **Atacar** | **Botão esquerdo do mouse** | J | Botão ATK |
+| **Defender** (segurar) | **F** | K | Botão DEF |
+| **Esquivar** | **Shift** | L | Botão ESQ |
+| Pausa / voltar | Esc | | |
+| Treino de Mira | Mouse (clicar no alvo) | | Tocar no alvo |
+
+Tudo pode ser remapeado em *Opções → Controles* (inclusive os botões do mouse). Controle/gamepad: A confirma/ataca,
+B esquiva, X defende, Start volta.
 
 ## Loop de jogo
 1. **Treinos** (cada um sobe um atributo): Golpe → Força, Escudo → Defesa, Esquiva → Agilidade, Mira → Foco.
-2. **Arena**: 8 desafiantes em sequência (até o chefe). Bloquear no instante exato = **PARRY** (atordoa o inimigo).
-   Aviso **vermelho (!!)** = golpe imbloqueável: esquive.
-3. **Ouro** das lutas e treinos melhora a arma.
+2. **Arena**: 8 desafiantes em sequência (até o chefe), com entrada animada (versus + contagem 3-2-1).
+3. **Ouro** das lutas e treinos melhora a arma. Esquivas e parries no tempo certo rendem **bônus de ouro**.
+
+### Combate: ler e reagir, não spammar
+- **Parry**: defenda no instante exato do golpe. O inimigo fica atordoado.
+- **Esquiva perfeita**: esquive no *último instante* (esquivar cedo demais só evita o dano). Devolve estamina.
+- **Contra-ataque**: depois de um parry ou de uma esquiva perfeita seu próximo golpe é mais rápido, crítico garantido e bem mais forte.
+- **Armadura dos inimigos**: golpes comuns fazem pouco dano e vão abalando uma barra de *armadura*. Parry, esquiva perfeita e
+  contra-ataque a quebram: o inimigo fica atordoado e vulnerável (dano cheio, "punido").
+- **Avisos**: vermelho (!!) = imbloqueável (esquive); laranja = quebra a guarda (aparar ou esquivar, não bloquear).
+  Inimigos também encadeiam golpes (combos) e, nas lutas finais, tentam aparar você.
+- **Fadiga**: atacar sem parar derruba o dano e gasta estamina, que só volta depois de uma pausa. O inimigo percebe o spam,
+  passa a se defender mais, contra-golpeia e castiga quem erra o golpe.
+- Em simulação, um jogador que só dá soco perde a partir da 4ª luta, enquanto quem lê e reage vence com a vida quase cheia.
+
+## Janela e tela
+A janela é totalmente redimensionável. O jogo ajusta a largura da imagem à proporção da janela (de 16:9 a ultrawide) em vez
+de deixar **barras pretas**; telas de layout fixo ficam centralizadas com as laterais esticadas, e a arena/menu mostram mais cenário.
+F11 alterna tela cheia. (A opção de VSync foi removida: janelas comuns não suportam e ela causava travamentos.)
 
 ## Saves, opções e ajuda
 - **3 slots de save** (menu → *Saves*): jogar, novo jogo, renomear treinador, copiar para outro slot, exportar
   (`%APPDATA%\UCDM\exports\*.ucdmsave`), importar o arquivo mais recente dessa pasta e apagar (segure o botão para confirmar).
   O save antigo continua no Slot 1. Antes de migrar um save de formato antigo, o jogo guarda `slotN.vX.bak`.
-- **Opções** (menu ou Campo de Treino), em 5 abas:
-  - *Vídeo*: tela cheia, limite de FPS, VSync, contador de FPS e **modo de baixo desempenho** (menos partículas e sem fundos animados).
+- **Opções** (menu ou Campo de Treino), em 5 abas (*Jogo* também liga/desliga a introdução da batalha):
+  - *Vídeo*: tela cheia, limite de FPS, contador de FPS e **modo de baixo desempenho** (menos partículas e sem fundos animados).
   - *Áudio*: volume de música e de efeitos.
   - *Controles*: **remapear teclas** (Esc é reservado). Controle/gamepad: A confirma/ataca, B esquiva, X defende, Start volta.
   - *Acessibilidade*: tamanho do texto, alto contraste, paleta para daltonismo (laranja/azul), *reduzir movimento*, intensidade dos efeitos,

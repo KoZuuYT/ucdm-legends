@@ -5,18 +5,7 @@ from core import ui
 from scenes.help import _Panel
 
 
-def wrap_text(font, text: str, width: int) -> list[str]:
-    words, lines, cur = text.split(), [], ""
-    for w in words:
-        trial = f"{cur} {w}".strip()
-        if font.size(trial)[0] <= width or not cur:
-            cur = trial
-        else:
-            lines.append(cur)
-            cur = w
-    if cur:
-        lines.append(cur)
-    return lines
+wrap_text = ui.wrap_text
 
 
 def split_sentences(notes: str) -> list[str]:

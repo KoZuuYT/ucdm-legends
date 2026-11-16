@@ -13,6 +13,10 @@ from core.input import InputManager
 from core.scene import Scene, SceneManager
 
 
+_RESIZE_EVENTS = tuple(getattr(pygame, n) for n in ("VIDEORESIZE", "WINDOWRESIZED", "WINDOWSIZECHANGED")
+                       if hasattr(pygame, n))
+
+
 class Game:
     def __init__(self, *, headless: bool = False) -> None:
         self.headless = headless
@@ -27,6 +31,8 @@ class Game:
                                fullscreen=disp.get("fullscreen", False),
                                vsync=disp.get("vsync", True), headless=headless)
         self.screen = self.display.surface
+        self._canvas_w = self.display.canvas_w
+        self._window_size = self.display.window_size()
         self.events = EventBus()
         self.feedback = Feedback(self.cfg)
         self.input = InputManager(self.display, self.cfg["input"])
@@ -65,6 +71,14 @@ class Game:
         self.save = self._SaveManager(slot, on_saved=self.feedback.saved)
         settings.set_value("last_slot", slot)
 
+    def _on_resize(self) -> None:
+        """Janela redimensionada/tela cheia: recalcula o canvas e avisa as cenas largas."""
+        self.display.layout()
+        self.screen = self.display.surface
+        if self.display.canvas_w != self._canvas_w:
+            self._canvas_w = self.display.canvas_w
+            self.scenes.on_resize(self._canvas_w)
+
     @property
     def low_perf(self) -> bool:
         return bool(self.cfg.get("performance", {}).get("low_mode", False))
@@ -85,6 +99,7 @@ class Game:
         self.show_debug = bool(disp.get("show_fps", False))
         if not self.headless and bool(disp.get("fullscreen", False)) != self.display.fullscreen:
             self.display.toggle_fullscreen()
+            self._on_resize()
         self.audio.configure(self.cfg.get("audio", {}))
         self.audio.apply_volumes()
         self.feedback.reload(self.cfg)
@@ -127,13 +142,23 @@ class Game:
             last = now
             acc += frame_dt
 
-            self.input.begin_frame(self.time)
+            ws = self.display.window_size()
+            if ws != self._window_size:                  # redimensionou (ou trocou tela cheia): refaz o canvas
+                self._window_size = ws
+                self._on_resize()
+            self.input.set_time(self.time)
+            self.input.origin_x = self.scenes.origin_x(self.display.canvas_w)
+            ip = self.input
+            ui.pointer = (ip.pointer_pos[0], ip.pointer_pos[1], ip.mouse_seen and not ip.touch_mode, ip.held("pointer"))
             for ev in pygame.event.get():
                 self.input.process(ev)
                 if ev.type == pygame.KEYDOWN and ev.key == pygame.K_F3:
                     self.show_debug = not self.show_debug
                 elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_F11:
                     self.display.toggle_fullscreen()
+                    self._on_resize()
+                elif ev.type in _RESIZE_EVENTS:
+                    self._on_resize()
                 elif ev.type == pygame.WINDOWFOCUSLOST and self.cfg.get("gameplay", {}).get("auto_pause", True):
                     if self.scenes.current:
                         self.scenes.current.on_focus_lost()
@@ -155,7 +180,10 @@ class Game:
                 self.time += step
                 acc -= step
                 first = False
+            if not first:
+                self.input.consume_step()    # ao menos um passo viu as entradas: agora podem ser descartadas
 
+            self.screen = self.display.surface           # o canvas é trocado quando a proporção da janela muda
             self.screen.fill((0, 0, 0))
             self.scenes.draw(self.screen)
             self.feedback.draw(self.screen, self.assets.font(24))

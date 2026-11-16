@@ -1,26 +1,99 @@
 {
   "stats": {
-    "strength": { "label": "Força",     "color": [230, 90, 70],  "trained_by": "slash" },
-    "defense":  { "label": "Defesa",    "color": [90, 150, 240], "trained_by": "shield" },
-    "agility":  { "label": "Agilidade", "color": [90, 210, 120], "trained_by": "agility" },
-    "focus":    { "label": "Foco",      "color": [240, 200, 70], "trained_by": "focus" }
+    "strength": {
+      "label": "Força",
+      "color": [
+        230,
+        90,
+        70
+      ],
+      "trained_by": "slash"
+    },
+    "defense": {
+      "label": "Defesa",
+      "color": [
+        90,
+        150,
+        240
+      ],
+      "trained_by": "shield"
+    },
+    "agility": {
+      "label": "Agilidade",
+      "color": [
+        90,
+        210,
+        120
+      ],
+      "trained_by": "agility"
+    },
+    "focus": {
+      "label": "Foco",
+      "color": [
+        240,
+        200,
+        70
+      ],
+      "trained_by": "focus"
+    }
   },
-  "xp_curve": { "base": 25, "growth": 1.32 },
-  "weapon":   { "base_cost": 40, "growth": 1.55, "damage_per_level": 3 },
+  "xp_curve": {
+    "base": 25,
+    "growth": 1.32
+  },
+  "weapon": {
+    "base_cost": 40,
+    "growth": 1.55,
+    "damage_per_level": 3
+  },
   "fighter": {
-    "base_hp": 100, "hp_per_defense": 14,
-    "base_damage": 8, "damage_per_strength": 3,
-    "base_stamina": 100, "stamina_per_agility": 6,
-    "stamina_regen": 24, "regen_per_agility": 1.5,
-    "dodge_cost": 30, "dodge_cost_per_agility": -0.8, "dodge_cost_min": 14,
-    "block_reduction": 0.5, "block_reduction_per_defense": 0.035, "block_reduction_max": 0.9,
-    "parry_window": 0.12, "parry_window_per_focus": 0.012, "parry_window_max": 0.35,
-    "crit_chance": 0.05, "crit_per_focus": 0.018, "crit_max": 0.6, "crit_mult": 2.0,
+    "base_hp": 100,
+    "hp_per_defense": 14,
+    "base_damage": 8,
+    "damage_per_strength": 3,
+    "base_stamina": 100,
+    "stamina_per_agility": 6,
+    "stamina_regen": 24,
+    "regen_per_agility": 1.5,
+    "dodge_cost": 30,
+    "dodge_cost_per_agility": -0.8,
+    "dodge_cost_min": 14,
+    "block_reduction": 0.5,
+    "block_reduction_per_defense": 0.035,
+    "block_reduction_max": 0.9,
+    "parry_window": 0.12,
+    "parry_window_per_focus": 0.012,
+    "parry_window_max": 0.35,
+    "crit_chance": 0.05,
+    "crit_per_focus": 0.018,
+    "crit_max": 0.6,
+    "crit_mult": 2.0,
     "parry_stun": 1.1,
     "attacks": [
-      { "name": "corte",       "windup": 0.14, "active": 0.08, "recover": 0.20, "damage_mult": 1.0,  "stamina_cost": 10 },
-      { "name": "corte 2",     "windup": 0.12, "active": 0.08, "recover": 0.22, "damage_mult": 1.15, "stamina_cost": 12 },
-      { "name": "golpe final", "windup": 0.22, "active": 0.10, "recover": 0.40, "damage_mult": 1.6,  "stamina_cost": 18 }
+      {
+        "name": "corte",
+        "windup": 0.14,
+        "active": 0.08,
+        "recover": 0.2,
+        "damage_mult": 1.0,
+        "stamina_cost": 14
+      },
+      {
+        "name": "corte 2",
+        "windup": 0.12,
+        "active": 0.08,
+        "recover": 0.22,
+        "damage_mult": 1.15,
+        "stamina_cost": 16
+      },
+      {
+        "name": "golpe final",
+        "windup": 0.22,
+        "active": 0.1,
+        "recover": 0.4,
+        "damage_mult": 1.6,
+        "stamina_cost": 24
+      }
     ]
   }
 }
