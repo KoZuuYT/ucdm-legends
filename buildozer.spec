@@ -8,7 +8,7 @@ source.include_patterns = assets/*,version.json
 source.exclude_dirs = dist,build,docs,installer,tests,tools,.github,.git,__pycache__,bin,.buildozer
 # (a versão é ajustada pelo CI a partir de version.json)
 version = 0.0.0
-requirements = hostpython3==3.11.5,python3==3.11.5,pygame
+requirements = hostpython3==3.10.12,python3==3.10.12,pygame
 orientation = landscape
 fullscreen = 1
 icon.filename = %(source.dir)s/assets/sprites/ui/icon.png

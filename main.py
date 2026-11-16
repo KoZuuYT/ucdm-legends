@@ -55,6 +55,7 @@ def _main(argv: list[str] | None = None) -> int:
     ap.add_argument("--frames", type=int, default=None)
     args = ap.parse_args(argv)
 
+    from core import paths
     from core.engine import Game
     game = Game(headless=args.headless)
 
@@ -63,7 +64,7 @@ def _main(argv: list[str] | None = None) -> int:
         data = game.save.load_raw()
         game.profile = Profile.from_dict(data) if data else Profile()
         first = _dev_scene(game, args.scene)
-    elif args.skip_update:
+    elif args.skip_update or paths.ANDROID:     # no celular não há checagem de atualização (baixe o novo APK)
         from scenes.menu import MenuScene
         first = MenuScene(game)
     else:
