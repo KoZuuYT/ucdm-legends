@@ -6,3 +6,6 @@ dist/
 .venv/
 # Artes originais em alta resolução: o jogo usa as versões otimizadas em assets/sprites/characters
 UCDM/
+
+# o spec do Android precisa ir para o repositório
+!buildozer.spec

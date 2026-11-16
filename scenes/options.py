@@ -4,13 +4,20 @@ Tudo grava em %APPDATA%/UCDM/settings.json (só a chave alterada) e aplica na ho
 Esc/Voltar sempre sai; as teclas de "voltar" não podem ser remapeadas, então o jogador nunca fica preso.
 """
 import json
+import unicodedata
 
 import pygame
 
 from core import i18n, paths, settings, sysinfo, ui
 from core.scene import Scene
 
-TABS = ("Vídeo", "Áudio", "Controles", "Acessibilidade", "Jogo")
+TABS = ("Vídeo", "Áudio", "Controles", "Acessibilidade", "Jogo", "Buscar")
+SEARCH = 5
+
+
+def _norm(text: str) -> str:
+    """Minúsculas sem acento, para a busca."""
+    return "".join(c for c in unicodedata.normalize("NFD", str(text).lower()) if unicodedata.category(c) != "Mn")
 BIND_ACTIONS = (("left", "Esquerda"), ("right", "Direita"), ("up", "Cima"), ("down", "Baixo"),
                 ("attack", "Atacar"), ("block", "Defender"), ("dodge", "Esquivar"), ("confirm", "Confirmar"))
 RESERVED = {"escape"}
@@ -67,6 +74,8 @@ class OptionsScene(Scene):
         self.in_tabs = False
         self.t = 0.0
         self.capturing: Row | None = None
+        self.query = ""
+        self.typing = False
         self.rows: list[Row] = []
         self._build()
 
@@ -85,9 +94,10 @@ class OptionsScene(Scene):
         self.game.apply_settings()
 
     # --- montagem ---------------------------------------------------------------------------
-    def _build(self) -> None:
-        if self.tab == 0:
-            self.rows = [
+    def _tab_rows(self, tab: int) -> list[Row]:
+        rows: list[Row] = []
+        if tab == 0:
+            rows = [
                 Row("Tela cheia", "bool", "display.fullscreen"),
                 Row("Limite de FPS", "choice", "display.fps_cap", choices=[(v, "Ilimitado" if v == 0 else str(v))
                                                                           for v in FPS_CHOICES]),
@@ -97,14 +107,14 @@ class OptionsScene(Scene):
                 Row("Modo de baixo desempenho", "bool", "performance.low_mode",
                     note="menos partículas, sem animações de fundo"),
             ]
-        elif self.tab == 1:
-            self.rows = [Row("Música", "slider", "audio.music_volume"), Row("Efeitos", "slider", "audio.sfx_volume")]
-        elif self.tab == 2:
-            self.rows = [Row(label, "bind", key=action) for action, label in BIND_ACTIONS]
-            self.rows.append(Row("Controle: A confirma/ataca · B esquiva · X defende · Start volta", "info"))
-            self.rows.append(Row("Restaurar teclas padrão", "action", action=self._reset_keys))
-        elif self.tab == 3:
-            self.rows = [
+        elif tab == 1:
+            rows = [Row("Música", "slider", "audio.music_volume"), Row("Efeitos", "slider", "audio.sfx_volume")]
+        elif tab == 2:
+            rows = [Row(label, "bind", key=action) for action, label in BIND_ACTIONS]
+            rows.append(Row("Controle: A confirma/ataca · B esquiva · X defende · Start volta", "info"))
+            rows.append(Row("Restaurar teclas padrão", "action", action=self._reset_keys))
+        elif tab == 3:
+            rows = [
                 Row("Tamanho do texto", "choice", "accessibility.text_scale",
                     choices=[(0.9, "Pequeno"), (1.0, "Normal"), (1.12, "Grande")]),
                 Row("Alto contraste", "bool", "accessibility.high_contrast", note="contorno e bordas mais fortes"),
@@ -118,7 +128,7 @@ class OptionsScene(Scene):
             ]
         else:
             langs = i18n.available()
-            self.rows = [
+            rows = [
                 Row("Dificuldade", "choice", "gameplay.difficulty", choices=list(DIFFICULTY),
                     note="muda dano do inimigo e janela de parry"),
                 Row("Pausar ao perder o foco", "bool", "gameplay.auto_pause"),
@@ -131,7 +141,23 @@ class OptionsScene(Scene):
                 Row("Ver tutorial", "action", action=self._help),
                 Row("Créditos", "action", action=self._credits),
             ]
-        if self.tab != 2:
+        return rows
+
+    def _build(self) -> None:
+        if self.tab == SEARCH:
+            self.rows = [Row("Buscar opção…", "search")]
+            q = _norm(self.query)
+            if q:
+                for t in (0, 1, 3, 4):
+                    for r in self._tab_rows(t):
+                        if r.path and (q in _norm(r.label) or q in _norm(i18n.tr(r.label)) or q in _norm(r.note)
+                                       or q in _norm(i18n.tr(r.note))):
+                            self.rows.append(r)
+                if len(self.rows) == 1:
+                    self.rows.append(Row("Nenhuma opção encontrada.", "info"))
+        else:
+            self.rows = self._tab_rows(self.tab)
+        if self.tab not in (2, SEARCH):
             self.rows.append(Row("Restaurar padrões desta aba", "action", action=self._reset_tab))
         self.rows.append(Row("Voltar", "action", action=self._back))
         self.focus = min(self.focus, len(self.rows) - 1)
@@ -202,6 +228,8 @@ class OptionsScene(Scene):
         elif r.kind == "action" and not direction:
             ui.sfx("confirm")
             r.action()
+        elif r.kind == "search" and not direction:
+            self._start_typing()
 
     def _finish_capture(self, key: str) -> None:
         r, self.capturing = self.capturing, None
@@ -216,6 +244,8 @@ class OptionsScene(Scene):
 
     def exit(self) -> None:
         self.game.input.capture = False
+        if self.typing:
+            pygame.key.stop_text_input()
 
     # --- ciclo ------------------------------------------------------------------------------
     def update(self, dt: float) -> None:
@@ -231,6 +261,8 @@ class OptionsScene(Scene):
                 else:
                     self._finish_capture(key)
             return
+        if self.typing:
+            return self._type(inp)
         if self.t < 0.15:
             return
         if inp.pressed("back"):
@@ -284,6 +316,32 @@ class OptionsScene(Scene):
                 if r.kind == "slider" and r.rect.collidepoint(inp.pointer_pos):
                     self._drag_slider(r, inp.pointer_pos[0])
 
+    def _type(self, inp) -> None:
+        """Modo de digitação da aba Buscar: Enter/Esc encerra, Backspace apaga."""
+        old = self.query
+        for ch in inp.text_input:
+            if ch.isprintable() and len(self.query) < 24:
+                self.query += ch
+        key, inp.captured = inp.captured, None
+        if key == "backspace":
+            self.query = self.query[:-1]
+        elif key in ("return", "escape", "enter"):
+            self._stop_typing()
+        if self.query != old:
+            self.focus = 0
+            self._build()
+
+    def _start_typing(self) -> None:
+        self.typing = True
+        self.game.input.capture = True
+        self.game.input.captured = None
+        pygame.key.start_text_input()
+
+    def _stop_typing(self) -> None:
+        self.typing = False
+        self.game.input.capture = False
+        pygame.key.stop_text_input()
+
     def _drag_slider(self, r: Row, x: float) -> None:
         track = self._slider_rect(r)
         k = max(0.0, min(1.0, (x - track.x) / track.w))
@@ -299,7 +357,7 @@ class OptionsScene(Scene):
             ui.sfx("click")
 
     def _tab_rects(self) -> list[pygame.Rect]:
-        return [pygame.Rect(150 + i * 197, 130, 187, 52) for i in range(len(TABS))]
+        return [pygame.Rect(110 + i * 182, 130, 174, 52) for i in range(len(TABS))]
 
     @staticmethod
     def _slider_rect(r: Row) -> pygame.Rect:
@@ -338,6 +396,12 @@ class OptionsScene(Scene):
     def _draw_value(self, surf, r: Row, a) -> None:
         font = a.font(26)
         right = r.rect.right - 20
+        if r.kind == "search":
+            blink = self.typing and int(self.t * 2) % 2 == 0
+            txt = (self.query or "") + ("|" if blink else "")
+            ui.text(surf, font, txt or ("digite para buscar" if not self.typing else ""), (r.rect.x + 360, r.rect.centery),
+                    ui.ACCENT if self.query else (150, 152, 168), "midleft")
+            return
         if r.kind == "bool":
             on = bool(self._get(r.path, False))
             box = pygame.Rect(0, 0, 80, 28)
