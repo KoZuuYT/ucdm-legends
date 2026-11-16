@@ -14,11 +14,13 @@ Atualizado na v0.7.0. Legenda: [x] feito, [~] parcial, [ ] não feito.
 
 ## 03 Menu e abertura
 - [x] Panorama, logo em bloco, frase "splash", botão Continuar com resumo do save, dicas no boot, notícias com ícones.
-- [ ] Modo atração, easter eggs.
+- [x] Easter egg (código Konami) na v0.8.0.
+- [ ] Modo atração.
 
 ## 04 Saves, personagens, hub
 - [x] Steve fixo, Álbum de Lendas (raridade, desafios, silhuetas), aparências desbloqueáveis, ícone de arma por nível.
-- [ ] Busca/filtro por texto no Álbum, comparação, estações do hub, mapa de rodadas visual.
+- [x] Busca por texto no Álbum (v0.8.0).
+- [ ] Comparação, estações do hub, mapa de rodadas visual.
 
 ## 05 Arena e HUD
 - [x] Corações, comida, armadura e barra de chefe (tema Minecraft), partículas do Minecraft, anel de timing para todos os golpes, nota S-D.
@@ -39,7 +41,8 @@ Atualizado na v0.7.0. Legenda: [x] feito, [~] parcial, [ ] não feito.
 
 ## 09 Conteúdo, áudio, acessibilidade
 - [x] Arena Infinita, Desafio do Dia (5 modificadores, recompensa dobrada 1x/dia), raridades/desbloqueios, conquistas.
-- [ ] Loja de cosméticos, música dinâmica, legendas de efeitos sonoros, modo foto.
+- [ ] Loja de cosméticos, música dinâmica, música dinâmica.
+- [x] Legendas de efeitos sonoros e modo foto (F12) na v0.8.0.
 
 ## 10 Assets de Minecraft
 - [x] Assets em `assets/mc/` (no GitHub), loader com 9-slice/escala inteira/tint, uso em UI, HUD, partículas, ícones.

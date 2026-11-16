@@ -195,6 +195,7 @@ class ArenaScene(Scene):
             VirtualButton("block", pygame.Rect(W - 3 * (s + m), H - s - m, s, s), "DEF"),
             VirtualButton("dodge", pygame.Rect(W - 2 * (s + m), H - s - m, s, s), "ESQ"),
             VirtualButton("attack", pygame.Rect(W - (s + m), H - s - m - 60, s, s + 60), "ATK"),
+            VirtualButton("back", pygame.Rect(W - 72, 8, 60, 60), "II"),
         ])
 
     def exit(self) -> None:

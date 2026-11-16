@@ -447,6 +447,8 @@
     "O inimigo tem o dobro de vida.": "The enemy has double health.",
     "Os golpes inimigos são 25% mais rápidos.": "Enemy attacks are 25% faster.",
     "O inimigo causa 50% mais dano.": "The enemy deals 50% more damage.",
-    "O inimigo tem o dobro de armadura (poise).": "The enemy has double armor (poise)."
+    "O inimigo tem o dobro de armadura (poise).": "The enemy has double armor (poise).",
+    "Legendas dos efeitos sonoros": "Sound captions",
+    "mostra [golpe], [defesa]... na tela": "shows [hit], [block]... on screen"
   }
 }

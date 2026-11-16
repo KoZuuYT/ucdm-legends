@@ -108,7 +108,8 @@ class OptionsScene(Scene):
                     note="menos partículas, sem animações de fundo"),
             ]
         elif tab == 1:
-            rows = [Row("Música", "slider", "audio.music_volume"), Row("Efeitos", "slider", "audio.sfx_volume")]
+            rows = [Row("Música", "slider", "audio.music_volume"), Row("Efeitos", "slider", "audio.sfx_volume"),
+                    Row("Legendas dos efeitos sonoros", "bool", "audio.captions", note="mostra [golpe], [defesa]... na tela")]
         elif tab == 2:
             rows = [Row(label, "bind", key=action) for action, label in BIND_ACTIONS]
             rows.append(Row("Controle: A confirma/ataca · B esquiva · X defende · Start volta", "info"))

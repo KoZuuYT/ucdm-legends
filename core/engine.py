@@ -17,6 +17,10 @@ _RESIZE_EVENTS = tuple(getattr(pygame, n) for n in ("VIDEORESIZE", "WINDOWRESIZE
                        if hasattr(pygame, n))
 
 
+CAPTION_NAMES = {"hit": "golpe", "block": "defesa", "parry": "contra-ataque", "dodge": "esquiva", "swing": "espadada",
+                 "win": "vitoria", "lose": "derrota", "levelup": "avanco", "click": "clique", "hurt": "dano"}
+
+
 class Game:
     def __init__(self, *, headless: bool = False) -> None:
         self.headless = headless
@@ -155,7 +159,19 @@ class Game:
                 self.input.process(ev)
                 if ev.type == pygame.KEYDOWN and ev.key == pygame.K_F3:
                     self.show_debug = not self.show_debug
-                elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_F11:
+                elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_F12:
+                    self._photo()
+                elif ev.type == pygame.KEYDOWN:
+                    self._konami(ev.key)
+                    if ev.key == pygame.K_F11:
+                        self.display.toggle_fullscreen()
+                        self._on_resize()
+                elif ev.type == getattr(pygame, "APP_WILLENTERBACKGROUND", -1):
+                    if self.profile is not None:                      # Android: minimizou -> salva e pausa
+                        self.save.save(self.profile)
+                    if self.scenes.current:
+                        self.scenes.current.on_focus_lost()
+                elif False:
                     self.display.toggle_fullscreen()
                     self._on_resize()
                 elif ev.type in _RESIZE_EVENTS:
@@ -188,6 +204,7 @@ class Game:
             self.screen.fill((0, 0, 0))
             self.scenes.draw(self.screen)
             self.feedback.draw(self.screen, self.assets.font(24))
+            self._draw_captions(self.screen)
             if self.show_debug:
                 self._draw_debug()
             self.display.present()
@@ -201,6 +218,47 @@ class Game:
             if not self.scenes.stack and not self.scenes.busy:
                 self.running = False
         self.shutdown()
+
+    # --- extras: modo foto, legendas de efeitos sonoros, easter egg ---------------------------
+    _KONAMI = (pygame.K_UP, pygame.K_UP, pygame.K_DOWN, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT,
+               pygame.K_LEFT, pygame.K_RIGHT, pygame.K_b, pygame.K_a)
+
+    def _konami(self, key: int) -> None:
+        seq = getattr(self, "_kseq", [])
+        seq.append(key)
+        self._kseq = seq[-len(self._KONAMI):]
+        if tuple(self._kseq) == self._KONAMI:
+            self._kseq = []
+            self.rainbow = not getattr(self, "rainbow", False)
+            self.feedback.toast("Código secreto! Modo arco-íris " + ("ligado" if self.rainbow else "desligado"), (255, 200, 80), 3.0)
+            self.audio.play("levelup")
+
+    def _photo(self) -> None:
+        """F12: salva a tela (sem o HUD de depuração) em screenshots/ na pasta do jogo."""
+        try:
+            folder = paths.USER_DIR / "screenshots"
+            folder.mkdir(parents=True, exist_ok=True)
+            name = time.strftime("ucdm_%Y%m%d_%H%M%S.png")
+            pygame.image.save(self.display.surface, str(folder / name))
+            self.feedback.toast(f"Foto salva: {name}", (160, 230, 160), 2.5)
+        except (OSError, pygame.error) as e:
+            self.feedback.toast(f"Não foi possível salvar a foto ({e})", (240, 120, 120), 3.0)
+
+    def _draw_captions(self, surf: pygame.Surface) -> None:
+        if not self.cfg.get("audio", {}).get("captions", False):
+            return
+        now = time.perf_counter()
+        recent = [(n, t) for n, t in self.audio.recent if now - t < 1.8][-4:]
+        self.audio.recent = recent
+        font = self.assets.font(20)
+        y = surf.get_height() - 150
+        for n, t in reversed(recent):
+            txt = font.render(f"[{CAPTION_NAMES.get(n, n.replace('_', ' '))}]", True, (240, 240, 240))
+            box = pygame.Surface((txt.get_width() + 16, txt.get_height() + 6), pygame.SRCALPHA)
+            box.fill((0, 0, 0, 150))
+            surf.blit(box, (16, y))
+            surf.blit(txt, (24, y + 3))
+            y -= box.get_height() + 4
 
     def _draw_debug(self) -> None:
         font = self.assets.font(16)

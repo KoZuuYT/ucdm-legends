@@ -27,6 +27,7 @@ class AudioManager:
             self.enabled = True
         except pygame.error as e:
             print(f"[audio] desativado: {e}")
+        self.recent: list[tuple[str, float]] = []        # efeitos tocados há pouco (legendas)
         self._current_music: str | None = None
         self._last: dict[str, float] = {}
         self._duck = 0.0
@@ -61,6 +62,8 @@ class AudioManager:
         if now - self._last.get(name, -1.0) < _MIN_GAP:
             return
         self._last[name] = now
+        self.recent.append((name, now))
+        del self.recent[:-8]
         rel = self._pick(name)
         snd = self.assets.sound(rel) if rel else None
         if snd:

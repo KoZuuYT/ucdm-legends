@@ -154,3 +154,19 @@ class CollectionFlowTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AlbumSearchTest(unittest.TestCase):
+    def test_busca_filtra_por_nome(self):
+        from core.engine import Game
+        from scenes.collection import CollectionScene
+        game = Game(headless=True)
+        game.profile = Profile()
+        sc = CollectionScene(game)
+        total = len(sc.items)
+        sc.query = sc.items[0]["name"][:3].lower()
+        sc._rebuild()
+        self.assertTrue(0 < len(sc.items) <= total)
+        sc.query = "zzzzzz"
+        sc._rebuild()
+        self.assertEqual(sc.items, [])

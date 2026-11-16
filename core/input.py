@@ -78,7 +78,8 @@ class InputManager:
         self.pointers: dict[int, Pointer] = {}
         self.taps: list[tuple[float, float]] = []          # cliques/toques curtos neste frame
         self.pointer_pos: tuple[float, float] = (0, 0)
-        self.touch_mode = False                            # último input foi toque?
+        from core import paths
+        self.touch_mode = bool(paths.ANDROID)               # último input foi toque? (celular: começa ligado)
         self.virtual_buttons: list[VirtualButton] = []
         self.quit_requested = False
         self.text_input: list[str] = []

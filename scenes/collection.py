@@ -24,6 +24,8 @@ class CollectionScene(Scene):
         super().__init__(game)
         self.mode = "legends"
         self.filter = 0                    # 0 = todas; 1.. = raridade
+        self.query = ""                    # busca por texto (nome, sem acento)
+        self.typing = False
         self.index = 0
         self.scroll = 0.0
         self.t = 0.0
@@ -35,6 +37,7 @@ class CollectionScene(Scene):
         self.back_btn = ui.Button((1280 - 330, 30, 290, 56), "Voltar", lambda: self.game.scenes.pop(fade="slide"))
         self.mode_btn = ui.Button((GRID_X, 84, 300, 48), "Aparências", self._toggle_mode)
         self.filter_btn = ui.Button((GRID_X + 320, 84, 300, 48), "Raridade: todas", self._cycle_filter)
+        self.search_btn = ui.Button((GRID_X + 640, 84, 300, 48), "Buscar", self._toggle_search)
 
     # --- dados --------------------------------------------------------------------------
     @property
@@ -50,6 +53,10 @@ class CollectionScene(Scene):
             if self.filter:
                 want = order[self.filter - 1]
                 items = [c for c in items if c.get("rarity", "comum") == want]
+            if self.query:
+                from scenes.options import _norm
+                q = _norm(self.query)
+                items = [c for c in items if q in _norm(c["name"])]
             # ordem: raridade (mais rara primeiro), depois nome
             self.items = sorted(items, key=lambda c: (-order.index(c.get("rarity", "comum")), c["name"].lower()))
         self.index = min(self.index, max(0, len(self.items) - 1))
@@ -67,6 +74,38 @@ class CollectionScene(Scene):
         self.mode_btn.label = "Lendas" if self.mode == "skins" else "Aparências"
         self._rebuild()
         ui.sfx("select")
+
+    def _toggle_search(self) -> None:
+        if self.typing:
+            return self._stop_typing()
+        self.typing = True
+        self.game.input.capture = True
+        self.game.input.captured = None
+        pygame.key.start_text_input()
+        self.search_btn.label = "Buscar: _"
+
+    def _stop_typing(self) -> None:
+        if self.typing:
+            self.typing = False
+            self.game.input.capture = False
+            pygame.key.stop_text_input()
+        self.search_btn.label = f"{tr('Buscar')}: {self.query}" if self.query else "Buscar"
+
+    def _type(self, inp) -> None:
+        old = self.query
+        for ch in inp.text_input:
+            if ch.isprintable() and len(self.query) < 16:
+                self.query += ch
+        key, inp.captured = inp.captured, None
+        if key == "backspace":
+            self.query = self.query[:-1]
+        elif key in ("return", "escape", "enter"):
+            return self._stop_typing()
+        self.search_btn.label = f"{tr('Buscar')}: {self.query}_"
+        if self.query != old:
+            self.index = 0
+            self.scroll = 0.0
+            self._rebuild()
 
     def _cycle_filter(self) -> None:
         if self.mode != "legends":
@@ -118,6 +157,7 @@ class CollectionScene(Scene):
         self._rebuild()
 
     def exit(self) -> None:
+        self._stop_typing()
         self.game.assets.unload("sprites/characters/")
         self.game.assets.unload("sprites/thumbs/")
 
@@ -130,6 +170,9 @@ class CollectionScene(Scene):
         self.t += dt
         self.toast = (self.toast[0], self.toast[1] - dt)
         inp = self.game.input
+        if self.typing:
+            self._type(inp)
+            return
         n = len(self.items)
         moved = True
         if n and inp.pressed("right"):
@@ -158,7 +201,7 @@ class CollectionScene(Scene):
         self.scroll = max(0.0, min(self.max_scroll, self.scroll))
         grid_area = pygame.Rect(GRID_X, GRID_Y, COLS * CELL_W, GRID_H)
         for pos in inp.taps:
-            for b in (self.act_btn, self.back_btn, self.mode_btn, self.filter_btn):
+            for b in (self.act_btn, self.back_btn, self.mode_btn, self.filter_btn, self.search_btn):
                 if b.rect.collidepoint(pos):
                     return b.on_click()
             if grid_area.collidepoint(pos):
@@ -201,6 +244,7 @@ class CollectionScene(Scene):
             ui.text(surf, a.font(40), f"{tr('Álbum de Lendas')}  {len(p.collection)}/{total}", (GRID_X, 24), ui.ACCENT)
         self.mode_btn.draw(surf, a.font(22))
         self.filter_btn.draw(surf, a.font(22), self.mode == "legends")
+        self.search_btn.draw(surf, a.font(22), self.mode == "legends")
         clip = pygame.Rect(GRID_X, GRID_Y, COLS * CELL_W, GRID_H)
         surf.set_clip(clip)
         first_row = int(self.scroll // CELL_H)

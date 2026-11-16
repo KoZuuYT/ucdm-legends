@@ -1,4 +1,4 @@
 {
-  "version": "0.7.0",
-  "notes": "Tema Minecraft nas Opcoes: botoes, paineis, coracoes de vida, barra de chefe, toasts de avanco e panorama no menu. Particulas de combate com os sprites do jogo (golpe, critico, parry, esquiva perfeita, armadura quebrada). Nota S-D depois de cada vitoria e dicas na derrota. 26 conquistas com tela propria. Arena Infinita com ondas cada vez mais fortes. Estatisticas com radar e historico de lutas. Opcoes com busca e auxilio de timing. Pausa com resumo e reinicio de luta. Espada do Steve evolui com a arma (madeira ate netherita). Versao Android (APK) com controles de toque."
+  "version": "0.8.0",
+  "notes": "Android: botoes de toque ligados desde o inicio, botao de pausa, salva e pausa ao minimizar. Busca por texto no Album, legendas dos efeitos sonoros (Opcoes, Audio), modo foto (F12) e um codigo secreto."
 }
