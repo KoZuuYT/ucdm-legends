@@ -1,4 +1,4 @@
 {
-  "version": "0.1.1",
-  "notes": "Corrige o jogo que fechava sozinho ao abrir. Instalador novo com janela: escolha de pasta, atalhos, configurações de tela, áudio e atualizações, e desinstalação pelo Windows. Erros agora ficam salvos em %APPDATA%/UCDM/logs."
+  "version": "0.1.2",
+  "notes": "Corrige o jogo que fechava sozinho ao abrir. Instalador novo com janela: escolha de pasta, atalhos, configurações de tela, áudio e atualizações, e desinstalação pelo Windows. Erros agora ficam salvos em %APPDATA%/UCDM/logs. Executáveis com informações de versão e compilação própria, para evitar alarme falso de antivírus."
 }

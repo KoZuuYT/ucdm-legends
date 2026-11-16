@@ -30,7 +30,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install -r requirements.txt pyinstaller
+      - run: pip install -r requirements.txt
+      # Bootloader compilado aqui (MSVC do runner) em vez do pré-compilado do PyInstaller, que é o mesmo
+      # usado por muito malware em Python e por isso leva falso positivo de antivírus (ex.: Bearfoos!ml).
+      - name: PyInstaller com bootloader próprio
+        env:
+          PYINSTALLER_COMPILE_BOOTLOADER: "1"
+        run: pip install --no-binary pyinstaller --no-cache-dir "pyinstaller==6.*"
       - name: Conferir tag x version.json
         if: startsWith(github.ref, 'refs/tags/')
         shell: bash

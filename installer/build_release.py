@@ -30,6 +30,33 @@ def run(cmd: list[str]) -> None:
     subprocess.run(cmd, check=True, cwd=ROOT)
 
 
+VERSION_INFO = """VSVersionInfo(
+  ffi=FixedFileInfo(filevers={t}, prodvers={t}, mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1,
+                    subtype=0x0, date=(0, 0)),
+  kids=[StringFileInfo([StringTable('041604B0', [
+      StringStruct('CompanyName', 'UCDM'),
+      StringStruct('FileDescription', '{desc}'),
+      StringStruct('FileVersion', '{v}'),
+      StringStruct('InternalName', '{name}'),
+      StringStruct('LegalCopyright', 'UCDM Legends'),
+      StringStruct('OriginalFilename', '{name}.exe'),
+      StringStruct('ProductName', 'UCDM Legends'),
+      StringStruct('ProductVersion', '{v}')])]),
+    VarFileInfo([VarStruct('Translation', [0x0416, 1200])])]
+)
+"""
+
+
+def version_file(name: str, desc: str, version: str) -> Path:
+    """Recurso de versão do Windows (Propriedades > Detalhes). Executável sem isso parece suspeito
+    para antivírus por aprendizado de máquina."""
+    nums = tuple((rt.parse_version(version) + (0, 0, 0, 0))[:4])
+    out = BUILD / f"version_{name}.txt"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(VERSION_INFO.format(t=nums, v=version, name=name, desc=desc), encoding="utf-8")
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--platform", default=rt.platform_tag())
@@ -59,13 +86,16 @@ def main() -> int:
             inst_src = patched
         icon = ROOT / "installer" / "art" / "icon.ico"
         run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir", "--windowed",
-             "--icon", str(icon), "--exclude-module", "tkinter", "--exclude-module", "numpy", "--name", "UCDM", "--distpath", str(DIST), "--workpath", str(BUILD / "game"),
+             "--icon", str(icon), "--exclude-module", "tkinter", "--exclude-module", "numpy",
+             "--version-file", str(version_file("UCDM", "UCDM Legends", version)),
+             "--name", "UCDM", "--distpath", str(DIST), "--workpath", str(BUILD / "game"),
              "--specpath", str(BUILD), "--paths", str(ROOT), "--collect-submodules", "minigames",
              "--collect-submodules", "scenes", str(ROOT / "main.py")])
         sep = ";" if sys.platform == "win32" else ":"
         run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onefile", "--windowed",
              "--icon", str(icon), "--add-data", f"{ROOT / 'installer' / 'art'}{sep}art",
              "--hidden-import", "installer.gui", "--hidden-import", "installer.setup_core",
+             "--version-file", str(version_file("UCDM-Installer", "Instalador do UCDM Legends", version)),
              "--name", "UCDM-Installer", "--distpath", str(DIST), "--workpath", str(BUILD / "inst"),
              "--specpath", str(BUILD), "--paths", str(ROOT), str(inst_src)])
         shutil.copy2(DIST / f"UCDM-Installer{exe}", stage / f"UCDM-Installer{exe}")
