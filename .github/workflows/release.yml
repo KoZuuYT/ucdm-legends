@@ -1,0 +1,62 @@
+# Publica um Release oficial quando você cria uma tag de versão:
+#   1. Atualize "version" em version.json (ex.: 0.2.0) e faça commit/push.
+#   2. git tag v0.2.0 && git push origin v0.2.0
+# O workflow compila, gera o zip + .sha256 e o UCDM-Installer.exe e anexa tudo ao Release.
+# Jogos instalados verão o novo version.json no branch e farão o auto-update.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt pyinstaller
+      - name: Conferir tag x version.json
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          V=$(python -c "import json;print(json.load(open('version.json'))['version'])")
+          [ "v$V" = "${GITHUB_REF_NAME}" ] || { echo "Tag ${GITHUB_REF_NAME} != version.json v$V"; exit 1; }
+      - run: python installer/build_release.py --platform windows --repo ${{ github.repository }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/UCDM-windows-v*.zip
+            dist/UCDM-windows-v*.zip.sha256
+            dist/UCDM-Installer.exe
+
+  publish:
+    needs: build-windows
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - name: Notas da versão
+        run: python -c "import json;print(json.load(open('version.json')).get('notes',''))" > notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/*
+          body_path: notes.md

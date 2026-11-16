@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec
+.venv/
+# Artes originais em alta resolução: o jogo usa as versões otimizadas em assets/sprites/characters
+UCDM/

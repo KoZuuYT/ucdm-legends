@@ -1,0 +1,1125 @@
+{
+  "_doc": "faces: para onde a arte original olha (-1 = esquerda, 1 = direita). O jogo espelha a imagem conforme o lado da luta.",
+  "characters": [
+    {
+      "id": "abacanhao",
+      "name": "Abacanhão",
+      "sprite": "sprites/characters/abacanhao.png",
+      "faces": -1,
+      "source": "Abacanhão.png"
+    },
+    {
+      "id": "abacaxitos",
+      "name": "Abacaxitos",
+      "sprite": "sprites/characters/abacaxitos.png",
+      "faces": -1,
+      "source": "abacaxitos.png"
+    },
+    {
+      "id": "aero_lurker",
+      "name": "Aero Lurker",
+      "sprite": "sprites/characters/aero_lurker.png",
+      "faces": -1,
+      "source": "Aero Lurker.png"
+    },
+    {
+      "id": "aerocolossus",
+      "name": "Aerocolossus",
+      "sprite": "sprites/characters/aerocolossus.png",
+      "faces": -1,
+      "source": "aerocolossus.png"
+    },
+    {
+      "id": "alexandre_barbosa",
+      "name": "Alexandre Barbosa",
+      "sprite": "sprites/characters/alexandre_barbosa.png",
+      "faces": -1,
+      "source": "Alexandre Barbosa.png"
+    },
+    {
+      "id": "alpha_speedon",
+      "name": "Alpha Speedon",
+      "sprite": "sprites/characters/alpha_speedon.png",
+      "faces": -1,
+      "source": "Alpha Speedon.png"
+    },
+    {
+      "id": "angummy",
+      "name": "Angummy",
+      "sprite": "sprites/characters/angummy.png",
+      "faces": -1,
+      "source": "Angummy.png"
+    },
+    {
+      "id": "anker",
+      "name": "Anker",
+      "sprite": "sprites/characters/anker.png",
+      "faces": -1,
+      "source": "Anker.png"
+    },
+    {
+      "id": "anna_hardy",
+      "name": "Anna Hardy",
+      "sprite": "sprites/characters/anna_hardy.png",
+      "faces": -1,
+      "source": "Anna Hardy.png"
+    },
+    {
+      "id": "applenite",
+      "name": "Applenite",
+      "sprite": "sprites/characters/applenite.png",
+      "faces": -1,
+      "source": "Applenite.png"
+    },
+    {
+      "id": "arkarnis_remastered",
+      "name": "Arkarnis (Remastered)",
+      "sprite": "sprites/characters/arkarnis_remastered.png",
+      "faces": -1,
+      "source": "Arkarnis (Remastered).png"
+    },
+    {
+      "id": "arthur_uno",
+      "name": "Arthur Uno",
+      "sprite": "sprites/characters/arthur_uno.png",
+      "faces": -1,
+      "source": "Arthur Uno.png"
+    },
+    {
+      "id": "arvoris",
+      "name": "Arvoris",
+      "sprite": "sprites/characters/arvoris.png",
+      "faces": -1,
+      "source": "Arvoris.png"
+    },
+    {
+      "id": "aslon",
+      "name": "Aslon",
+      "sprite": "sprites/characters/aslon.png",
+      "faces": -1,
+      "source": "aslon.png"
+    },
+    {
+      "id": "augusto",
+      "name": "Augusto",
+      "sprite": "sprites/characters/augusto.png",
+      "faces": -1,
+      "source": "augusto.png"
+    },
+    {
+      "id": "bananosaurus",
+      "name": "Bananosaurus",
+      "sprite": "sprites/characters/bananosaurus.png",
+      "faces": -1,
+      "source": "bananosaurus.png"
+    },
+    {
+      "id": "barrettoi",
+      "name": "Barrettoi",
+      "sprite": "sprites/characters/barrettoi.png",
+      "faces": -1,
+      "source": "barrettoi.png"
+    },
+    {
+      "id": "beast",
+      "name": "Beast",
+      "sprite": "sprites/characters/beast.png",
+      "faces": -1,
+      "source": "Beast.png"
+    },
+    {
+      "id": "benzo",
+      "name": "Benzo",
+      "sprite": "sprites/characters/benzo.png",
+      "faces": -1,
+      "source": "benzo.png"
+    },
+    {
+      "id": "berinkong",
+      "name": "Berinkong",
+      "sprite": "sprites/characters/berinkong.png",
+      "faces": -1,
+      "source": "Berinkong.png"
+    },
+    {
+      "id": "beterabix",
+      "name": "Beterabix",
+      "sprite": "sprites/characters/beterabix.png",
+      "faces": -1,
+      "source": "beterabix.png"
+    },
+    {
+      "id": "bogaras",
+      "name": "Bogaras",
+      "sprite": "sprites/characters/bogaras.png",
+      "faces": -1,
+      "source": "Bogaras.png"
+    },
+    {
+      "id": "boongalong",
+      "name": "Boongalong",
+      "sprite": "sprites/characters/boongalong.png",
+      "faces": -1,
+      "source": "Boongalong.png"
+    },
+    {
+      "id": "buffalo",
+      "name": "Buffalo",
+      "sprite": "sprites/characters/buffalo.png",
+      "faces": -1,
+      "source": "buffalo.png"
+    },
+    {
+      "id": "cabelinho",
+      "name": "Cabelinho",
+      "sprite": "sprites/characters/cabelinho.png",
+      "faces": -1,
+      "source": "cabelinho.png"
+    },
+    {
+      "id": "cadu",
+      "name": "Cadu",
+      "sprite": "sprites/characters/cadu.png",
+      "faces": -1,
+      "source": "cadu.png"
+    },
+    {
+      "id": "cadutapir",
+      "name": "Cadutapir",
+      "sprite": "sprites/characters/cadutapir.png",
+      "faces": -1,
+      "source": "cadutapir.png"
+    },
+    {
+      "id": "caiopinto",
+      "name": "Caiopinto",
+      "sprite": "sprites/characters/caiopinto.png",
+      "faces": -1,
+      "source": "caiopinto.png"
+    },
+    {
+      "id": "careco",
+      "name": "Careco",
+      "sprite": "sprites/characters/careco.png",
+      "faces": -1,
+      "source": "careco.png"
+    },
+    {
+      "id": "carecossauro",
+      "name": "Carecossauro",
+      "sprite": "sprites/characters/carecossauro.png",
+      "faces": -1,
+      "source": "carecossauro.png"
+    },
+    {
+      "id": "cerascape",
+      "name": "Cerascape",
+      "sprite": "sprites/characters/cerascape.png",
+      "faces": -1,
+      "source": "Cerascape.png"
+    },
+    {
+      "id": "chupacabra_rework",
+      "name": "Chupacabra (Rework)",
+      "sprite": "sprites/characters/chupacabra_rework.png",
+      "faces": -1,
+      "source": "Chupacabra (Rework).png"
+    },
+    {
+      "id": "chupagozao",
+      "name": "Chupagozao",
+      "sprite": "sprites/characters/chupagozao.png",
+      "faces": -1,
+      "source": "Chupagozao.png"
+    },
+    {
+      "id": "clorus",
+      "name": "Clorus",
+      "sprite": "sprites/characters/clorus.png",
+      "faces": -1,
+      "source": "Clorus.png"
+    },
+    {
+      "id": "continha_contoba",
+      "name": "Continha contoba",
+      "sprite": "sprites/characters/continha_contoba.png",
+      "faces": -1,
+      "source": "continha contoba.png"
+    },
+    {
+      "id": "cryoloft",
+      "name": "Cryoloft",
+      "sprite": "sprites/characters/cryoloft.png",
+      "faces": -1,
+      "source": "cryoloft.png"
+    },
+    {
+      "id": "curiga",
+      "name": "CURIGA",
+      "sprite": "sprites/characters/curiga.png",
+      "faces": -1,
+      "source": "CURIGA.png"
+    },
+    {
+      "id": "dani_koko_seko",
+      "name": "Dani Koko Seko",
+      "sprite": "sprites/characters/dani_koko_seko.png",
+      "faces": -1,
+      "source": "Dani Koko Seko.png"
+    },
+    {
+      "id": "danibarretto",
+      "name": "Danibarretto",
+      "sprite": "sprites/characters/danibarretto.png",
+      "faces": -1,
+      "source": "danibarretto.png"
+    },
+    {
+      "id": "dark_lurker",
+      "name": "Dark Lurker",
+      "sprite": "sprites/characters/dark_lurker.png",
+      "faces": -1,
+      "source": "Dark Lurker.png"
+    },
+    {
+      "id": "darkoko",
+      "name": "Darkoko",
+      "sprite": "sprites/characters/darkoko.png",
+      "faces": -1,
+      "source": "darkoko.png"
+    },
+    {
+      "id": "dryoskel",
+      "name": "Dryoskel",
+      "sprite": "sprites/characters/dryoskel.png",
+      "faces": -1,
+      "source": "Dryoskel.png"
+    },
+    {
+      "id": "dunkler",
+      "name": "Dunkler",
+      "sprite": "sprites/characters/dunkler.png",
+      "faces": -1,
+      "source": "Dunkler.png"
+    },
+    {
+      "id": "electrobrute",
+      "name": "Electrobrute",
+      "sprite": "sprites/characters/electrobrute.png",
+      "faces": -1,
+      "source": "electrobrute.png"
+    },
+    {
+      "id": "electronite",
+      "name": "Electronite",
+      "sprite": "sprites/characters/electronite.png",
+      "faces": -1,
+      "source": "Electronite.png"
+    },
+    {
+      "id": "enrique_tortoise",
+      "name": "Enrique Tortoise",
+      "sprite": "sprites/characters/enrique_tortoise.png",
+      "faces": -1,
+      "source": "Enrique Tortoise.png"
+    },
+    {
+      "id": "evolvedchupacabra",
+      "name": "Evolvedchupacabra",
+      "sprite": "sprites/characters/evolvedchupacabra.png",
+      "faces": -1,
+      "source": "evolvedchupacabra.png"
+    },
+    {
+      "id": "ezechiel",
+      "name": "Ezechiel",
+      "sprite": "sprites/characters/ezechiel.png",
+      "faces": -1,
+      "source": "Ezechiel.png"
+    },
+    {
+      "id": "fire_lurker",
+      "name": "Fire Lurker",
+      "sprite": "sprites/characters/fire_lurker.png",
+      "faces": -1,
+      "source": "Fire Lurker.png"
+    },
+    {
+      "id": "flighter",
+      "name": "Flighter",
+      "sprite": "sprites/characters/flighter.png",
+      "faces": -1,
+      "source": "Flighter.png"
+    },
+    {
+      "id": "gabriel_dragon",
+      "name": "Gabriel Dragon",
+      "sprite": "sprites/characters/gabriel_dragon.png",
+      "faces": -1,
+      "source": "Gabriel Dragon.png"
+    },
+    {
+      "id": "gaiarework",
+      "name": "GaiaRework",
+      "sprite": "sprites/characters/gaiarework.png",
+      "faces": -1,
+      "source": "GaiaRework.png"
+    },
+    {
+      "id": "gatito",
+      "name": "Gatito",
+      "sprite": "sprites/characters/gatito.png",
+      "faces": -1,
+      "source": "gatito.png"
+    },
+    {
+      "id": "geolichen",
+      "name": "Geolichen",
+      "sprite": "sprites/characters/geolichen.png",
+      "faces": -1,
+      "source": "Geolichen.png"
+    },
+    {
+      "id": "gigahorn",
+      "name": "Gigahorn",
+      "sprite": "sprites/characters/gigahorn.png",
+      "faces": -1,
+      "source": "gigahorn.png"
+    },
+    {
+      "id": "gigalurker",
+      "name": "Gigalurker",
+      "sprite": "sprites/characters/gigalurker.png",
+      "faces": -1,
+      "source": "gigalurker.png"
+    },
+    {
+      "id": "gozao_remastered",
+      "name": "Gozao (Remastered)",
+      "sprite": "sprites/characters/gozao_remastered.png",
+      "faces": -1,
+      "source": "Gozao (Remastered).png"
+    },
+    {
+      "id": "grimlhiso",
+      "name": "Grimlhiso",
+      "sprite": "sprites/characters/grimlhiso.png",
+      "faces": -1,
+      "source": "Grimlhiso.png"
+    },
+    {
+      "id": "grimlurker",
+      "name": "Grimlurker",
+      "sprite": "sprites/characters/grimlurker.png",
+      "faces": -1,
+      "source": "grimlurker.png"
+    },
+    {
+      "id": "gugas",
+      "name": "Gugas",
+      "sprite": "sprites/characters/gugas.png",
+      "faces": -1,
+      "source": "gugas.png"
+    },
+    {
+      "id": "harker_rework",
+      "name": "Harker (Rework)",
+      "sprite": "sprites/characters/harker_rework.png",
+      "faces": -1,
+      "source": "Harker (Rework).png"
+    },
+    {
+      "id": "heydex",
+      "name": "Heydex",
+      "sprite": "sprites/characters/heydex.png",
+      "faces": -1,
+      "source": "heydex.png"
+    },
+    {
+      "id": "hydroterastios_remastered",
+      "name": "Hydroterastios (Remastered)",
+      "sprite": "sprites/characters/hydroterastios_remastered.png",
+      "faces": -1,
+      "source": "Hydroterastios (Remastered).png"
+    },
+    {
+      "id": "ian",
+      "name": "Ian",
+      "sprite": "sprites/characters/ian.png",
+      "faces": -1,
+      "source": "ian.png"
+    },
+    {
+      "id": "icelurker",
+      "name": "Icelurker",
+      "sprite": "sprites/characters/icelurker.png",
+      "faces": -1,
+      "source": "icelurker.png"
+    },
+    {
+      "id": "jagunsusmilenius",
+      "name": "Jagunsusmilenius",
+      "sprite": "sprites/characters/jagunsusmilenius.png",
+      "faces": -1,
+      "source": "jagunsusmilenius.png"
+    },
+    {
+      "id": "jessica_vortex",
+      "name": "Jessica Vortex",
+      "sprite": "sprites/characters/jessica_vortex.png",
+      "faces": -1,
+      "source": "Jessica Vortex.png"
+    },
+    {
+      "id": "jumpy_lurker",
+      "name": "Jumpy Lurker",
+      "sprite": "sprites/characters/jumpy_lurker.png",
+      "faces": -1,
+      "source": "Jumpy Lurker.png"
+    },
+    {
+      "id": "junior_stensel",
+      "name": "Junior Stensel",
+      "sprite": "sprites/characters/junior_stensel.png",
+      "faces": -1,
+      "source": "Junior Stensel.png"
+    },
+    {
+      "id": "kakareko",
+      "name": "Kakareko",
+      "sprite": "sprites/characters/kakareko.png",
+      "faces": -1,
+      "source": "Kakareko.png"
+    },
+    {
+      "id": "killerkazuo",
+      "name": "Killerkazuo",
+      "sprite": "sprites/characters/killerkazuo.png",
+      "faces": -1,
+      "source": "killerkazuo.png"
+    },
+    {
+      "id": "kinglurker",
+      "name": "KingLurker",
+      "sprite": "sprites/characters/kinglurker.png",
+      "faces": -1,
+      "source": "KingLurker.png"
+    },
+    {
+      "id": "kira_ancient",
+      "name": "Kira Ancient",
+      "sprite": "sprites/characters/kira_ancient.png",
+      "faces": -1,
+      "source": "Kira Ancient.png"
+    },
+    {
+      "id": "koko_king_remastered",
+      "name": "Koko King (Remastered)",
+      "sprite": "sprites/characters/koko_king_remastered.png",
+      "faces": -1,
+      "source": "Koko King (Remastered).png"
+    },
+    {
+      "id": "koko_sentry",
+      "name": "Koko Sentry",
+      "sprite": "sprites/characters/koko_sentry.png",
+      "faces": -1,
+      "source": "Koko Sentry.png"
+    },
+    {
+      "id": "kokoking",
+      "name": "Kokoking",
+      "sprite": "sprites/characters/kokoking.png",
+      "faces": -1,
+      "source": "kokoking.png"
+    },
+    {
+      "id": "kokokow",
+      "name": "Kokokow",
+      "sprite": "sprites/characters/kokokow.png",
+      "faces": -1,
+      "source": "Kokokow.png"
+    },
+    {
+      "id": "kokoseko",
+      "name": "Kokoseko",
+      "sprite": "sprites/characters/kokoseko.png",
+      "faces": -1,
+      "source": "kokoseko.png"
+    },
+    {
+      "id": "kozu",
+      "name": "Kozu",
+      "sprite": "sprites/characters/kozu.png",
+      "faces": -1,
+      "source": "kozu.png"
+    },
+    {
+      "id": "kozuu_spark",
+      "name": "KoZuu Spark",
+      "sprite": "sprites/characters/kozuu_spark.png",
+      "faces": -1,
+      "source": "KoZuu Spark.png"
+    },
+    {
+      "id": "limenis",
+      "name": "Limenis",
+      "sprite": "sprites/characters/limenis.png",
+      "faces": -1,
+      "source": "limenis.png"
+    },
+    {
+      "id": "lipee_anime",
+      "name": "Lipee Anime",
+      "sprite": "sprites/characters/lipee_anime.png",
+      "faces": -1,
+      "source": "Lipee Anime.png"
+    },
+    {
+      "id": "lord_golem",
+      "name": "Lord Golem",
+      "sprite": "sprites/characters/lord_golem.png",
+      "faces": -1,
+      "source": "Lord Golem.png"
+    },
+    {
+      "id": "loyko_kato",
+      "name": "Loyko Kato",
+      "sprite": "sprites/characters/loyko_kato.png",
+      "faces": -1,
+      "source": "Loyko Kato.png"
+    },
+    {
+      "id": "luiz_zenor",
+      "name": "Luiz Zenor",
+      "sprite": "sprites/characters/luiz_zenor.png",
+      "faces": -1,
+      "source": "Luiz Zenor.png"
+    },
+    {
+      "id": "lushfiend",
+      "name": "Lushfiend",
+      "sprite": "sprites/characters/lushfiend.png",
+      "faces": -1,
+      "source": "Lushfiend.png"
+    },
+    {
+      "id": "lushzard",
+      "name": "Lushzard",
+      "sprite": "sprites/characters/lushzard.png",
+      "faces": -1,
+      "source": "Lushzard.png"
+    },
+    {
+      "id": "madara_cat",
+      "name": "Madara Cat",
+      "sprite": "sprites/characters/madara_cat.png",
+      "faces": -1,
+      "source": "Madara Cat.png"
+    },
+    {
+      "id": "made_in_sauron_remastered",
+      "name": "Made In Sauron Remastered",
+      "sprite": "sprites/characters/made_in_sauron_remastered.png",
+      "faces": -1,
+      "source": "Made In Sauron Remastered.png"
+    },
+    {
+      "id": "malosaurus",
+      "name": "Malosaurus",
+      "sprite": "sprites/characters/malosaurus.png",
+      "faces": -1,
+      "source": "malosaurus.png"
+    },
+    {
+      "id": "mason",
+      "name": "Mason",
+      "sprite": "sprites/characters/mason.png",
+      "faces": -1,
+      "source": "Mason.png"
+    },
+    {
+      "id": "mason_megalos",
+      "name": "Mason Megalos",
+      "sprite": "sprites/characters/mason_megalos.png",
+      "faces": -1,
+      "source": "Mason Megalos.png"
+    },
+    {
+      "id": "masterovenator",
+      "name": "Masterovenator",
+      "sprite": "sprites/characters/masterovenator.png",
+      "faces": -1,
+      "source": "Masterovenator.png"
+    },
+    {
+      "id": "matheus_nite",
+      "name": "Matheus Nite",
+      "sprite": "sprites/characters/matheus_nite.png",
+      "faces": -1,
+      "source": "Matheus Nite.png"
+    },
+    {
+      "id": "megahorn",
+      "name": "Megahorn",
+      "sprite": "sprites/characters/megahorn.png",
+      "faces": -1,
+      "source": "Megahorn.png"
+    },
+    {
+      "id": "megaloraptor",
+      "name": "Megaloraptor",
+      "sprite": "sprites/characters/megaloraptor.png",
+      "faces": -1,
+      "source": "Megaloraptor.png"
+    },
+    {
+      "id": "megonha",
+      "name": "Megonha",
+      "sprite": "sprites/characters/megonha.png",
+      "faces": -1,
+      "source": "Megonha.png"
+    },
+    {
+      "id": "megonha_alternative",
+      "name": "Megonha (Alternative)",
+      "sprite": "sprites/characters/megonha_alternative.png",
+      "faces": -1,
+      "source": "Megonha (Alternative).png"
+    },
+    {
+      "id": "michael_high",
+      "name": "Michael High",
+      "sprite": "sprites/characters/michael_high.png",
+      "faces": -1,
+      "source": "Michael High.png"
+    },
+    {
+      "id": "miguel_counter",
+      "name": "Miguel Counter",
+      "sprite": "sprites/characters/miguel_counter.png",
+      "faces": -1,
+      "source": "Miguel Counter.png"
+    },
+    {
+      "id": "mimi",
+      "name": "Mimi",
+      "sprite": "sprites/characters/mimi.png",
+      "faces": -1,
+      "source": "Mimi.png"
+    },
+    {
+      "id": "mogger",
+      "name": "Mogger",
+      "sprite": "sprites/characters/mogger.png",
+      "faces": -1,
+      "source": "mogger.png"
+    },
+    {
+      "id": "moggerqueen",
+      "name": "Moggerqueen",
+      "sprite": "sprites/characters/moggerqueen.png",
+      "faces": -1,
+      "source": "moggerqueen.png"
+    },
+    {
+      "id": "monochromatic_rework",
+      "name": "Monochromatic Rework",
+      "sprite": "sprites/characters/monochromatic_rework.png",
+      "faces": -1,
+      "source": "Monochromatic Rework.png"
+    },
+    {
+      "id": "mothok_remastered",
+      "name": "Mothok Remastered",
+      "sprite": "sprites/characters/mothok_remastered.png",
+      "faces": -1,
+      "source": "Mothok Remastered.png"
+    },
+    {
+      "id": "mothokremastered",
+      "name": "MothokRemastered",
+      "sprite": "sprites/characters/mothokremastered.png",
+      "faces": -1,
+      "source": "MothokRemastered.png"
+    },
+    {
+      "id": "mun",
+      "name": "Mun",
+      "sprite": "sprites/characters/mun.png",
+      "faces": -1,
+      "source": "mun.png"
+    },
+    {
+      "id": "nagatitan",
+      "name": "Nagatitan",
+      "sprite": "sprites/characters/nagatitan.png",
+      "faces": -1,
+      "source": "Nagatitan.png"
+    },
+    {
+      "id": "nexcau",
+      "name": "Nexcau",
+      "sprite": "sprites/characters/nexcau.png",
+      "faces": -1,
+      "source": "nexcau.png"
+    },
+    {
+      "id": "nexus_drake_rework",
+      "name": "Nexus Drake Rework",
+      "sprite": "sprites/characters/nexus_drake_rework.png",
+      "faces": -1,
+      "source": "Nexus Drake Rework.png"
+    },
+    {
+      "id": "pancake",
+      "name": "Pancake",
+      "sprite": "sprites/characters/pancake.png",
+      "faces": -1,
+      "source": "Pancake.png"
+    },
+    {
+      "id": "pedroca",
+      "name": "Pedroca",
+      "sprite": "sprites/characters/pedroca.png",
+      "faces": -1,
+      "source": "pedroca.png"
+    },
+    {
+      "id": "penasyd",
+      "name": "Penasyd",
+      "sprite": "sprites/characters/penasyd.png",
+      "faces": -1,
+      "source": "Penasyd.png"
+    },
+    {
+      "id": "penasyd_all_out",
+      "name": "Penasyd (All Out)",
+      "sprite": "sprites/characters/penasyd_all_out.png",
+      "faces": -1,
+      "source": "Penasyd (All Out).png"
+    },
+    {
+      "id": "peruzin",
+      "name": "Peruzin",
+      "sprite": "sprites/characters/peruzin.png",
+      "faces": -1,
+      "source": "Peruzin.png"
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "sprite": "sprites/characters/phoenix.png",
+      "faces": -1,
+      "source": "Phoenix.png"
+    },
+    {
+      "id": "pietro_hardy",
+      "name": "Pietro Hardy",
+      "sprite": "sprites/characters/pietro_hardy.png",
+      "faces": -1,
+      "source": "Pietro Hardy.png"
+    },
+    {
+      "id": "pipimentox",
+      "name": "Pipimentox",
+      "sprite": "sprites/characters/pipimentox.png",
+      "faces": -1,
+      "source": "Pipimentox.png"
+    },
+    {
+      "id": "power_lurker",
+      "name": "Power Lurker",
+      "sprite": "sprites/characters/power_lurker.png",
+      "faces": -1,
+      "source": "Power Lurker.png"
+    },
+    {
+      "id": "primal_sauron",
+      "name": "Primal Sauron",
+      "sprite": "sprites/characters/primal_sauron.png",
+      "faces": -1,
+      "source": "Primal Sauron.png"
+    },
+    {
+      "id": "pyrotitan",
+      "name": "Pyrotitan",
+      "sprite": "sprites/characters/pyrotitan.png",
+      "faces": -1,
+      "source": "pyrotitan.png"
+    },
+    {
+      "id": "redbull",
+      "name": "Redbull",
+      "sprite": "sprites/characters/redbull.png",
+      "faces": -1,
+      "source": "redbull.png"
+    },
+    {
+      "id": "repolhiso",
+      "name": "Repolhiso",
+      "sprite": "sprites/characters/repolhiso.png",
+      "faces": -1,
+      "source": "Repolhiso.png"
+    },
+    {
+      "id": "repolhiso_rework",
+      "name": "Repolhiso (rework)",
+      "sprite": "sprites/characters/repolhiso_rework.png",
+      "faces": -1,
+      "source": "repolhiso (rework).png"
+    },
+    {
+      "id": "repolhao",
+      "name": "Repolhão",
+      "sprite": "sprites/characters/repolhao.png",
+      "faces": -1,
+      "source": "Repolhão.png"
+    },
+    {
+      "id": "rick",
+      "name": "Rick",
+      "sprite": "sprites/characters/rick.png",
+      "faces": -1,
+      "source": "rick.png"
+    },
+    {
+      "id": "rocket_tyrant",
+      "name": "Rocket Tyrant",
+      "sprite": "sprites/characters/rocket_tyrant.png",
+      "faces": -1,
+      "source": "Rocket Tyrant.png"
+    },
+    {
+      "id": "royal_saurophaganax",
+      "name": "Royal saurophaganax",
+      "sprite": "sprites/characters/royal_saurophaganax.png",
+      "faces": -1,
+      "source": "royal saurophaganax.png"
+    },
+    {
+      "id": "rusted",
+      "name": "Rusted",
+      "sprite": "sprites/characters/rusted.png",
+      "faces": -1,
+      "source": "Rusted.png"
+    },
+    {
+      "id": "sageki",
+      "name": "Sageki",
+      "sprite": "sprites/characters/sageki.png",
+      "faces": -1,
+      "source": "sageki.png"
+    },
+    {
+      "id": "sappovarudo",
+      "name": "Sappovarudo",
+      "sprite": "sprites/characters/sappovarudo.png",
+      "faces": -1,
+      "source": "sappovarudo.png"
+    },
+    {
+      "id": "sauron_z",
+      "name": "Sauron Z",
+      "sprite": "sprites/characters/sauron_z.png",
+      "faces": -1,
+      "source": "Sauron Z.png"
+    },
+    {
+      "id": "sauronyx",
+      "name": "Sauronyx",
+      "sprite": "sprites/characters/sauronyx.png",
+      "faces": -1,
+      "source": "sauronyx.png"
+    },
+    {
+      "id": "scathrax",
+      "name": "Scathrax",
+      "sprite": "sprites/characters/scathrax.png",
+      "faces": -1,
+      "source": "Scathrax.png"
+    },
+    {
+      "id": "shogalla",
+      "name": "Shogalla",
+      "sprite": "sprites/characters/shogalla.png",
+      "faces": -1,
+      "source": "Shogalla.png"
+    },
+    {
+      "id": "skeleto",
+      "name": "Skeleto",
+      "sprite": "sprites/characters/skeleto.png",
+      "faces": -1,
+      "source": "skeleto.png"
+    },
+    {
+      "id": "snakarrot",
+      "name": "Snakarrot",
+      "sprite": "sprites/characters/snakarrot.png",
+      "faces": -1,
+      "source": "snakarrot.png"
+    },
+    {
+      "id": "speedon",
+      "name": "Speedon",
+      "sprite": "sprites/characters/speedon.png",
+      "faces": -1,
+      "source": "Speedon.png"
+    },
+    {
+      "id": "spiderock_rework",
+      "name": "Spiderock Rework",
+      "sprite": "sprites/characters/spiderock_rework.png",
+      "faces": -1,
+      "source": "Spiderock Rework.png"
+    },
+    {
+      "id": "stegas",
+      "name": "Stegas",
+      "sprite": "sprites/characters/stegas.png",
+      "faces": -1,
+      "source": "Stegas.png"
+    },
+    {
+      "id": "stony",
+      "name": "Stony",
+      "sprite": "sprites/characters/stony.png",
+      "faces": -1,
+      "source": "Stony.png"
+    },
+    {
+      "id": "sukito",
+      "name": "Sukito",
+      "sprite": "sprites/characters/sukito.png",
+      "faces": -1,
+      "source": "Sukito.png"
+    },
+    {
+      "id": "taiker",
+      "name": "Taiker",
+      "sprite": "sprites/characters/taiker.png",
+      "faces": -1,
+      "source": "Taiker.png"
+    },
+    {
+      "id": "terrachio",
+      "name": "Terrachio",
+      "sprite": "sprites/characters/terrachio.png",
+      "faces": -1,
+      "source": "terrachio.png"
+    },
+    {
+      "id": "thermius_avunsus",
+      "name": "Thermius Avunsus",
+      "sprite": "sprites/characters/thermius_avunsus.png",
+      "faces": -1,
+      "source": "Thermius Avunsus.png"
+    },
+    {
+      "id": "thogays",
+      "name": "Thogays",
+      "sprite": "sprites/characters/thogays.png",
+      "faces": -1,
+      "source": "thogays.png"
+    },
+    {
+      "id": "thomas",
+      "name": "Thomas",
+      "sprite": "sprites/characters/thomas.png",
+      "faces": -1,
+      "source": "thomas.png"
+    },
+    {
+      "id": "tubaronic",
+      "name": "Tubaronic",
+      "sprite": "sprites/characters/tubaronic.png",
+      "faces": -1,
+      "source": "Tubaronic.png"
+    },
+    {
+      "id": "turcrab",
+      "name": "Turcrab",
+      "sprite": "sprites/characters/turcrab.png",
+      "faces": -1,
+      "source": "Turcrab.png"
+    },
+    {
+      "id": "ulliemurus_rework",
+      "name": "Ulliemurus (Rework)",
+      "sprite": "sprites/characters/ulliemurus_rework.png",
+      "faces": -1,
+      "source": "Ulliemurus (Rework).png"
+    },
+    {
+      "id": "umbranodon",
+      "name": "Umbranodon",
+      "sprite": "sprites/characters/umbranodon.png",
+      "faces": -1,
+      "source": "umbranodon.png"
+    },
+    {
+      "id": "umbraseeker",
+      "name": "Umbraseeker",
+      "sprite": "sprites/characters/umbraseeker.png",
+      "faces": -1,
+      "source": "Umbraseeker.png"
+    },
+    {
+      "id": "vankyu",
+      "name": "Vankyu",
+      "sprite": "sprites/characters/vankyu.png",
+      "faces": -1,
+      "source": "Vankyu.png"
+    },
+    {
+      "id": "violet_sandict",
+      "name": "Violet Sandict",
+      "sprite": "sprites/characters/violet_sandict.png",
+      "faces": -1,
+      "source": "Violet Sandict.png"
+    },
+    {
+      "id": "vivian_frost",
+      "name": "Vivian Frost",
+      "sprite": "sprites/characters/vivian_frost.png",
+      "faces": -1,
+      "source": "Vivian Frost.png"
+    },
+    {
+      "id": "vonda",
+      "name": "Vonda",
+      "sprite": "sprites/characters/vonda.png",
+      "faces": -1,
+      "source": "Vonda.png"
+    },
+    {
+      "id": "winter_monarch",
+      "name": "Winter Monarch",
+      "sprite": "sprites/characters/winter_monarch.png",
+      "faces": -1,
+      "source": "Winter Monarch.png"
+    },
+    {
+      "id": "xalthurion",
+      "name": "Xalthurion",
+      "sprite": "sprites/characters/xalthurion.png",
+      "faces": -1,
+      "source": "Xalthurion.png"
+    },
+    {
+      "id": "z",
+      "name": "Z",
+      "sprite": "sprites/characters/z.png",
+      "faces": -1,
+      "source": "Z.png"
+    },
+    {
+      "id": "zero",
+      "name": "Zero",
+      "sprite": "sprites/characters/zero.png",
+      "faces": -1,
+      "source": "zero.png"
+    }
+  ]
+}

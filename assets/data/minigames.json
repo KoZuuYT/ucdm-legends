@@ -1,0 +1,23 @@
+{
+  "slash": {
+    "title": "Treino de Golpe", "stat": "strength", "duration": 45, "lives": 3,
+    "xp_per_point": 1.0, "gold_per_point": 0.5,
+    "spawn_interval": [1.1, 0.42], "speed": [260, 520], "bomb_chance": 0.15,
+    "hit_zone": 150, "zone_size": 52, "perfect_size": 16
+  },
+  "shield": {
+    "title": "Treino de Escudo", "stat": "defense", "duration": 45, "lives": 3,
+    "xp_per_point": 1.0, "gold_per_point": 0.5,
+    "spawn_interval": [1.2, 0.45], "speed": [300, 640], "parry_window": 0.16
+  },
+  "agility": {
+    "title": "Treino de Esquiva", "stat": "agility", "duration": 45, "lives": 3,
+    "xp_per_point": 1.0, "gold_per_point": 0.5,
+    "spawn_interval": [1.3, 0.55], "speed": [380, 760], "pose_time": 0.45
+  },
+  "focus": {
+    "title": "Treino de Mira", "stat": "focus", "duration": 40, "lives": 3,
+    "xp_per_point": 1.0, "gold_per_point": 0.5,
+    "spawn_interval": [1.0, 0.45], "target_life": [1.8, 0.9], "radius": [56, 30]
+  }
+}

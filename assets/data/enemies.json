@@ -1,0 +1,320 @@
+{
+  "_doc": "Escada da arena, em ordem. 'character' referencia um id de characters.json. Ataques 'unblockable' (aviso vermelho) só podem ser esquivados. stagger_resist: chance (0..1) de o inimigo não ser interrompido ao apanhar durante um ataque.",
+  "enemies": [
+    {
+      "id": "skeleto",
+      "character": "skeleto",
+      "title": "O Ossudo",
+      "hp": 70,
+      "damage": 7,
+      "stamina": 100,
+      "reach": 180,
+      "gold": 25,
+      "stagger_resist": 0.1,
+      "ai": {
+        "aggression": 0.3,
+        "block_chance": 0.1,
+        "dodge_chance": 0.0,
+        "cooldown": [
+          1.4,
+          2.4
+        ]
+      },
+      "attacks": [
+        {
+          "name": "pancada",
+          "windup": 0.7,
+          "active": 0.1,
+          "recover": 0.5,
+          "damage_mult": 1.0,
+          "stamina_cost": 10
+        }
+      ]
+    },
+    {
+      "id": "applenite",
+      "character": "applenite",
+      "title": "Fruta Furiosa",
+      "hp": 110,
+      "damage": 9,
+      "stamina": 100,
+      "reach": 170,
+      "gold": 40,
+      "stagger_resist": 0.2,
+      "ai": {
+        "aggression": 0.45,
+        "block_chance": 0.2,
+        "dodge_chance": 0.05,
+        "cooldown": [
+          1.1,
+          2.0
+        ]
+      },
+      "attacks": [
+        {
+          "name": "mordida",
+          "windup": 0.55,
+          "active": 0.1,
+          "recover": 0.45,
+          "damage_mult": 1.0,
+          "stamina_cost": 10
+        }
+      ]
+    },
+    {
+      "id": "speedon",
+      "character": "speedon",
+      "title": "Raio Amarelo",
+      "hp": 140,
+      "damage": 10,
+      "stamina": 120,
+      "reach": 200,
+      "gold": 60,
+      "stagger_resist": 0.3,
+      "ai": {
+        "aggression": 0.75,
+        "block_chance": 0.1,
+        "dodge_chance": 0.25,
+        "cooldown": [
+          0.6,
+          1.3
+        ]
+      },
+      "attacks": [
+        {
+          "name": "garra",
+          "windup": 0.38,
+          "active": 0.08,
+          "recover": 0.35,
+          "damage_mult": 0.8,
+          "stamina_cost": 8,
+          "weight": 3
+        },
+        {
+          "name": "investida",
+          "windup": 0.7,
+          "active": 0.12,
+          "recover": 0.6,
+          "damage_mult": 1.6,
+          "stamina_cost": 20,
+          "unblockable": true,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "anker",
+      "character": "anker",
+      "title": "Couraça Viva",
+      "hp": 230,
+      "damage": 13,
+      "stamina": 140,
+      "reach": 210,
+      "gold": 90,
+      "stagger_resist": 0.4,
+      "ai": {
+        "aggression": 0.4,
+        "block_chance": 0.45,
+        "dodge_chance": 0.0,
+        "cooldown": [
+          1.2,
+          2.2
+        ]
+      },
+      "attacks": [
+        {
+          "name": "cauda",
+          "windup": 0.65,
+          "active": 0.12,
+          "recover": 0.55,
+          "damage_mult": 1.2,
+          "stamina_cost": 12,
+          "weight": 2
+        },
+        {
+          "name": "esmagar",
+          "windup": 0.95,
+          "active": 0.14,
+          "recover": 0.8,
+          "damage_mult": 2.0,
+          "stamina_cost": 25,
+          "unblockable": true,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "megonha",
+      "character": "megonha",
+      "title": "Mestre Megonha",
+      "hp": 260,
+      "damage": 15,
+      "stamina": 140,
+      "reach": 190,
+      "gold": 130,
+      "stagger_resist": 0.5,
+      "ai": {
+        "aggression": 0.6,
+        "block_chance": 0.35,
+        "dodge_chance": 0.2,
+        "cooldown": [
+          0.8,
+          1.6
+        ]
+      },
+      "attacks": [
+        {
+          "name": "soco",
+          "windup": 0.4,
+          "active": 0.08,
+          "recover": 0.35,
+          "damage_mult": 0.9,
+          "stamina_cost": 8,
+          "weight": 3
+        },
+        {
+          "name": "voadora",
+          "windup": 0.75,
+          "active": 0.12,
+          "recover": 0.6,
+          "damage_mult": 1.7,
+          "stamina_cost": 20,
+          "unblockable": true,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "electrobrute",
+      "character": "electrobrute",
+      "title": "Brutamontes Elétrico",
+      "hp": 380,
+      "damage": 19,
+      "stamina": 160,
+      "reach": 220,
+      "gold": 180,
+      "stagger_resist": 0.6,
+      "ai": {
+        "aggression": 0.55,
+        "block_chance": 0.3,
+        "dodge_chance": 0.05,
+        "cooldown": [
+          0.9,
+          1.7
+        ]
+      },
+      "attacks": [
+        {
+          "name": "choque",
+          "windup": 0.5,
+          "active": 0.1,
+          "recover": 0.45,
+          "damage_mult": 1.0,
+          "stamina_cost": 10,
+          "weight": 3
+        },
+        {
+          "name": "descarga",
+          "windup": 0.85,
+          "active": 0.15,
+          "recover": 0.7,
+          "damage_mult": 2.2,
+          "stamina_cost": 25,
+          "unblockable": true,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "phoenix",
+      "character": "phoenix",
+      "title": "Ave de Brasa",
+      "hp": 420,
+      "damage": 22,
+      "stamina": 180,
+      "reach": 230,
+      "gold": 240,
+      "stagger_resist": 0.7,
+      "ai": {
+        "aggression": 0.8,
+        "block_chance": 0.15,
+        "dodge_chance": 0.35,
+        "cooldown": [
+          0.5,
+          1.2
+        ]
+      },
+      "attacks": [
+        {
+          "name": "bicada",
+          "windup": 0.32,
+          "active": 0.08,
+          "recover": 0.3,
+          "damage_mult": 0.8,
+          "stamina_cost": 8,
+          "weight": 4
+        },
+        {
+          "name": "mergulho flamejante",
+          "windup": 0.7,
+          "active": 0.12,
+          "recover": 0.6,
+          "damage_mult": 2.0,
+          "stamina_cost": 22,
+          "unblockable": true,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "winter_monarch",
+      "character": "winter_monarch",
+      "title": "Monarca do Inverno (Chefe)",
+      "hp": 700,
+      "damage": 27,
+      "stamina": 220,
+      "reach": 240,
+      "gold": 500,
+      "stagger_resist": 0.75,
+      "ai": {
+        "aggression": 0.7,
+        "block_chance": 0.4,
+        "dodge_chance": 0.2,
+        "cooldown": [
+          0.6,
+          1.3
+        ]
+      },
+      "attacks": [
+        {
+          "name": "lâmina de gelo",
+          "windup": 0.36,
+          "active": 0.08,
+          "recover": 0.35,
+          "damage_mult": 0.9,
+          "stamina_cost": 8,
+          "weight": 3
+        },
+        {
+          "name": "nevasca",
+          "windup": 0.9,
+          "active": 0.16,
+          "recover": 0.7,
+          "damage_mult": 2.4,
+          "stamina_cost": 25,
+          "unblockable": true,
+          "weight": 1
+        },
+        {
+          "name": "golpe real",
+          "windup": 0.55,
+          "active": 0.1,
+          "recover": 0.5,
+          "damage_mult": 1.4,
+          "stamina_cost": 14,
+          "weight": 2
+        }
+      ]
+    }
+  ]
+}

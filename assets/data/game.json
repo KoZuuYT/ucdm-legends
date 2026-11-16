@@ -1,0 +1,43 @@
+{
+  "title": "UCDM Legends",
+  "display": { "width": 1280, "height": 720, "fullscreen": false, "vsync": true, "tick_rate": 60, "fps_cap": 144 },
+  "input": {
+    "left":    ["left", "a"],
+    "right":   ["right", "d"],
+    "up":      ["up", "w"],
+    "down":    ["down", "s"],
+    "confirm": ["return", "space"],
+    "back":    ["escape", "backspace"],
+    "attack":  ["j", "z"],
+    "block":   ["k", "x"],
+    "dodge":   ["l", "c", "left shift"]
+  },
+  "audio": {
+    "sfx_volume": 0.8,
+    "music_volume": 0.5,
+    "sfx": {
+      "hit": "audio/sfx/hit.ogg",
+      "crit": "audio/sfx/crit.ogg",
+      "block": "audio/sfx/block.ogg",
+      "parry": "audio/sfx/parry.ogg",
+      "miss": "audio/sfx/miss.ogg",
+      "coin": "audio/sfx/coin.ogg",
+      "levelup": "audio/sfx/levelup.ogg",
+      "click": "audio/sfx/click.ogg"
+    },
+    "music": {
+      "menu": "audio/music/menu.ogg",
+      "hub": "audio/music/hub.ogg",
+      "training": "audio/music/training.ogg",
+      "arena": "audio/music/arena.ogg"
+    }
+  },
+  "update": {
+    "enabled": true,
+    "repo": "SEU_USUARIO/SEU_REPOSITORIO",
+    "branch": "main",
+    "asset_pattern": "UCDM-{platform}-v{version}.zip",
+    "timeout": 6
+  },
+  "default_character": "kozu"
+}
