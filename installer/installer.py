@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from network import release_tools as rt  # noqa: E402
 
 # Substituído automaticamente no build do Release (workflow) pelo repositório real.
-DEFAULT_REPO = "SEU_USUARIO/SEU_REPOSITORIO"
+DEFAULT_REPO = "KoZuuYT/ucdm-legends"
 ASSET_PATTERN = "UCDM-{platform}-v{version}.zip"
 APP_NAME = "UCDM Legends"
 

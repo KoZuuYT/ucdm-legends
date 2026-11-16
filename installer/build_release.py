@@ -55,7 +55,7 @@ def main() -> int:
             patched = BUILD / "installer_entry.py"   # build/ fica 1 nível abaixo da raiz, como installer/
             patched.parent.mkdir(parents=True, exist_ok=True)
             patched.write_text(inst_src.read_text(encoding="utf-8").replace(
-                'DEFAULT_REPO = "SEU_USUARIO/SEU_REPOSITORIO"', f'DEFAULT_REPO = "{args.repo}"'), encoding="utf-8")
+                'DEFAULT_REPO = "KoZuuYT/ucdm-legends"', f'DEFAULT_REPO = "{args.repo}"'), encoding="utf-8")
             inst_src = patched
         run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir", "--windowed",
              "--name", "UCDM", "--distpath", str(DIST), "--workpath", str(BUILD / "game"),

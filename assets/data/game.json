@@ -34,7 +34,7 @@
   },
   "update": {
     "enabled": true,
-    "repo": "SEU_USUARIO/SEU_REPOSITORIO",
+    "repo": "KoZuuYT/ucdm-legends",
     "branch": "main",
     "asset_pattern": "UCDM-{platform}-v{version}.zip",
     "timeout": 6
