@@ -6,10 +6,12 @@ import random
 import pygame
 
 from core import paths, ui
+from core.i18n import tr
 from core.scene import Scene
 from entities import roster
 from entities.progression import Profile
-from systems import backdrop
+from core import config, theme
+from systems import backdrop, menu_fx
 
 
 def _read_version() -> str:
@@ -29,6 +31,7 @@ class MenuScene(Scene):
         chars = roster.characters()
         self.scenery = backdrop.Scenery(game, "dusk", 620)
         self.parade = random.sample(chars, k=min(7, len(chars)))
+        self.splash_text = random.choice(config.load("menu")["splashes"])
         self._build()
 
     def on_resize(self, canvas_w: int) -> None:
@@ -44,13 +47,21 @@ class MenuScene(Scene):
             buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Atualizar agora", self._update_now))
             y += 68
         if self.game.save.exists():
-            buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Continuar", self._continue))
-            y += 68
+            buttons.append(ui.Button((W // 2 - 170, y, 340, 62), "Continuar", self._continue, sub=self._save_line()))
+            y += 72
         buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Saves", self._saves))
         buttons.append(ui.Button((W // 2 - 170, y + 68, 340, 58), "Opções", self._options))
         buttons.append(ui.Button((W // 2 - 170, y + 136, 340, 58), "Sair", self._ask_quit))
         self.menu = ui.Menu(buttons)
         self.menu.focus = min(focus, len(buttons) - 1)
+
+    def _save_line(self) -> str:
+        """Resumo do save atual no botão Continuar: 'Nv 4 · Luta 3/8 · 120 ouro'."""
+        s = self.game.save.summary()
+        if not s:
+            return ""
+        n = len(roster.enemies())
+        return f"Nv {s['level']}  ·  Luta {min(s['arena_stage'] + 1, n)}/{n}  ·  {s['gold']} ouro"
 
     def _update_now(self) -> None:
         from scenes.boot import BootScene
@@ -128,7 +139,13 @@ class MenuScene(Scene):
 
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
-        self.scenery.draw(surf, self.t)
+        mc_look = theme.mc() and not ui.high_contrast
+        if not (mc_look and menu_fx.draw_panorama(surf, self.t)):
+            self.scenery.draw(surf, self.t)
+        a = self.game.assets
+        who = self.game.profile.character if self.game.profile else "steve"
+        hero = a.image_h(roster.character(who)["sprite"], 320)
+        surf.blit(hero, hero.get_rect(midbottom=(int(W * 0.17), 650 + 5 * math.sin(self.t * 2))))
         for i, c in enumerate(self.parade):
             x = 90 + i * (W - 180) / max(1, len(self.parade) - 1)
             y = 640 + 8 * math.sin(self.t * 3 + i)
@@ -136,13 +153,22 @@ class MenuScene(Scene):
             img = self.game.assets.image_h(c["sprite"], 150, look != c.get("faces", -1))
             surf.blit(img, img.get_rect(midbottom=(x, y)))
         title = self.game.cfg["title"]
-        tr_ = ui.text(surf, self.game.assets.font(96), title, (W // 2, 110 + 6 * math.sin(self.t * 2)), ui.ACCENT, "midtop")
-        self._title_shine(surf, tr_, title)
-        ui.text(surf, self.game.assets.font(26), "Treine. Lute. Evolua.", (W // 2, 230), anchor="midtop")
+        if mc_look:
+            logo = menu_fx.extruded_title(a.font(88), title)
+            lr = logo.get_rect(midtop=(W // 2, 100 + int(4 * math.sin(self.t * 2))))
+            surf.blit(logo, lr)
+            sp = menu_fx.splash(a.font(24), tr(self.splash_text), self.t, self.game.feedback.reduce_motion)
+            surf.blit(sp, sp.get_rect(center=(lr.right - 40, lr.bottom - 6)))
+        else:
+            tr_ = ui.text(surf, a.font(96), title, (W // 2, 110 + 6 * math.sin(self.t * 2)), ui.ACCENT, "midtop")
+            self._title_shine(surf, tr_, title)
+            ui.text(surf, a.font(26), "Treine. Lute. Evolua.", (W // 2, 230), anchor="midtop")
         if self.game.update_notice:
             from network.updater import can_self_update
             msg = (f"Nova versão {self.game.update_notice} disponível!" if can_self_update()
                    else f"Nova versão {self.game.update_notice} disponível (use git pull)")
             ui.text(surf, self.game.assets.font(22), msg, (W // 2, 282), ui.GREEN, "midtop")
-        self.menu.draw(surf, self.game.assets.font(32))
+        self.menu.draw(surf, a.font(32), a.font(17, bold=False))
+        ui.text(surf, a.font(16, bold=False), "Enter: selecionar    Esc: sair    F11: tela cheia", (16, H - 10),
+                (200, 200, 210), "bottomleft")
         ui.text(surf, self.game.assets.font(18), f"v{self.version}", (W - 12, H - 10), (200, 200, 200), "bottomright")

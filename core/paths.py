@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 FROZEN = getattr(sys, "frozen", False)
+ANDROID = "ANDROID_ARGUMENT" in os.environ or "ANDROID_PRIVATE" in os.environ
 
 # Pasta raiz da instalação (onde ficam assets/, version.json, executável).
 if FROZEN:
@@ -22,6 +23,8 @@ VERSION_FILE = BASE_DIR / "version.json"
 
 
 def _user_dir() -> Path:
+    if ANDROID:        # pasta privada do app (os saves sobrevivem a atualizações do APK)
+        return Path(os.environ.get("ANDROID_PRIVATE", os.environ.get("ANDROID_ARGUMENT", "."))) / "ucdm"
     if sys.platform == "win32":
         root = Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming"))
         return root / "UCDM"

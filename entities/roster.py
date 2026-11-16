@@ -79,6 +79,23 @@ def challenge_edef(cid: str) -> dict:
     return e
 
 
+WEAPON_TIERS = (("wooden_sword", "Espada de madeira"), ("stone_sword", "Espada de pedra"), ("iron_sword", "Espada de ferro"),
+                ("golden_sword", "Espada de ouro"), ("diamond_sword", "Espada de diamante"), ("netherite_sword", "Espada de netherita"))
+
+
+def weapon_tier(level: int) -> int:
+    """Nível da arma -> degrau (0 madeira ... 5 netherita): sobe a cada 2 níveis."""
+    return max(0, min(len(WEAPON_TIERS) - 1, (level - 1) // 2))
+
+
+def weapon_icon(level: int) -> str:
+    return f"item/{WEAPON_TIERS[weapon_tier(level)][0]}.png"
+
+
+def weapon_name(level: int) -> str:
+    return WEAPON_TIERS[weapon_tier(level)][1]
+
+
 def unlocked_skin(profile: Profile, s: dict) -> bool:
     u = s.get("unlock", {})
     if "wins" in u and profile.wins < u["wins"]:

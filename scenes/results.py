@@ -13,9 +13,10 @@ class ResultsOverlay(Scene):
     dim_alpha = 150
 
     def __init__(self, game, title: str, lines: list[str], on_close: Callable[[], None],
-                 color=ui.ACCENT) -> None:
+                 color=ui.ACCENT, grade: str | None = None) -> None:
         super().__init__(game)
         self.title, self.lines, self.color = title, lines, color
+        self.grade = grade
         self.on_close = on_close
         self.t = 0.0
         W, H = game.display.width, game.display.height
@@ -45,5 +46,13 @@ class ResultsOverlay(Scene):
         for i, line in enumerate(self.lines):   # linhas aparecem em sequência
             if self.t > 0.25 + i * 0.12:
                 ui.text(surf, s, line, (pr.centerx, pr.top + 110 + i * 44), anchor="midtop")
+        if self.grade and self.t > 0.9:         # carimbo da nota: entra grande e "bate" no painel
+            from systems import grading
+            k = min(1.0, (self.t - 0.9) / 0.25)
+            size = int(150 - 60 * k)
+            img = ui._heading(self.game.assets.font(size), self.grade, grading.GRADE_COLORS[self.grade])
+            img = pygame.transform.rotozoom(img, 12, 1.0)
+            img.set_alpha(int(255 * k))
+            surf.blit(img, img.get_rect(center=(pr.right - 110, pr.top + 150 + off)))
         self.menu.buttons[0].rect.y = self._btn_y + off
         self.menu.draw(surf, s)

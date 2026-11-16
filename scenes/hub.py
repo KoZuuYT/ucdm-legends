@@ -4,6 +4,8 @@ import math
 import pygame
 
 from core import config, icons, ui
+from core import mcassets as mc
+from core.i18n import tr
 from core.scene import Scene
 from entities import roster
 from entities.progression import STATS, weapon_cost, xp_to_next
@@ -40,7 +42,7 @@ class HubScene(Scene):
                                      sub="Campeão! Enfrente o chefe de novo"))
         cost = weapon_cost(p.weapon_level)
         buttons.append(ui.Button((x0, y0 + 256, 280, 62), f"Arma nv {p.weapon_level + 1}", self._upgrade,
-                                 enabled=p.gold >= cost, sub=f"{cost} ouro"))
+                                 enabled=p.gold >= cost, sub=f"{cost} ouro · {tr(roster.weapon_name(p.weapon_level + 1))}"))
         buttons.append(ui.Button((x0 + 300, y0 + 256, 280, 62), "Álbum de Lendas", self._change_char,
                                  sub=f"{len(p.collection)}/{len(roster.characters())} cartas"))
         last = p.last_training if p.last_training in REGISTRY else ""
@@ -134,6 +136,9 @@ class HubScene(Scene):
         ui.panel(surf, (24, 20, 400, 300))
         ui.text(surf, a.font(32), ch["name"], (44, 34), ui.ACCENT)
         ui.text(surf, a.font(22), f"Ouro: {p.gold}    Vitórias: {p.wins}", (44, 74))
+        wi = mc.sprite(roster.weapon_icon(p.weapon_level), 3)
+        if wi is not None:
+            surf.blit(wi, wi.get_rect(topright=(410, 22)))
         bal = config.load("balance")["stats"]
         for i, stat in enumerate(STATS):
             s = p.stats[stat]

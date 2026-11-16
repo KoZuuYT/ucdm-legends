@@ -15,10 +15,14 @@ import random
 
 import pygame
 
-from core import config, ui
+from core import compat
+
+from core import config, mcui, theme, ui
+from core import mcassets as mc
 from core.i18n import tr
 from core.input import VirtualButton, pretty_key
 from core.scene import Scene
+from systems import achievements, grading
 from entities import roster
 from entities.ai import EnemyBrain
 from systems import backdrop
@@ -36,7 +40,7 @@ class Decor:
 
     def __init__(self, kind, x, y, h, sprite=None, color=(0, 0, 0), flip=False):
         self.kind, self.x, self.y, self.h, self.sprite, self.color, self.flip = kind, x, y, h, sprite, color, flip
-        self.rect = pygame.FRect(x - h, y - h, h * 2, h)
+        self.rect = compat.FRect(x - h, y - h, h * 2, h)
 
 
 class ArenaScene(Scene):
@@ -72,10 +76,13 @@ class ArenaScene(Scene):
         self.hurt_flash = 0.0                   # borda vermelha quando o jogador leva dano
         self.hud_shake = 0.0
         self.style_total = 0                    # esquivas perfeitas + parries (bônus de ouro no fim)
+        self.st = dict(taken=0, dealt=0, parries=0, perfect_dodges=0, dodges=0, breaks=0, guardbreaks_taken=0,
+                       unblockable_taken=0, attacks=0, hits_landed=0, fatigue_peak=0.0)
         self._tired_cd = 0.0
         self._warned = False
         self._vignette: pygame.Surface | None = None
         self.now = 0.0
+        self._counted_windup = False
         self.over = 0.0          # tempo desde o fim da luta
         self.result: str | None = None
         self.parry_stun = config.load("balance")["fighter"]["parry_stun"]
@@ -126,6 +133,7 @@ class ArenaScene(Scene):
         enemy_dmg, parry = {"easy": (0.75, 1.25), "hard": (1.25, 0.85)}.get(gp.get("difficulty", "normal"), (1.0, 1.0))
         self.enemy.damage *= enemy_dmg
         self.player.parry_window *= parry
+        self.enemy.timing_aid = bool(gp.get("timing_aid", True))
         if gp.get("extended_warning"):
             self.enemy.attacks = [dataclasses.replace(a, windup=a.windup * 1.5) if (a.unblockable or a.guard_break) else a
                                   for a in self.enemy.attacks]
@@ -307,6 +315,10 @@ class ArenaScene(Scene):
             if att.pending_hit:
                 self._resolve(att, dfn)
         self._warning_cues(e)
+        self.st["fatigue_peak"] = max(self.st["fatigue_peak"], p.fatigue)
+        if p.state == "windup" and not self._counted_windup:
+            self.st["attacks"] += 1
+        self._counted_windup = p.state == "windup"
         if p.fatigue >= 3 and self._tired_cd <= 0 and p.state == "windup":
             self._tired_cd = 2.5
             self._float(p.pos.x, p.pos.y - p.height - 30, "CANSADO!", (240, 200, 90))
@@ -368,6 +380,29 @@ class ArenaScene(Scene):
         self._warned = danger
 
     # --- resolução de golpes ----------------------------------------------------------------
+    def _mc_fx(self, kind: str, x: float, y: float, facing: int = 1) -> None:
+        """Efeitos com os sprites de partícula do Minecraft (só no tema Minecraft)."""
+        if not theme.mc() or ui.high_contrast or self.game.low_perf:
+            return
+        fx = self.fx
+        if kind == "hit":
+            fx.anim(x, y, "particle/sweep", 8, k=4, flip=facing < 0, tint=(255, 235, 225))
+            fx.icons(x, y, "particle/damage.png", n=5, speed=300, k=4, direction=facing, tint=(235, 70, 55))
+        elif kind == "crit":
+            fx.anim(x, y, "particle/sweep", 8, k=6, flip=facing < 0, tint=(255, 225, 120))
+            fx.icons(x, y, "particle/critical_hit.png", n=10, speed=420, k=5, direction=facing, tint=(255, 215, 90))
+        elif kind == "parry":
+            fx.icons(x, y, "particle/enchanted_hit.png", n=12, speed=380, k=5, tint=(150, 215, 255))
+            fx.anim(x, y, "particle/spark", 8, k=7, fps=26, tint=(255, 215, 120))
+        elif kind == "dodge":
+            fx.anim(x, y, "particle/spark", 8, k=6, fps=28, tint=(140, 215, 255))
+            fx.icons(x, y, "particle/glint.png", n=6, speed=260, k=4, gravity=0, tint=(190, 235, 255))
+        elif kind == "break":
+            fx.anim(x, y, "particle/explosion", 16, k=8, fps=36, tint=(255, 200, 110))
+            fx.icons(x, y, "particle/critical_hit.png", n=8, speed=380, k=4, tint=(255, 215, 90))
+        elif kind == "block":
+            fx.icons(x, y, "particle/generic_3.png", n=5, speed=240, k=4, direction=facing, tint=(130, 170, 255))
+
     def _resolve(self, att, dfn) -> None:
         atk, att.pending_hit = att.pending_hit, None
         mine = dfn is self.player           # o jogador é quem está se defendendo
@@ -386,6 +421,9 @@ class ArenaScene(Scene):
                 self._poise_broken(att)
             else:
                 att.stun(self.parry_stun if mine else 1.0)
+            self._mc_fx("parry", x, y)
+            if mine:
+                self.st["parries"] += 1
             fx.burst(x, y, ui.ACCENT, n=24, speed=360, streak=True)
             fx.ring(x, y, (150, 220, 255), radius=170, life=0.4, width=7)
             fx.star(x, y, (200, 240, 255), size=120, life=0.25)
@@ -414,6 +452,8 @@ class ArenaScene(Scene):
                 dfn.stamina = min(dfn.max_stamina, dfn.stamina + 24)
                 dfn.style += 2
                 self.style_total += 2
+                self._mc_fx("dodge", x, y)
+                self.st["perfect_dodges"] += 1
                 fx.ring(x, y, (130, 200, 255), radius=200, life=0.45, width=6)
                 fx.burst(x, y, (180, 225, 255), n=18, speed=380, streak=True)
                 self._float(x, y, "ESQUIVA PERFEITA!", (140, 215, 255), self.big_font)
@@ -433,7 +473,9 @@ class ArenaScene(Scene):
                     self.brain.on_defended("dodge", self.now)
             if mine:
                 prof.bump("dodges")
+                self.st["dodges"] += 1
         elif res.outcome == "block":
+            self._mc_fx("block", x, y, facing)
             fx.burst(x, y, ui.BLUE, n=10, speed=300, streak=True, direction=facing)
             fx.ring(x, y, (150, 190, 255), radius=90, life=0.25, width=5)
             self._float(x, y, f"-{res.damage}", ui.BLUE)
@@ -446,6 +488,9 @@ class ArenaScene(Scene):
             else:
                 dfn.style = 0
         elif res.outcome == "guardbreak":
+            if mine:
+                self.st["guardbreaks_taken"] += 1
+                self.st["taken"] += res.damage
             fx.burst(x, y, (255, 160, 40), n=22, speed=420, streak=True)
             fx.ring(x, y, (255, 160, 40), radius=150, life=0.4, width=7)
             self._float(x, y, "GUARDA QUEBRADA!", (255, 160, 40), self.big_font)
@@ -458,7 +503,15 @@ class ArenaScene(Scene):
             dfn.style = 0
         elif res.outcome in ("hit", "crit"):
             crit = res.outcome == "crit"
+            if mine:
+                self.st["taken"] += res.damage
+                if atk.unblockable:
+                    self.st["unblockable_taken"] += 1
+            else:
+                self.st["dealt"] += res.damage
+                self.st["hits_landed"] += 1
             col = (255, 215, 90) if crit else (255, 90, 70)
+            self._mc_fx("crit" if crit else "hit", x, y, facing)
             fx.burst(x, y, (255, 230, 120) if crit else (235, 70, 55), n=22 if crit else 13, speed=430, streak=True,
                      direction=facing)
             fx.burst(x, y, (255, 255, 255), n=6, speed=200, size=4)
@@ -500,6 +553,9 @@ class ArenaScene(Scene):
     def _poise_broken(self, f) -> None:
         """A armadura do inimigo caiu: ele fica atordoado e vulnerável (dano cheio)."""
         x, y = f.pos.x, f.pos.y - f.height * 0.6
+        if f is self.enemy:
+            self.st["breaks"] += 1
+        self._mc_fx("break", x, y)
         self.fx.burst(x, y, (255, 220, 120), n=26, speed=440, streak=True)
         self.fx.ring(x, y, (255, 220, 120), radius=210, life=0.45, width=8)
         self.fx.star(x, y, (255, 240, 190), size=150, life=0.3)
@@ -511,6 +567,11 @@ class ArenaScene(Scene):
 
     def _float(self, x, y, msg, color, font=None) -> None:
         self.fx.text(x, y, (font or self.dmg_font).render(tr(msg), True, color))
+
+    def _fight_stats(self, won: bool) -> dict:
+        p = self.player
+        return {**self.st, "won": won, "time": self.now, "hp_frac": p.hp / max(1.0, p.max_hp),
+                "par_time": 25.0 + self.enemy.max_hp * 0.12}
 
     def _finish(self) -> None:
         prof = self.game.profile
@@ -535,6 +596,15 @@ class ArenaScene(Scene):
             if first and not self.challenger:
                 prof.arena_stage += 1
             lines = [f"Você derrotou {self.enemy.name}!", f"+{gold} ouro"]
+            letter = grading.grade(self._fight_stats(True))
+            lines.append(f"Nota: {letter}")
+            prof.bump("gold_total", gold)
+            prof.bump("armor_breaks", self.st["breaks"])
+            prof.record("parries_fight", self.st["parries"])
+            if self.player.hp >= self.player.max_hp - 0.01:
+                prof.bump("flawless_wins")
+            if letter == "S":
+                prof.bump("rank_s")
             rar = roster.rarity(self.edef["character"])
             if (self.challenger and first) or (not self.challenger and new_card):
                 lines.append(f"Carta {roster.rarity_info(rar)['label']} adicionada ao álbum!")
@@ -551,11 +621,17 @@ class ArenaScene(Scene):
             self.game.audio.play("coin")
             title, color = "VITÓRIA", ui.ACCENT
         else:
-            lines = [f"{self.enemy.name} venceu desta vez.", "Treine seus atributos e volte!"]
+            lines = [f"{self.enemy.name} venceu desta vez."]
+            lines += grading.hints(self._fight_stats(False)) or ["Treine seus atributos e volte!"]
             title, color = "DERROTA", ui.RED
+            letter = None
+        for d in achievements.check(prof):
+            lines.append(f"Conquista: {d['name']}")
+            self.game.feedback.toast(f"Conquista: {d['name']}", (255, 205, 70), 4.0)
         self.game.save.save(prof)
         self.game.scenes.push(ResultsOverlay(self.game, title, lines,
-                                             on_close=lambda: self.game.scenes.pop(fade=True), color=color))
+                                             on_close=lambda: self.game.scenes.pop(fade=True), color=color,
+                                             grade=letter if self.result == "win" else None))
 
     # --- render -------------------------------------------------------------------------
     def _zoom(self) -> float:
@@ -685,16 +761,38 @@ class ArenaScene(Scene):
             bx = portrait.right + 12 if side < 0 else portrait.left - 12 - 420
             hurt = shake if f is p else 0
             ui.text(surf, self.font, f.name, (bx if side < 0 else bx + 420, 14), anchor="topleft" if side < 0 else "topright")
+            if f is p:
+                wi = mc.sprite(roster.weapon_icon(self.game.profile.weapon_level), 2)
+                if wi is not None:
+                    surf.blit(wi, (bx + self.font.size(f.name)[0] + 10, 10))
             low = f.hp / f.max_hp < 0.3 and int(self.now * 4) % 2 == 0
-            ui.bar(surf, (bx + hurt, 46, 420, 24), f.hp / f.max_hp, (255, 120, 90) if low else ui.RED, ghost=ghost,
-                   rtl=side > 0)
-            ui.text(surf, self.small, f"{int(f.hp)}/{int(f.max_hp)}", (bx + 210, 49), anchor="midtop")
+            frac = f.hp / f.max_hp
+            mc_hud = theme.mc() and not ui.high_contrast
+            if mc_hud and f is p:        # tema Minecraft: corações (pisca ao levar dano, treme com pouca vida)
+                mcui.hearts(surf, bx + hurt, 42, frac, blink=ghost > frac + 0.02,
+                            shake_t=self.now if frac < 0.3 else None)
+            elif mc_hud:                 # inimigo: barra de chefe (segmentada na luta final)
+                boss = self.stage == len(roster.enemies()) - 1
+                mcui.boss_bar(surf, pygame.Rect(bx, 48, 420, 16), frac, "purple" if boss else "red",
+                              notches=20 if boss else 0, rtl=True)
+            else:
+                ui.bar(surf, (bx + hurt, 46, 420, 24), frac, (255, 120, 90) if low else ui.RED, ghost=ghost,
+                       rtl=side > 0)
+            ui.text(surf, self.small, f"{int(f.hp)}/{int(f.max_hp)}", (bx + 210, 49 if not mc_hud or f is not p else 72),
+                    anchor="midtop")
             if f is p:
                 low_st = p.stamina < p.dodge_cost
                 sta_col = (255, 150, 50) if low_st and int(self.now * 6) % 2 == 0 else ui.GREEN
-                ui.bar(surf, (bx, 76, 300, 12), p.stamina / p.max_stamina, sta_col)
+                if mc_hud:
+                    mcui.icons(surf, bx, 76, p.stamina / p.max_stamina, "food", k=2)
+                else:
+                    ui.bar(surf, (bx, 76, 300, 12), p.stamina / p.max_stamina, sta_col)
             else:
-                if f.max_poise > 0:
+                if f.max_poise > 0 and mc_hud:
+                    mcui.icons(surf, bx + 420 - 18, 68, f.poise / f.max_poise, "armor", k=2, rtl=True)
+                    ui.text(surf, self.small, self.edef.get("title", ""), (bx + 420, 90), ui.ACCENT, "topright")
+                    continue
+                elif f.max_poise > 0:
                     broken = f.poise <= 0
                     col = (255, 120, 90) if broken else (235, 200, 90)
                     ui.bar(surf, (bx, 74, 300, 12), f.poise / f.max_poise, col, rtl=True)

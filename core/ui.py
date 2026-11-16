@@ -8,6 +8,7 @@ from typing import Callable
 
 import pygame
 
+from core import mcui, theme
 from core.i18n import tr
 from core.input import InputManager
 
@@ -212,6 +213,8 @@ def bar(surf, rect, frac, color, back=(34, 36, 48), border=WHITE, ghost: float |
 def panel(surf, rect, color=(20, 22, 32, 210), accent=True):
     """Painel com degradê, sombra suave, borda e cantos em destaque."""
     rect = pygame.Rect(rect)
+    if theme.mc() and not high_contrast and mcui.panel(surf, rect):
+        return
     alpha = 255 if high_contrast else color[3] if len(color) > 3 else 210
     base = color[:3]
     shadow = _remember(("pshadow", rect.w, rect.h), lambda: _shadow_surface(rect.size))
@@ -306,6 +309,8 @@ class Button:
         grow_x = 12 * k + 14 * pop - 8 * self._press
         grow_y = 6 * k + 8 * pop - 5 * self._press
         r = self.rect.inflate(int(grow_x), int(grow_y))
+        if theme.mc() and not high_contrast:
+            return self._draw_mc(surf, r, font, small_font, lit, dt)
         if self.enabled:
             top = _mix((92, 98, 130), (168, 138, 66), k)
             bot = _mix((50, 54, 82), (104, 82, 36), k)
@@ -347,6 +352,21 @@ class Button:
         if self.sub and small_font:
             text(surf, small_font, self.sub, (r.centerx, r.centery + 16), (205, 205, 175) if self.enabled else txt,
                  "center")
+
+
+def _draw_mc(self, surf, r, font, small_font, lit, dt) -> None:
+    """Botão no tema Minecraft: sprite 9-slice + texto com sombra dura (sem gradiente/glint)."""
+    if not mcui.button(surf, r, lit, self.enabled):
+        return
+    if self._ripple:
+        self._ripple = None
+    cy = r.centery - (9 if self.sub and small_font else 0)
+    mcui.label(surf, font, tr(self.label), (r.centerx, cy + int(2 * self._press)), lit, self.enabled)
+    if self.sub and small_font:
+        mcui.label(surf, small_font, tr(self.sub), (r.centerx, r.centery + 16), False, self.enabled)
+
+
+Button._draw_mc = _draw_mc
 
 
 def _glow_surface(size) -> pygame.Surface:

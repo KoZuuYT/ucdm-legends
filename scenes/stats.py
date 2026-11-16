@@ -5,7 +5,7 @@ from core import config, ui
 from core.scene import Scene
 from entities import roster
 from scenes.save_select import fmt_time
-from systems import backdrop
+from systems import achievements, backdrop
 
 
 class StatsScene(Scene):
@@ -13,10 +13,24 @@ class StatsScene(Scene):
         super().__init__(game)
         self.t = 0.0
         self.scenery = backdrop.Scenery(game, "night", 600)
+        self.ach_btn = ui.Button((1280 - 330, 30, 290, 52), "Conquistas", self._open_ach,
+                                 sub=f"{len(game.profile.achievements)}/{len(achievements.defs())}")
+
+    def _open_ach(self) -> None:
+        from scenes.achievements_screen import AchievementsScene
+        self.game.scenes.push(AchievementsScene(self.game), fade="slide")
+
+    def resume(self) -> None:
+        self.ach_btn.sub = f"{len(self.game.profile.achievements)}/{len(achievements.defs())}"
 
     def update(self, dt: float) -> None:
         self.t += dt
         inp = self.game.input
+        for pos in inp.taps:
+            if self.ach_btn.rect.collidepoint(pos):
+                return self.ach_btn.click(pos)
+        if self.t > 0.15 and inp.pressed("dodge"):
+            return self._open_ach()
         if self.t > 0.15 and (inp.pressed("back") or inp.pressed("confirm") or inp.taps):
             ui.sfx("back")
             self.game.scenes.pop(fade="slide")
@@ -26,7 +40,7 @@ class StatsScene(Scene):
         a = self.game.assets
         p = self.game.profile
         self.scenery.draw(surf, self.t)
-        ui.text(surf, a.font(52), "Estatísticas", (W // 2, 24), ui.ACCENT, "midtop")
+        ui.text(surf, a.font(52), "Estatísticas", (60, 24), ui.ACCENT, "topleft")
         c = p.counters
         ui.panel(surf, (40, 100, 560, 560))
         rows = [("Tempo de jogo", fmt_time(p.playtime)), ("Ouro", p.gold), ("Nível da arma", p.weapon_level),
@@ -61,4 +75,5 @@ class StatsScene(Scene):
             ui.text(surf, a.font(20, bold=False), f"{i + 1}. {name if i <= p.arena_stage else '???'}", (660, y), col)
             ui.text(surf, a.font(20, bold=False), state, (1210, y), col, "topright")
             y += 30
-        ui.text(surf, a.font(18, bold=False), "Esc / Enter para voltar", (W // 2, H - 26), (190, 190, 200), "midbottom")
+        self.ach_btn.draw(surf, a.font(24), False, a.font(16, bold=False))
+        ui.text(surf, a.font(18, bold=False), "Esc / Enter para voltar    Esquiva: conquistas", (W // 2, H - 26), (190, 190, 200), "midbottom")

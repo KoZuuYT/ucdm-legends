@@ -1,0 +1,78 @@
+# APK Android (debug assinado, instalável direto no celular).
+# Dispara ao publicar uma tag vX.Y.Z ou manualmente (Actions -> Android APK -> Run workflow).
+# O APK fica como artefato da execução e, quando for uma tag, também anexado à Release.
+name: Android APK
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [android-test]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Dependências do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip autoconf automake libtool pkg-config zlib1g-dev \
+            libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential ccache
+
+      - name: Buildozer
+        run: pip install --upgrade pip "cython==0.29.36" buildozer
+
+      - name: Ajustar versão
+        run: |
+          V=$(python -c "import json;print(json.load(open('version.json',encoding='utf-8'))['version'])")
+          sed -i "s/^version = .*/version = $V/" buildozer.spec
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+
+      - name: Cache do Buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}-v1
+
+      - name: Compilar APK
+        run: buildozer -v android debug
+
+      - name: Nomear APK
+        run: |
+          mkdir -p out
+          cp bin/*.apk "out/UCDM-Legends-v${VERSION}.apk"
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UCDM-Legends-apk
+          path: out/*.apk
+
+      - name: Anexar à Release (se for tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          for i in $(seq 1 60); do
+            if gh release view "$TAG" >/dev/null 2>&1; then break; fi
+            echo "aguardando a release $TAG..."; sleep 30
+          done
+          gh release upload "$TAG" out/*.apk --clobber

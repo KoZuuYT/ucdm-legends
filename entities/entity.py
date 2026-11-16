@@ -8,6 +8,8 @@ from typing import TypeVar
 
 import pygame
 
+from core import compat
+
 C = TypeVar("C")
 _ids = itertools.count(1)
 
@@ -21,8 +23,8 @@ class Entity:
         self._components: dict[type, object] = {}
 
     @property
-    def rect(self) -> pygame.FRect:
-        return pygame.FRect(self.pos.x - self.size.x / 2, self.pos.y - self.size.y, self.size.x, self.size.y)
+    def rect(self) -> compat.FRect:
+        return compat.FRect(self.pos.x - self.size.x / 2, self.pos.y - self.size.y, self.size.x, self.size.y)
 
     def add(self, component: C) -> C:
         self._components[type(component)] = component

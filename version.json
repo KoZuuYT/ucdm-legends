@@ -1,4 +1,4 @@
 {
-  "version": "0.5.1",
-  "notes": "Voce agora joga como o Steve! As lendas do UCDM viraram adversarios com raridade (Comum, Incomum, Raro, Epico e Lendario): derrote-as para completar o Album de Lendas. Cada raridade abre conforme voce avanca na arena. Novas aparencias do Steve (Alex, Ari, Efe, Kai, Makena, Noor, Sunny e Zuri) desbloqueiam por metas. Assets de Minecraft incluidos no projeto (projeto de fas, sem fins lucrativos). Corrige a publicacao da versao 0.5.0."
+  "version": "0.6.0",
+  "notes": "Inicio do overhaul de design: tema Minecraft nas Opcoes (botoes, paineis e HUD de coracoes e barra de chefe com os graficos do jogo), novas curvas de animacao, mola e sequencias, e a base de assets de Minecraft com 9-slice."
 }

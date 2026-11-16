@@ -5,7 +5,7 @@ import time
 
 import pygame
 
-from core import config, i18n, paths, settings, ui
+from core import config, i18n, paths, settings, theme, ui
 from core.display import Display
 from core.events import EventBus
 from core.feedback import Feedback
@@ -90,6 +90,7 @@ class Game:
         ui.apply_accessibility(colorblind_mode=acc.get("colorblind", False),
                                high_contrast_mode=acc.get("high_contrast", False))
         self.assets.set_font_scale(acc.get("text_scale", 1.0))
+        theme.set_theme(self.cfg.get("ui", {}).get("theme", "torneio"))
 
     def apply_settings(self) -> None:
         """Relê settings.json e aplica o que dá para mudar sem reiniciar."""
@@ -109,7 +110,7 @@ class Game:
     def _background_update(self, dt: float) -> None:
         """A cada N minutos checa se há versão nova (thread). Só AVISA: nunca baixa nem reinicia sozinho."""
         cfg = self.cfg.get("update", {})
-        if self.headless or not cfg.get("background_check", True) or self.update_notice:
+        if self.headless or paths.ANDROID or not cfg.get("background_check", True) or self.update_notice:
             return
         task = self._bg_task
         if task is not None:

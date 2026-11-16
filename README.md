@@ -39,6 +39,12 @@ Você joga como o **Steve**. As **lendas do UCDM** são os adversários e têm r
 
 Os gráficos de Minecraft ficam em `assets/mc/` (projeto de fãs gratuito, sem afiliação com a Mojang/Microsoft).
 
+## Interface: temas e visual
+Em *Opções → Vídeo → Tema da interface* escolha **Torneio** (padrão) ou **Minecraft**: botões, painéis, corações de vida, barra de chefe,
+panorama do menu e partículas de combate usam os gráficos de `assets/mc/`. Depois de cada vitória você recebe uma **nota (S-D)**
+(vida restante, ritmo e jogadas de parry/esquiva perfeita) e, na derrota, dicas calculadas dos números da luta.
+O planejamento completo do overhaul está em `docs/planejamento/design/`.
+
 ## Loop de jogo
 1. **Treinos** (cada um sobe um atributo): Golpe → Força, Escudo → Defesa, Esquiva → Agilidade, Mira → Foco.
 2. **Arena**: 8 desafiantes em sequência (até o chefe), com entrada animada (versus + contagem 3-2-1).

@@ -130,6 +130,7 @@ class Fighter(Entity):
         self._since_hit = 0.0
         # --- animação / efeitos ---
         self.ghosts_on = True               # desligado no modo de baixo desempenho
+        self.timing_aid = True              # anel de timing: mostra o instante do golpe (parry / esquiva perfeita)
         self.ghosts: list[list] = []        # rastro: [x, y, vida, superfície]
         self._ghost_cd = 0.0
         self.fx_queue: list[tuple] = []     # pedidos de partículas para a cena: ("dust", x, y) etc.
@@ -566,9 +567,13 @@ class Fighter(Entity):
             pygame.draw.polygon(surf, col, [(cx + 22, cy - 8), (cx + 38, cy - 8), (cx + 38, cy + 4), (cx + 30, cy + 14),
                                             (cx + 22, cy + 4)], 2)
             pygame.draw.line(surf, col, (cx + 24, cy - 10), (cx + 36, cy + 12), 2)
-        if kind != "normal":            # anel de perigo que se fecha no alvo
-            rr = int(60 - 40 * k)
-            pygame.draw.circle(surf, col, (cx, cy), rr, 2)
+        if kind != "normal" or self.timing_aid:     # anel que se fecha no alvo: o golpe cai quando ele toca o círculo verde
+            rr = int(62 - 44 * k)
+            pygame.draw.circle(surf, col, (cx, cy), max(8, rr), 2)
+        if self.timing_aid:
+            pygame.draw.circle(surf, (120, 255, 160), (cx, cy), 18, 1)
+            if k > 0.72:                # janela final: o círculo-alvo acende
+                pygame.draw.circle(surf, (120, 255, 160), (cx, cy), 18, 3)
 
     def _draw_counter_marker(self, surf, sx, sy, font) -> None:
         """Ícone dourado + barra: avisa que o PRÓXIMO golpe é um contra-ataque."""

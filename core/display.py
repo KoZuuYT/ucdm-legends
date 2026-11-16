@@ -27,10 +27,15 @@ class Display:
         pygame.display.set_caption(title)
         if not headless:
             self._set_icon()
-        self.window = self._set_mode((width, height), pygame.RESIZABLE)
+        from core import paths
+        if paths.ANDROID and not headless:        # celular: tela inteira, sem janela
+            self.window = self._set_mode((0, 0), pygame.FULLSCREEN)
+            self.fullscreen = True
+        else:
+            self.window = self._set_mode((width, height), pygame.RESIZABLE)
         self.surface = self._new_canvas(width)
         self.rect = self.surface.get_rect()
-        if fullscreen and not headless:
+        if fullscreen and not headless and not self.fullscreen:
             self.toggle_fullscreen()
         self.layout()
 

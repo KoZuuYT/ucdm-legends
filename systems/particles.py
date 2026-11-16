@@ -8,6 +8,7 @@ import random
 
 import pygame
 
+from core import mcassets as mc
 from systems.pool import Pool
 from systems.tween import ease_out_back, ease_out_cubic
 
@@ -24,6 +25,20 @@ class Particle:
         self.color = (255, 255, 255)
         self.gravity = 0.0
         self.kind = SQUARE
+
+
+class Spr:
+    """Sprite de Minecraft: animação de quadros (sweep, explosion...) ou ícone solto que voa (critical_hit...)."""
+    __slots__ = ("x", "y", "vx", "vy", "gravity", "life", "max_life", "frames", "k", "flip", "angle", "tint")
+
+    def __init__(self) -> None:
+        self.x = self.y = self.vx = self.vy = self.gravity = 0.0
+        self.life = self.max_life = 0.0
+        self.frames: list[str] = []
+        self.k = 4
+        self.flip = False
+        self.angle = 0.0
+        self.tint = None
 
 
 class FloatText:
@@ -50,6 +65,8 @@ class ParticleSystem:
         self.parts: Pool[Particle] = Pool(Particle, capacity, grow=False)  # teto fixo de custo
         self.texts: Pool[FloatText] = Pool(FloatText, 32)
         self.rings: Pool[Ring] = Pool(Ring, 24, grow=False)
+        self.sprs: Pool[Spr] = Pool(Spr, 64, grow=False)
+        self._frames: dict[str, list[str]] = {}
         self.scale = 1.0     # multiplicador de quantidade (intensidade de feedback / modo reduzido)
 
     def ring(self, x, y, color, radius=120, life=0.35, width=5, star=False) -> None:
@@ -57,6 +74,42 @@ class ParticleSystem:
         if r is None:
             return
         r.x, r.y, r.color, r.radius, r.life, r.max_life, r.width, r.star = x, y, color, radius, life, life, width, star
+
+    def frames_of(self, prefix: str, count: int) -> list[str]:
+        """Caminhos dos quadros `<prefix>_0..N` que existem em assets/mc (em cache)."""
+        fr = self._frames.get(prefix)
+        if fr is None:
+            fr = [f"{prefix}_{i}.png" for i in range(count) if mc.load(f"{prefix}_{i}.png") is not None]
+            self._frames[prefix] = fr
+        return fr
+
+    def anim(self, x, y, prefix: str, count: int, k: int = 5, fps: float = 30.0, flip: bool = False,
+             angle: float = 0.0, tint=None) -> None:
+        """Toca uma animação de partícula de Minecraft (ex.: 'particle/sweep', 8 quadros) no mundo."""
+        fr = self.frames_of(prefix, count)
+        if not fr or self.scale <= 0:
+            return
+        s = self.sprs.spawn()
+        if s is None:
+            return
+        s.x, s.y, s.vx, s.vy, s.gravity = x, y, 0.0, 0.0, 0.0
+        s.frames, s.k, s.flip, s.angle, s.tint = fr, k, flip, angle, tint
+        s.life = s.max_life = len(fr) / fps
+
+    def icons(self, x, y, rel: str, n: int = 6, speed: float = 320, k: int = 4, gravity: float = 500,
+              life: float = 0.5, direction: int | None = None, tint=None) -> None:
+        """Rajada de ícones de partícula (ex.: 'particle/critical_hit.png') com leve gravidade."""
+        if mc.load(rel) is None:
+            return
+        for _ in range(max(1, int(n * self.scale))):
+            s = self.sprs.spawn()
+            if s is None:
+                return
+            ang = random.uniform(0, math.tau) if direction is None else math.atan2(random.uniform(-0.9, 0.3), direction) + random.uniform(-0.5, 0.5)
+            sp = speed * random.uniform(0.5, 1.0)
+            s.x, s.y, s.vx, s.vy, s.gravity = x, y, math.cos(ang) * sp, math.sin(ang) * sp, gravity
+            s.frames, s.k, s.flip, s.angle, s.tint = [rel], k, False, 0.0, tint
+            s.life = s.max_life = life * random.uniform(0.7, 1.1)
 
     def star(self, x, y, color, size=100, life=0.25) -> None:
         """Estrela de impacto (8 pontas) que estoura e some: o "POW" do golpe."""
@@ -106,6 +159,12 @@ class ParticleSystem:
             if p.kind == PUFF:
                 p.vx *= 1 - 2.0 * dt
         self.parts.release_where(lambda p: p.life <= 0)
+        for s in self.sprs.active:
+            s.life -= dt
+            s.vy += s.gravity * dt
+            s.x += s.vx * dt
+            s.y += s.vy * dt
+        self.sprs.release_where(lambda s: s.life <= 0)
         for t in self.texts.active:
             t.life -= dt
             t.y -= 60 * dt
@@ -143,6 +202,20 @@ class ParticleSystem:
             pygame.draw.circle(ring, (*r.color, int(230 * (1 - k))), (rad + 4, rad + 4), rad,
                                max(1, int(r.width * (1 - k)) + 1))
             surf.blit(ring, ring.get_rect(center=(x, y)), special_flags=pygame.BLEND_PREMULTIPLIED)
+        for s in self.sprs.active:
+            x, y = camera.to_screen(s.x, s.y) if camera else (s.x, s.y)
+            if not (-80 <= x < w + 80 and -80 <= y < h + 80):
+                continue
+            n = len(s.frames)
+            idx = min(n - 1, int((1 - s.life / s.max_life) * n))
+            img = mc.tinted(s.frames[idx], s.k, s.tint) if s.tint else mc.sprite(s.frames[idx], s.k)
+            if img is None:
+                continue
+            if s.flip:
+                img = pygame.transform.flip(img, True, False)
+            if s.angle:
+                img = pygame.transform.rotate(img, s.angle)
+            surf.blit(img, img.get_rect(center=(x, y)))
         for t in self.texts.active:
             x, y = camera.to_screen(t.x, t.y) if camera else (t.x, t.y)
             img = t.img
@@ -176,3 +249,4 @@ class ParticleSystem:
         self.parts.clear()
         self.texts.clear()
         self.rings.clear()
+        self.sprs.clear()

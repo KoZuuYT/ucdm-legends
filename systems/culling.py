@@ -7,12 +7,14 @@ from typing import Generic, Hashable, Iterable, TypeVar
 
 import pygame
 
+from core import compat
+
 T = TypeVar("T", bound=Hashable)
 
 
 class Camera:
     def __init__(self, width: int, height: int, world: pygame.Rect | None = None) -> None:
-        self.view = pygame.FRect(0, 0, width, height)
+        self.view = compat.FRect(0, 0, width, height)
         self.world = world
         self.smooth = 8.0
         self.shake_time = 0.0
@@ -52,7 +54,7 @@ class SpatialGrid(Generic[T]):
         self.cell = cell
         self._cells: dict[tuple[int, int], set[T]] = {}
         self._where: dict[T, tuple[tuple[int, int], ...]] = {}
-        self._rects: dict[T, pygame.FRect] = {}
+        self._rects: dict[T, compat.FRect] = {}
 
     def _keys(self, r) -> tuple[tuple[int, int], ...]:
         c = self.cell
@@ -66,14 +68,14 @@ class SpatialGrid(Generic[T]):
         for k in keys:
             self._cells.setdefault(k, set()).add(obj)
         self._where[obj] = keys
-        self._rects[obj] = pygame.FRect(rect)
+        self._rects[obj] = compat.FRect(rect)
 
     def move(self, obj: T, rect) -> None:
         keys = self._keys(rect)
         if self._where.get(obj) != keys:
             self.insert(obj, rect)
         else:
-            self._rects[obj] = pygame.FRect(rect)
+            self._rects[obj] = compat.FRect(rect)
 
     def remove(self, obj: T) -> None:
         for k in self._where.pop(obj, ()):

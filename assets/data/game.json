@@ -146,7 +146,8 @@
     "difficulty": "normal",
     "extended_warning": false,
     "auto_pause": true,
-    "battle_intro": true
+    "battle_intro": true,
+    "timing_aid": true
   },
   "feedback": {},
   "language": "pt-BR",
@@ -157,5 +158,8 @@
   },
   "performance": {
     "low_mode": false
+  },
+  "ui": {
+    "theme": "torneio"
   }
 }

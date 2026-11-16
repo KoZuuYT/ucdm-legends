@@ -1,0 +1,29 @@
+{
+  "_doc": "Conquistas. stat = contador do perfil (counters) ou campo especial: wins, arena_stage, collection, legends, weapon_level, gold_total, trainings. min = valor mínimo. secret = aparece como ??? até liberar. icon = item de assets/mc/item.",
+  "achievements": [
+    {"id": "first_blood",   "name": "Primeiro Sangue",     "desc": "Vença sua primeira luta.",                    "icon": "iron_sword",        "stat": "wins", "min": 1},
+    {"id": "ten_wins",      "name": "Veterano",            "desc": "Vença 10 lutas.",                             "icon": "diamond_sword",     "stat": "wins", "min": 10},
+    {"id": "fifty_wins",    "name": "Lenda da Arena",      "desc": "Vença 50 lutas.",                             "icon": "netherite_sword",   "stat": "wins", "min": 50},
+    {"id": "parry_5",       "name": "Escudo Vivo",         "desc": "Faça 5 parries.",                             "icon": "totem_of_undying",  "stat": "parries", "min": 5},
+    {"id": "parry_50",      "name": "Mestre do Parry",     "desc": "Faça 50 parries.",                            "icon": "enchanted_book",    "stat": "parries", "min": 50},
+    {"id": "pdodge_10",     "name": "Fantasma",            "desc": "Faça 10 esquivas perfeitas.",                 "icon": "feather",           "stat": "perfect_dodges", "min": 10},
+    {"id": "pdodge_50",     "name": "Intocável",           "desc": "Faça 50 esquivas perfeitas.",                 "icon": "ender_pearl",       "stat": "perfect_dodges", "min": 50},
+    {"id": "crit_20",       "name": "Golpe Certeiro",      "desc": "Acerte 20 críticos.",                         "icon": "golden_apple",      "stat": "crits", "min": 20},
+    {"id": "big_hit",       "name": "Pancada Monstra",     "desc": "Cause 40 de dano em um golpe.",              "icon": "mace",              "stat": "max_hit", "min": 40},
+    {"id": "breaker_10",    "name": "Quebra-Armaduras",    "desc": "Quebre 10 armaduras.",                        "icon": "iron_chestplate",   "stat": "armor_breaks", "min": 10},
+    {"id": "breaker_50",    "name": "Demolidor",           "desc": "Quebre 50 armaduras.",                        "icon": "diamond_chestplate","stat": "armor_breaks", "min": 50},
+    {"id": "flawless",      "name": "Sem um Arranhão",     "desc": "Vença sem perder vida.",                      "icon": "nether_star",       "stat": "flawless_wins", "min": 1},
+    {"id": "rank_s",        "name": "Nota S",              "desc": "Consiga nota S em uma luta.",                 "icon": "diamond",           "stat": "rank_s", "min": 1},
+    {"id": "rank_s_5",      "name": "Perfeccionista",      "desc": "Consiga nota S 5 vezes.",                     "icon": "netherite_ingot",   "stat": "rank_s", "min": 5},
+    {"id": "boss",          "name": "Chefe Derrubado",     "desc": "Vença o chefe da arena.",                     "icon": "trident",           "stat": "arena_stage", "min": 8},
+    {"id": "cards_10",      "name": "Colecionador",        "desc": "Derrote 10 lendas diferentes.",               "icon": "book",              "stat": "collection", "min": 10},
+    {"id": "cards_50",      "name": "Curador do Álbum",    "desc": "Derrote 50 lendas diferentes.",               "icon": "written_book",      "stat": "collection", "min": 50},
+    {"id": "cards_100",     "name": "Enciclopédia Viva",   "desc": "Derrote 100 lendas diferentes.",              "icon": "map",               "stat": "collection", "min": 100},
+    {"id": "legend_1",      "name": "Caçador de Lendas",   "desc": "Derrote uma lenda Lendária.",                 "icon": "gold_ingot",        "stat": "legends", "min": 1, "secret": true},
+    {"id": "trainer",       "name": "Rato de Academia",    "desc": "Complete 10 treinos.",                        "icon": "experience_bottle", "stat": "trainings", "min": 10},
+    {"id": "armory",        "name": "Ferreiro",            "desc": "Leve a arma ao nível 5.",                     "icon": "iron_ingot",        "stat": "weapon_level", "min": 5},
+    {"id": "rich",          "name": "Rei da Esmeralda",    "desc": "Acumule 1000 de ouro ao longo do jogo.",      "icon": "emerald",           "stat": "gold_total", "min": 1000},
+    {"id": "survivor",      "name": "Persistente",         "desc": "Perca 5 lutas e continue tentando.",          "icon": "bone",              "stat": "losses", "min": 5, "secret": true},
+    {"id": "all_skins",     "name": "Guarda-Roupa Completo","desc": "Desbloqueie todas as aparências.",           "icon": "name_tag",          "stat": "skins", "min": 9, "secret": true}
+  ]
+}

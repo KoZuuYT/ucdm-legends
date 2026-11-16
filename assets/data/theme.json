@@ -1,0 +1,9 @@
+{
+  "_doc": "Temas da interface. style: classic = visual 'Torneio' desenhado em código; mc = usa os sprites de assets/mc (botões, painéis, HUD de corações). Sem os assets de Minecraft o tema mc cai para classic.",
+  "default": "torneio",
+  "themes": {
+    "torneio":   {"label": "Torneio",   "style": "classic"},
+    "minecraft": {"label": "Minecraft", "style": "mc",
+                  "text": [255, 255, 255], "text_hover": [255, 255, 160], "text_disabled": [160, 160, 160], "shadow": [63, 63, 63]}
+  }
+}

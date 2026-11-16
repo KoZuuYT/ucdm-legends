@@ -295,6 +295,8 @@ class InputManager:
                 return
             for a in self._key_to_actions.get(event.key, ()):
                 self._press(a)
+            if event.key == getattr(pygame, "K_AC_BACK", None):     # botão "voltar" do Android
+                self._pulse("back")
         elif t == pygame.KEYUP:
             for a in self._key_to_actions.get(event.key, ()):
                 self._release(a)

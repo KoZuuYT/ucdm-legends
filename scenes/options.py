@@ -91,6 +91,8 @@ class OptionsScene(Scene):
                 Row("Tela cheia", "bool", "display.fullscreen"),
                 Row("Limite de FPS", "choice", "display.fps_cap", choices=[(v, "Ilimitado" if v == 0 else str(v))
                                                                           for v in FPS_CHOICES]),
+                Row("Tema da interface", "choice", "ui.theme", choices=[("torneio", "Torneio"), ("minecraft", "Minecraft")],
+                    note="Minecraft: botões, painéis e HUD com os gráficos do jogo"),
                 Row("Contador de FPS", "bool", "display.show_fps", note="também no F3"),
                 Row("Modo de baixo desempenho", "bool", "performance.low_mode",
                     note="menos partículas, sem animações de fundo"),
@@ -121,6 +123,7 @@ class OptionsScene(Scene):
                     note="muda dano do inimigo e janela de parry"),
                 Row("Pausar ao perder o foco", "bool", "gameplay.auto_pause"),
                 Row("Introdução da batalha", "bool", "gameplay.battle_intro", note="entrada animada e contagem 3-2-1"),
+                Row("Auxílio de timing", "bool", "gameplay.timing_aid", note="anel que fecha no instante do golpe inimigo"),
                 Row("Idioma", "choice", "language", choices=langs, note="textos sem tradução ficam em português"),
                 Row("Avisar de atualizações com o jogo aberto", "bool", "update.background_check"),
                 Row("Verificar arquivos do jogo", "action", action=self._integrity),

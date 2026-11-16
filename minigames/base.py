@@ -181,6 +181,7 @@ class TrainingGame(Scene):
         gold = int(self.score * self.cfg["gold_per_point"])
         levels = prof.stats[self.stat].add_xp(xp)
         prof.gold += gold
+        prof.bump("gold_total", gold)
         best = prof.best_scores.get(self.key, 0)
         record = self.score > best
         if record:
@@ -194,6 +195,11 @@ class TrainingGame(Scene):
             lines.append(f"{label} subiu para o nível {prof.level(self.stat)}!")
             self.game.audio.play("levelup")
             self.game.audio.duck(1.2)
+        from systems import achievements
+        for d in achievements.check(prof):
+            lines.append(f"Conquista: {d['name']}")
+            self.game.feedback.toast(f"Conquista: {d['name']}", (255, 205, 70), 4.0)
+        self.game.save.save(prof)
         from scenes.results import ResultsOverlay
         self.game.scenes.push(ResultsOverlay(self.game, self.cfg["title"], lines,
                                              on_close=lambda: self.game.scenes.pop(fade=True)))
