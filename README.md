@@ -37,9 +37,9 @@ systems/     AssetManager (lazy + LRU + mods), culling (Camera + SpatialGrid), p
 minigames/   treinos plugáveis (@register) sobre uma base comum
 scenes/      boot/update, menu, seleção de personagem, hub, arena, overlays
 network/     checagem de versão, download seguro e aplicação de updates via GitHub
-installer/   instalador/patcher (só stdlib) e script que monta o Release
+installer/   instalador gráfico, desinstalador e patcher (só stdlib + tkinter) e o script que monta o Release
 assets/      data/*.json (todo o balanceamento), sprites/, audio/, fonts/
-tools/       import_characters.py
+tools/       import_characters.py, make_installer_art.py
 ```
 
 **Desempenho**
@@ -76,8 +76,16 @@ O workflow `.github/workflows/release.yml` roda os testes, compila `UCDM.exe` (o
 e publica no Release `UCDM-windows-v0.2.0.zip` junto com o `.sha256`.
 
 **O que acontece na máquina do jogador**
-- **Instalar**: o jogador baixa só o `UCDM-Installer.exe` (pequeno). Ele busca o último Release, confere o SHA-256,
-  instala em `%LOCALAPPDATA%\Programs\UCDM` e cria o atalho na Área de Trabalho.
+- **Instalar**: o jogador baixa só o `UCDM-Installer.exe`. O assistente mostra a versão e as notas do último Release e deixa escolher:
+  - pasta (padrão `%LOCALAPPDATA%\Programs\UCDM`, com espaço livre conferido);
+  - atalhos na Área de Trabalho e no Menu Iniciar;
+  - registro em "Aplicativos instalados";
+  - tela cheia ou janela, limite de FPS, VSync, contador de FPS, volumes e atualizações automáticas.
+
+  As preferências vão para `%APPDATA%\UCDM\settings.json`, que o jogo mescla por cima de `game.json`.
+- **Desinstalar**: pelas Configurações do Windows ou com `UCDM-Installer.exe --uninstall`. Os saves são mantidos, a menos que o jogador marque para apagar.
+- **Sem janela**: `UCDM-Installer.exe --silent [--dir PASTA] [--no-shortcut] [--no-register]`, com log em `%TEMP%\ucdm-installer.log`.
+- **Erros do jogo**: ficam em `%APPDATA%\UCDM\logs\` (`game.log` e `crash.log`), e o jogo mostra um aviso em vez de fechar sem explicação.
 - **Atualizar**: no boot, o jogo compara o `version.json` local com o do GitHub. Se houver versão nova, ele baixa,
   confere o hash, prepara os arquivos, fecha e o patcher troca os arquivos e reabre o jogo.
   Os saves ficam em `%APPDATA%\UCDM` e nunca são tocados. Sem internet, o jogo abre normalmente.
