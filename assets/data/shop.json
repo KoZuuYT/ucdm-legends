@@ -1,0 +1,129 @@
+{
+  "_doc": "Cosmeticos da loja (so visuais). slot: fx_hit | fx_dodge.",
+  "items": [
+    {
+      "id": "hit_default",
+      "slot": "fx_hit",
+      "name": "Padrão",
+      "price": 0,
+      "color": [
+        255,
+        90,
+        70
+      ]
+    },
+    {
+      "id": "hit_emerald",
+      "slot": "fx_hit",
+      "name": "Esmeralda",
+      "price": 60,
+      "color": [
+        80,
+        230,
+        120
+      ]
+    },
+    {
+      "id": "hit_amethyst",
+      "slot": "fx_hit",
+      "name": "Ametista",
+      "price": 90,
+      "color": [
+        190,
+        110,
+        255
+      ]
+    },
+    {
+      "id": "hit_flame",
+      "slot": "fx_hit",
+      "name": "Chamas",
+      "price": 120,
+      "color": [
+        255,
+        140,
+        40
+      ]
+    },
+    {
+      "id": "hit_ice",
+      "slot": "fx_hit",
+      "name": "Gelo",
+      "price": 120,
+      "color": [
+        150,
+        220,
+        255
+      ]
+    },
+    {
+      "id": "hit_rainbow",
+      "slot": "fx_hit",
+      "name": "Arco-íris",
+      "price": 300,
+      "rainbow": true
+    },
+    {
+      "id": "dodge_default",
+      "slot": "fx_dodge",
+      "name": "Padrão",
+      "price": 0,
+      "color": [
+        140,
+        215,
+        255
+      ]
+    },
+    {
+      "id": "dodge_gold",
+      "slot": "fx_dodge",
+      "name": "Ouro",
+      "price": 80,
+      "color": [
+        255,
+        215,
+        90
+      ]
+    },
+    {
+      "id": "dodge_rose",
+      "slot": "fx_dodge",
+      "name": "Rosa",
+      "price": 80,
+      "color": [
+        255,
+        140,
+        190
+      ]
+    },
+    {
+      "id": "dodge_void",
+      "slot": "fx_dodge",
+      "name": "Vazio",
+      "price": 140,
+      "color": [
+        150,
+        90,
+        220
+      ]
+    },
+    {
+      "id": "dodge_lime",
+      "slot": "fx_dodge",
+      "name": "Limão",
+      "price": 140,
+      "color": [
+        190,
+        255,
+        80
+      ]
+    },
+    {
+      "id": "dodge_rainbow",
+      "slot": "fx_dodge",
+      "name": "Arco-íris",
+      "price": 300,
+      "rainbow": true
+    }
+  ]
+}

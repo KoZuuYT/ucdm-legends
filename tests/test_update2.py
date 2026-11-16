@@ -324,7 +324,7 @@ class GameExtrasTest(unittest.TestCase):
         from scenes.integrity import IntegrityOverlay, RepairScene
         from scenes.options import TABS, OptionsScene
         g = self.game
-        self.assertEqual(len(TABS), 6)
+        self.assertEqual(len(TABS), 7)
         for tab in range(len(TABS)):
             o = OptionsScene(g, tab)
             for r in o.rows:

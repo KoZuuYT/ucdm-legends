@@ -15,7 +15,8 @@
       "desc": "Vença 10 lutas.",
       "icon": "diamond_sword",
       "stat": "wins",
-      "min": 10
+      "min": 10,
+      "parent": "first_blood"
     },
     {
       "id": "fifty_wins",
@@ -23,7 +24,8 @@
       "desc": "Vença 50 lutas.",
       "icon": "netherite_sword",
       "stat": "wins",
-      "min": 50
+      "min": 50,
+      "parent": "ten_wins"
     },
     {
       "id": "parry_5",
@@ -39,7 +41,8 @@
       "desc": "Faça 50 parries.",
       "icon": "enchanted_book",
       "stat": "parries",
-      "min": 50
+      "min": 50,
+      "parent": "parry_5"
     },
     {
       "id": "pdodge_10",
@@ -55,7 +58,8 @@
       "desc": "Faça 50 esquivas perfeitas.",
       "icon": "ender_pearl",
       "stat": "perfect_dodges",
-      "min": 50
+      "min": 50,
+      "parent": "pdodge_10"
     },
     {
       "id": "crit_20",
@@ -87,7 +91,8 @@
       "desc": "Quebre 50 armaduras.",
       "icon": "diamond_chestplate",
       "stat": "armor_breaks",
-      "min": 50
+      "min": 50,
+      "parent": "breaker_10"
     },
     {
       "id": "flawless",
@@ -111,7 +116,8 @@
       "desc": "Consiga nota S 5 vezes.",
       "icon": "netherite_ingot",
       "stat": "rank_s",
-      "min": 5
+      "min": 5,
+      "parent": "rank_s"
     },
     {
       "id": "boss",
@@ -135,7 +141,8 @@
       "desc": "Derrote 50 lendas diferentes.",
       "icon": "written_book",
       "stat": "collection",
-      "min": 50
+      "min": 50,
+      "parent": "cards_10"
     },
     {
       "id": "cards_100",
@@ -143,7 +150,8 @@
       "desc": "Derrote 100 lendas diferentes.",
       "icon": "map",
       "stat": "collection",
-      "min": 100
+      "min": 100,
+      "parent": "cards_50"
     },
     {
       "id": "legend_1",
@@ -211,7 +219,8 @@
       "icon": "trident",
       "stat": "endless_best",
       "min": 10,
-      "secret": true
+      "secret": true,
+      "parent": "endless_5"
     },
     {
       "id": "daily_3",

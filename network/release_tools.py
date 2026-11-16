@@ -73,9 +73,11 @@ class _SafeRedirect(urllib.request.HTTPRedirectHandler):
 _opener = urllib.request.build_opener(_SafeRedirect)
 
 
-def _open(url: str, timeout: float, accept: str | None = None):
+def _open(url: str, timeout: float, accept: str | None = None, start: int = 0):
     _check_url(url)
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    if start > 0:
+        req.add_header("Range", f"bytes={start}-")
     if accept:
         req.add_header("Accept", accept)
     token = os.environ.get("UCDM_GITHUB_TOKEN")   # opcional: evita rate-limit em testes
@@ -98,11 +100,14 @@ def download(url: str, dest: Path, progress: Progress | None = None, timeout: fl
              cancel: Callable[[], bool] | None = None) -> Path:
     dest.parent.mkdir(parents=True, exist_ok=True)
     part = dest.with_suffix(dest.suffix + ".part")
-    with _open(url, timeout) as r, open(part, "wb") as f:
-        total = int(r.headers.get("Content-Length") or 0)
+    have = part.stat().st_size if part.exists() else 0          # retomada: continua de onde parou
+    r = _open(url, timeout, start=have)
+    resumed = have > 0 and getattr(r, "status", 200) == 206
+    with r, open(part, "ab" if resumed else "wb") as f:
+        total = int(r.headers.get("Content-Length") or 0) + (have if resumed else 0)
         if total > MAX_PACKAGE_BYTES:
             raise ValueError("Pacote grande demais")
-        done = 0
+        done = have if resumed else 0
         while True:
             if cancel and cancel():
                 raise InterruptedError("cancelado")
@@ -211,11 +216,67 @@ def _replace_file(src: Path, dst: Path) -> None:
     raise PermissionError(f"Não foi possível substituir {dst}")
 
 
+BACKUP_DIR = "_backup"
+
+
+def _backup(target: Path, rels: set[str], log) -> None:
+    """Guarda a versão atual (só os arquivos que serão trocados/removidos) para poder voltar atrás."""
+    bk = target / BACKUP_DIR
+    shutil.rmtree(bk, ignore_errors=True)
+    n = 0
+    for rel in sorted(rels):
+        p = target / rel
+        if p.is_file():
+            (bk / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(p, bk / rel)
+            n += 1
+    if (target / MANIFEST).exists():
+        shutil.copy2(target / MANIFEST, bk / MANIFEST)
+    log(f"Backup da versão anterior: {n} arquivos")
+
+
+def has_backup(target: Path) -> bool:
+    return (target / BACKUP_DIR / MANIFEST).exists()
+
+
+def rollback(target: Path, log: Callable[[str], None] = print) -> bool:
+    """Restaura a versão guardada por install_tree. Retorna False se não há backup."""
+    bk = target / BACKUP_DIR
+    if not has_backup(target):
+        return False
+    restored = {p.relative_to(bk).as_posix() for p in bk.rglob("*") if p.is_file()}
+    current = _read_manifest(target)                 # lê ANTES de restaurar (o manifesto antigo vem junto)
+    for rel in sorted(restored):
+        _replace_file(bk / rel, target / rel)
+    for rel in sorted(current - restored):          # arquivos criados pela versão nova
+        p = (target / rel).resolve()
+        if p.is_relative_to(target.resolve()) and p.is_file():
+            try:
+                p.unlink()
+            except OSError:
+                pass
+    shutil.rmtree(bk, ignore_errors=True)
+    log(f"Versão anterior restaurada ({len(restored)} arquivos)")
+    return True
+
+
 def install_tree(src: Path, target: Path, log: Callable[[str], None] = print) -> None:
-    """Copia a nova versão por cima da instalação e remove arquivos obsoletos."""
+    """Copia a nova versão por cima da instalação (com backup) e remove arquivos obsoletos."""
     target.mkdir(parents=True, exist_ok=True)
     old_files = _read_manifest(target)
     new_files = _read_manifest(src) or {p.relative_to(src).as_posix() for p in src.rglob("*") if p.is_file()}
+    if old_files:
+        _backup(target, old_files | new_files, log)
+        try:
+            return _install_files(src, target, old_files, new_files, log)
+        except Exception:
+            log("Falha ao instalar: restaurando a versão anterior")
+            rollback(target, log)
+            raise
+    _install_files(src, target, old_files, new_files, log)
+
+
+def _install_files(src: Path, target: Path, old_files: set, new_files: set, log) -> None:
     for rel in sorted(new_files):
         s = src / rel
         if s.is_file():

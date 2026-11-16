@@ -116,6 +116,12 @@ class AssetManager:
         return s
 
     # --- fontes / sons -----------------------------------------------------------------
+    bitmap_enabled = True                       # Opções: "Fonte pixelada" (só vale no tema Minecraft)
+
+    def bitmap_font(self) -> bool:
+        from core import mcfont, theme
+        return self.bitmap_enabled and theme.mc() and mcfont.available()
+
     def set_font_scale(self, scale: float) -> None:
         scale = max(0.8, min(1.4, float(scale)))
         if scale != self.font_scale:
@@ -124,6 +130,13 @@ class AssetManager:
 
     def font(self, size: int, name: str | None = None, bold: bool = True) -> pygame.font.Font:
         size = max(8, round(size * self.font_scale))
+        if not name and self.bitmap_font():
+            key = ("bitmap", size)
+            f = self._fonts.get(key)
+            if f is None:
+                from core import mcfont
+                f = self._fonts[key] = mcfont.for_size(size)
+            return f
         key = (name, size, bold)
         f = self._fonts.get(key)
         if f is None:

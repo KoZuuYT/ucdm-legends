@@ -113,6 +113,21 @@ def apply(args, log) -> int:
     return code
 
 
+def do_rollback(args, log) -> int:
+    target = Path(args.target) if args.target else (sc.find_existing() or (sc.default_dir(), ""))[0]
+    ok = rt.rollback(target, log)
+    if ok:
+        v = sc.installed_version(target)
+        if v:
+            try:
+                sc.update_registered_version(target, v)
+            except OSError:
+                pass
+    if args.relaunch:
+        rt.launch_detached(rt.game_command(target), target)
+    return 0 if ok else 1
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=f"{sc.APP_NAME} installer/patcher")
     ap.add_argument("--repo")
@@ -124,12 +139,15 @@ def main(argv=None) -> int:
     ap.add_argument("--uninstall", action="store_true")
     ap.add_argument("--wipe-data", action="store_true")
     ap.add_argument("--self-delete", action="store_true", help=argparse.SUPPRESS)
+    ap.add_argument("--rollback", action="store_true", help="volta para a versão anterior (backup do último update)")
     ap.add_argument("--apply")
     ap.add_argument("--target")
     ap.add_argument("--wait-pid")
     ap.add_argument("--relaunch", action="store_true")
     args = ap.parse_args(argv)
 
+    if args.rollback:
+        return do_rollback(args, _Log(LOG_FILE))
     if args.apply:
         if not args.target:
             ap.error("--apply exige --target")

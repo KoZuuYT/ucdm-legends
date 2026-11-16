@@ -25,6 +25,7 @@ class CollectionScene(Scene):
         self.mode = "legends"
         self.filter = 0                    # 0 = todas; 1.. = raridade
         self.query = ""                    # busca por texto (nome, sem acento)
+        self.mark: str | None = None       # carta marcada para comparar (tecla de ataque)
         self.typing = False
         self.index = 0
         self.scroll = 0.0
@@ -35,9 +36,9 @@ class CollectionScene(Scene):
         self._rebuild()
         self.act_btn = ui.Button((1280 - 330, 600, 290, 70), "Desafiar", self._act)
         self.back_btn = ui.Button((1280 - 330, 30, 290, 56), "Voltar", lambda: self.game.scenes.pop(fade="slide"))
-        self.mode_btn = ui.Button((GRID_X, 84, 300, 48), "Aparências", self._toggle_mode)
-        self.filter_btn = ui.Button((GRID_X + 320, 84, 300, 48), "Raridade: todas", self._cycle_filter)
-        self.search_btn = ui.Button((GRID_X + 640, 84, 300, 48), "Buscar", self._toggle_search)
+        self.mode_btn = ui.Button((GRID_X, 84, 260, 48), "Aparências", self._toggle_mode)
+        self.filter_btn = ui.Button((GRID_X + 270, 84, 260, 48), "Raridade: todas", self._cycle_filter)
+        self.search_btn = ui.Button((GRID_X + 540, 84, 260, 48), "Buscar", self._toggle_search)
 
     # --- dados --------------------------------------------------------------------------
     @property
@@ -191,6 +192,10 @@ class CollectionScene(Scene):
             return self._act()
         if inp.pressed("back"):
             return self.game.scenes.pop(fade="slide")
+        if inp.pressed("attack") and self.mode == "legends" and n:
+            cid = self.items[self.index]["id"]
+            self.mark = None if self.mark == cid else cid
+            ui.sfx("click")
         if inp.pressed("dodge"):
             self._toggle_mode()
         if inp.pressed("block"):
@@ -279,15 +284,33 @@ class CollectionScene(Scene):
             self.drawn += 1
         surf.set_clip(None)
         self._draw_side(surf)
+        if self.mark and self.items and self.mode == "legends" and self.items[self.index]["id"] != self.mark:
+            self._draw_compare(surf, self.items[self.index])
         self.back_btn.draw(surf, a.font(26))
         if self.max_scroll:
             k = self.scroll / self.max_scroll
             pygame.draw.rect(surf, (80, 80, 100), (GRID_X + COLS * CELL_W + 4, GRID_Y, 6, GRID_H), border_radius=3)
             pygame.draw.rect(surf, ui.ACCENT, (GRID_X + COLS * CELL_W + 4, GRID_Y + k * (GRID_H - 60), 6, 60), border_radius=3)
-        ui.text(surf, a.font(16, bold=False), "Esquiva: alternar Lendas/Aparências   Defesa: filtrar raridade   Enter: escolher",
+        ui.text(surf, a.font(16, bold=False), "Esquiva: Lendas/Aparências   Defesa: raridade   Ataque: marcar p/ comparar   Enter: escolher",
                 (GRID_X, 700), (170, 172, 190), "midleft")
         if self.toast[1] > 0:
             ui.text(surf, a.font(26), self.toast[0], (640, 690), ui.ACCENT, "center")
+
+    def _draw_compare(self, surf: pygame.Surface, item: dict) -> None:
+        """Comparação lado a lado (vida, dano, defesa) entre a carta marcada e a selecionada."""
+        a = self.game.assets
+        other = roster.character(self.mark)
+        ea, eb = roster.challenge_edef(self.mark), roster.challenge_edef(item["id"])
+        base_x, y = 1280 - 330, 180
+        box = pygame.Surface((320, 102), pygame.SRCALPHA)
+        box.fill((0, 0, 0, 170))
+        surf.blit(box, (base_x - 8, y - 6))
+        ui.text(surf, a.font(16), f"{tr('Comparar')}: {other['name'][:12]} -> {item['name'][:12]}", (base_x, y), ui.ACCENT)
+        for k, (key, label) in enumerate((("hp", "Vida"), ("damage", "Dano"), ("armor", "Armadura"))):
+            va, vb = ea.get(key, 0), eb.get(key, 0)
+            diff = round(vb - va, 2)
+            col = ui.RED if diff > 0 else ui.GREEN if diff < 0 else (190, 190, 200)     # mais forte = mais perigoso
+            ui.text(surf, a.font(16, bold=False), f"{tr(label)}: {va} -> {vb}  ({'+' if diff > 0 else ''}{diff})", (base_x, y + 24 + k * 22), col)
 
     def _draw_side(self, surf: pygame.Surface) -> None:
         a = self.game.assets

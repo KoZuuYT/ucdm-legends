@@ -8,11 +8,11 @@ import unicodedata
 
 import pygame
 
-from core import i18n, paths, settings, sysinfo, ui
+from core import i18n, mcui, paths, settings, sysinfo, theme, ui
 from core.scene import Scene
 
-TABS = ("Vídeo", "Áudio", "Controles", "Acessibilidade", "Jogo", "Buscar")
-SEARCH = 5
+TABS = ("Vídeo", "Áudio", "Controles", "Acessibilidade", "Jogo", "Sistema", "Buscar")
+SEARCH = 6
 
 
 def _norm(text: str) -> str:
@@ -66,6 +66,51 @@ class Row:
         self.slot = 0            # só para linhas de tecla (0 principal, 1 alternativa)
 
 
+class RevertOverlay(Scene):
+    """"Manter estas configurações?" com contagem de 10 s; sem resposta, desfaz a mudança de vídeo."""
+    transparent = True
+    SECONDS = 10.0
+
+    def __init__(self, game, revert, after) -> None:
+        super().__init__(game)
+        self.revert, self.after = revert, after
+        self.left = self.SECONDS
+        self.t = 0.0
+        W, H = game.display.width, game.display.height
+        self.rect = pygame.Rect(0, 0, 560, 220)
+        self.rect.center = (W // 2, H // 2)
+        self.menu = ui.Menu([ui.Button((self.rect.x + 30, self.rect.bottom - 80, 240, 56), "Manter", self._keep),
+                             ui.Button((self.rect.right - 270, self.rect.bottom - 80, 240, 56), "Reverter", self._undo)])
+        self.menu.focus = 1
+
+    def _keep(self) -> None:
+        self.game.scenes.pop()
+
+    def _undo(self) -> None:
+        self.revert()
+        self.after()
+        self.game.scenes.pop()
+
+    def update(self, dt: float) -> None:
+        self.t += dt
+        self.left -= dt
+        if self.left <= 0 or self.game.input.pressed("back"):
+            return self._undo()
+        if self.t > 0.3:
+            self.menu.update(self.game.input)
+
+    def draw(self, surf: pygame.Surface) -> None:
+        dim = pygame.Surface(surf.get_size(), pygame.SRCALPHA)
+        dim.fill((0, 0, 0, 150))
+        surf.blit(dim, (0, 0))
+        ui.panel(surf, self.rect)
+        a = self.game.assets
+        ui.text(surf, a.font(32), i18n.tr("Manter estas configurações?"), (self.rect.centerx, self.rect.y + 26), ui.ACCENT, "midtop")
+        ui.text(surf, a.font(24), f"{i18n.tr('Revertendo em')} {int(self.left) + 1} s", (self.rect.centerx, self.rect.y + 84), ui.WHITE, "midtop")
+        ui.bar(surf, (self.rect.x + 30, self.rect.y + 126, 500, 12), self.left / self.SECONDS, ui.ACCENT)
+        self.menu.draw(surf, a.font(26))
+
+
 class OptionsScene(Scene):
     def __init__(self, game, tab: int = 0) -> None:
         super().__init__(game)
@@ -103,6 +148,10 @@ class OptionsScene(Scene):
                                                                           for v in FPS_CHOICES]),
                 Row("Tema da interface", "choice", "ui.theme", choices=[("torneio", "Torneio"), ("minecraft", "Minecraft")],
                     note="Minecraft: botões, painéis e HUD com os gráficos do jogo"),
+                Row("Fonte pixelada", "bool", "ui.bitmap_font", note="letras do Minecraft (só no tema Minecraft)"),
+                Row("Estilo do HUD", "choice", "display.hud_style", choices=[("completo", "Completo"), ("minimo", "Mínimo")],
+                    note="mínimo esconde a barra de golpes"),
+                Row("Câmera dinâmica", "bool", "display.dynamic_camera", note="aproxima quando os lutadores estão perto"),
                 Row("Contador de FPS", "bool", "display.show_fps", note="também no F3"),
                 Row("Modo de baixo desempenho", "bool", "performance.low_mode",
                     note="menos partículas, sem animações de fundo"),
@@ -127,7 +176,7 @@ class OptionsScene(Scene):
                 Row("Congelar no impacto", "bool", "feedback.hitstop"),
                 Row("Aviso do golpe (!!) mais longo", "bool", "gameplay.extended_warning"),
             ]
-        else:
+        elif tab == 4:
             langs = i18n.available()
             rows = [
                 Row("Dificuldade", "choice", "gameplay.difficulty", choices=list(DIFFICULTY),
@@ -136,10 +185,18 @@ class OptionsScene(Scene):
                 Row("Introdução da batalha", "bool", "gameplay.battle_intro", note="entrada animada e contagem 3-2-1"),
                 Row("Auxílio de timing", "bool", "gameplay.timing_aid", note="anel que fecha no instante do golpe inimigo"),
                 Row("Idioma", "choice", "language", choices=langs, note="textos sem tradução ficam em português"),
+            ]
+        else:
+            rows = [
                 Row("Avisar de atualizações com o jogo aberto", "bool", "update.background_check"),
+                Row("Canal de atualização", "choice", "update.channel", choices=[("estavel", "Estável"), ("beta", "Beta")],
+                    note="beta recebe novidades antes, com mais risco"),
+                Row("Voltar à versão anterior", "action", action=self._rollback, note="desfaz a última atualização (versão instalada)"),
                 Row("Verificar arquivos do jogo", "action", action=self._integrity),
                 Row("Copiar informações do sistema", "action", action=self._sysinfo),
-                Row("Ver tutorial", "action", action=self._help),
+                Row("Tutorial interativo", "action", action=self._tutorial, note="pratique mover, atacar, defender e esquivar"),
+                Row("Ver ajuda", "action", action=self._help),
+                Row("Galeria de componentes", "action", action=self._gallery, note="visual de todos os widgets (ferramenta de design)"),
                 Row("Créditos", "action", action=self._credits),
             ]
         return rows
@@ -149,7 +206,7 @@ class OptionsScene(Scene):
             self.rows = [Row("Buscar opção…", "search")]
             q = _norm(self.query)
             if q:
-                for t in (0, 1, 3, 4):
+                for t in (0, 1, 3, 4, 5):
                     for r in self._tab_rows(t):
                         if r.path and (q in _norm(r.label) or q in _norm(i18n.tr(r.label)) or q in _norm(r.note)
                                        or q in _norm(i18n.tr(r.note))):
@@ -172,6 +229,14 @@ class OptionsScene(Scene):
     def _back(self) -> None:
         self.game.scenes.pop(fade="slide")
 
+    def _gallery(self) -> None:
+        from scenes.gallery import GalleryScene
+        self.game.scenes.push(GalleryScene(self.game), fade=True)
+
+    def _tutorial(self) -> None:
+        from scenes.tutorial import TutorialScene
+        self.game.scenes.push(TutorialScene(self.game), fade=True)
+
     def _help(self) -> None:
         from scenes.help import HelpOverlay
         self.game.scenes.push(HelpOverlay(self.game))
@@ -179,6 +244,13 @@ class OptionsScene(Scene):
     def _credits(self) -> None:
         from scenes.help import CreditsOverlay
         self.game.scenes.push(CreditsOverlay(self.game))
+
+    def _rollback(self) -> None:
+        from network import updater
+        if updater.start_rollback():
+            self.game.quit()
+        else:
+            self.game.feedback.toast("Sem versão anterior guardada (só na versão instalada).", (240, 200, 120), 3.0)
 
     def _integrity(self) -> None:
         from scenes.integrity import IntegrityOverlay
@@ -204,7 +276,16 @@ class OptionsScene(Scene):
         self.game.apply_settings()
         self.game.feedback.toast("Teclas restauradas.", ui.GREEN)
 
+    REVERTABLE = ("display.fullscreen", "ui.theme", "accessibility.text_scale", "accessibility.high_contrast")
+
     def _change(self, r: Row, direction: int) -> None:
+        """Mudanças de vídeo pedem confirmação: se você não confirmar em 10 s, voltam sozinhas."""
+        old = self._get(r.path) if r.path in self.REVERTABLE else None
+        self._change_now(r, direction)
+        if r.path in self.REVERTABLE and self._get(r.path) != old and not self.game.headless:
+            self.game.scenes.push(RevertOverlay(self.game, lambda p=r.path, o=old: self._set(p, o), self._build))
+
+    def _change_now(self, r: Row, direction: int) -> None:
         """direction: -1/+1 (setas) ou 0 (confirmar/clicar)."""
         if r.kind == "bool":
             self._set(r.path, not bool(self._get(r.path, False)))
@@ -358,7 +439,7 @@ class OptionsScene(Scene):
             ui.sfx("click")
 
     def _tab_rects(self) -> list[pygame.Rect]:
-        return [pygame.Rect(110 + i * 182, 130, 174, 52) for i in range(len(TABS))]
+        return [pygame.Rect(100 + i * 160, 130, 152, 52) for i in range(len(TABS))]
 
     @staticmethod
     def _slider_rect(r: Row) -> pygame.Rect:
@@ -368,6 +449,22 @@ class OptionsScene(Scene):
     def _bind_text(self, r: Row, slot: int) -> str:
         keys = self.game.input.bindings.get(r.key, [])
         return keys[slot].upper() if slot < len(keys) else "—"
+
+    def _draw_preview(self, surf: pygame.Surface, a) -> None:
+        """Prévia ao vivo: botão, corações e texto no tema e no tamanho de texto escolhidos agora."""
+        from core import mcui, theme
+        box = pygame.Rect(1140, 200, 130, 250)
+        ui.panel(surf, box)
+        ui.text(surf, a.font(16), i18n.tr("Prévia"), (box.centerx, box.y + 8), ui.ACCENT, "midtop")
+        ui.Button((box.x + 10, box.y + 36, 110, 40), "Botão", lambda: None).draw(surf, a.font(18), True)
+        if theme.mc():
+            mcui.hearts(surf, box.x + 8, box.y + 96, 0.7, count=5, k=2)
+            mcui.icons(surf, box.x + 8, box.y + 120, 0.8, "food", count=5, k=2)
+        else:
+            ui.bar(surf, (box.x + 10, box.y + 100, 110, 14), 0.7, ui.GREEN)
+            ui.bar(surf, (box.x + 10, box.y + 124, 110, 14), 0.5, ui.BLUE)
+        ui.text(surf, a.font(24), "Aa Bb 123", (box.centerx, box.y + 160), ui.WHITE, "midtop")
+        ui.text(surf, a.font(16, bold=False), i18n.tr("Texto de exemplo"), (box.centerx, box.y + 196), (200, 200, 215), "midtop")
 
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
@@ -379,6 +476,8 @@ class OptionsScene(Scene):
             ui.row(surf, rect, focused=sel and self.in_tabs, active=sel)
             ui.text(surf, a.font(22), TABS[i], rect.center, ui.WHITE if sel else (180, 180, 190), "center")
         small = a.font(18, bold=False)
+        if self.tab in (0, 3):
+            self._draw_preview(surf, a)
         for i, r in enumerate(self.rows):
             focused = i == self.focus and not self.in_tabs
             ui.row(surf, r.rect, focused=focused)
@@ -407,6 +506,12 @@ class OptionsScene(Scene):
             on = bool(self._get(r.path, False))
             box = pygame.Rect(0, 0, 80, 28)
             box.midright = (right, r.rect.centery)
+            focused_row = r is self.rows[self.focus] and not self.in_tabs
+            if theme.mc() and not ui.high_contrast:
+                cb = mcui.checkbox(surf, (right, r.rect.centery), on, focused_row, 2 if r.rect.h < 44 else 2)
+                if cb is not None:
+                    ui.text(surf, a.font(18), "LIGADO" if on else "DESLIG.", (cb.left - 12, cb.centery), (200, 200, 210), "midright", False)
+                    return
             pygame.draw.rect(surf, (60, 150, 90) if on else (80, 80, 92), box, border_radius=15)
             knob_x = box.right - 16 if on else box.left + 16
             pygame.draw.circle(surf, ui.WHITE, (knob_x, box.centery), 11)
@@ -420,6 +525,9 @@ class OptionsScene(Scene):
             track = self._slider_rect(r)
             v = float(self._get(r.path, 0.5))
             k = (v - r.lo) / (r.hi - r.lo) if r.hi > r.lo else 0
+            if theme.mc() and not ui.high_contrast and mcui.slider(surf, track, k, r is self.rows[self.focus] and not self.in_tabs):
+                ui.text(surf, font, f"{int(round(v * 100))}%", (right, r.rect.centery), anchor="midright")
+                return
             pygame.draw.rect(surf, (70, 72, 90), track, border_radius=8)
             fill = track.copy()
             fill.width = int(track.w * max(0.0, min(1.0, k)))

@@ -7,7 +7,9 @@
     "vsync": true,
     "tick_rate": 60,
     "fps_cap": 144,
-    "show_fps": false
+    "show_fps": false,
+    "hud_style": "completo",
+    "dynamic_camera": true
   },
   "input": {
     "left": [
@@ -139,7 +141,8 @@
     "asset_pattern": "UCDM-{platform}-v{version}.zip",
     "timeout": 6,
     "background_check": true,
-    "background_minutes": 30
+    "background_minutes": 30,
+    "channel": "estavel"
   },
   "default_character": "steve",
   "gameplay": {
@@ -160,6 +163,7 @@
     "low_mode": false
   },
   "ui": {
-    "theme": "torneio"
+    "theme": "torneio",
+    "bitmap_font": true
   }
 }

@@ -1,9 +1,64 @@
 {
-  "_doc": "Temas da interface. style: classic = visual 'Torneio' desenhado em código; mc = usa os sprites de assets/mc (botões, painéis, HUD de corações). Sem os assets de Minecraft o tema mc cai para classic.",
+  "_doc": "Temas da interface. style: classic = visual 'Torneio' desenhado em código; mc = usa os sprites de assets/mc (botões, painéis, HUD de corações). Sem os assets de Minecraft o tema mc cai para classic. Tokens de cor (white, dark, accent, red, green, blue) ficam aqui; ui.py le os do tema Torneio.",
   "default": "torneio",
   "themes": {
-    "torneio":   {"label": "Torneio",   "style": "classic"},
-    "minecraft": {"label": "Minecraft", "style": "mc",
-                  "text": [255, 255, 255], "text_hover": [255, 255, 160], "text_disabled": [160, 160, 160], "shadow": [63, 63, 63]}
+    "torneio": {
+      "label": "Torneio",
+      "style": "classic",
+      "white": [
+        240,
+        240,
+        240
+      ],
+      "dark": [
+        22,
+        24,
+        34
+      ],
+      "accent": [
+        255,
+        196,
+        64
+      ],
+      "red": [
+        220,
+        70,
+        60
+      ],
+      "green": [
+        90,
+        200,
+        110
+      ],
+      "blue": [
+        80,
+        150,
+        240
+      ]
+    },
+    "minecraft": {
+      "label": "Minecraft",
+      "style": "mc",
+      "text": [
+        255,
+        255,
+        255
+      ],
+      "text_hover": [
+        255,
+        255,
+        160
+      ],
+      "text_disabled": [
+        160,
+        160,
+        160
+      ],
+      "shadow": [
+        63,
+        63,
+        63
+      ]
+    }
   }
 }

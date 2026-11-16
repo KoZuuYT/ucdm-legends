@@ -82,6 +82,9 @@ def _dev_scene(game, name: str):
         from entities import roster
         from scenes.arena import ArenaScene
         return ArenaScene(game, min(game.profile.arena_stage, len(roster.enemies()) - 1))
+    if name == "gallery":
+        from scenes.gallery import GalleryScene
+        return GalleryScene(game)
     if name in ("select", "collection"):
         from scenes.collection import CollectionScene
         return CollectionScene(game)

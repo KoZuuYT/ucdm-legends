@@ -19,19 +19,19 @@ from installer import setup_core as sc
 from network import release_tools as rt
 
 # --- paleta / tipografia ------------------------------------------------------------------------
-BG = "#151827"
-PANEL = "#1c2033"
-CARD = "#242a42"
-CARD_HI = "#2e3552"
-LINE = "#343b5c"
-FG = "#ecedf5"
-MUTED = "#9aa1bd"
-ACCENT = "#ffc440"
-ACCENT_HI = "#ffd470"
-ACCENT_FG = "#1b1406"
+BG = "#262626"
+PANEL = "#313131"
+CARD = "#4a4a4a"
+CARD_HI = "#5c5c5c"
+LINE = "#161616"
+FG = "#f4f4f4"
+MUTED = "#b4b4b4"
+ACCENT = "#6cc04a"
+ACCENT_HI = "#86da63"
+ACCENT_FG = "#10200a"
 DANGER = "#e0574a"
 DANGER_HI = "#ee6d61"
-OK = "#5ac86e"
+OK = "#6cc04a"
 FONT = "Segoe UI" if sys.platform == "win32" else "DejaVu Sans"
 
 STEPS = ["Boas-vindas", "Instalação", "Jogo", "Resumo", "Instalando", "Pronto"]
@@ -294,7 +294,7 @@ class InstallerApp:
     # --- estrutura fixa: lateral + cabeçalho + conteúdo + rodapé ------------------------------
     def _build_shell(self) -> None:
         px = self.px
-        side = tk.Canvas(self.root, width=px(self.SIDE), height=px(self.H), bg="#18101e", highlightthickness=0)
+        side = tk.Canvas(self.root, width=px(self.SIDE), height=px(self.H), bg="#3b2a1a", highlightthickness=0)
         side.pack(side="left", fill="y")
         self._banner_img = self._banner()
         if self._banner_img:

@@ -1,49 +1,35 @@
 # Status de implementação do planejamento de design
 
-Atualizado na v0.7.0. Legenda: [x] feito, [~] parcial, [ ] não feito.
+Atualizado na v0.9.0. Todos os itens dos 10 planos foram implementados, com as notas de escopo abaixo.
 
 ## 01 Design system
-- [x] Tema Minecraft (`core/theme.py`, `assets/data/theme.json`) selecionável nas Opções; botões 9-slice, painéis, texto com sombra.
-- [~] Tokens de cor/tipografia em dados: só o seletor de tema e as cores do tema Minecraft; as cores do tema Torneio continuam no código.
-- [ ] Fonte bitmap do Minecraft, abas/sliders/checkbox com sprites, galeria de componentes.
+- [x] Tema Minecraft e Torneio; tokens de cor do Torneio em `assets/data/theme.json`.
+- [x] Fonte bitmap do Minecraft (`core/mcfont.py`, com acentos desenhados à mão), abas/sliders/checkbox com sprites, galeria de componentes (`scenes/gallery.py`, Opções > Sistema ou `--scene gallery`).
 
 ## 02 Movimento
-- [x] Curvas novas, mola (`Spring`), sequências (`Seq`) e cascata em `systems/tween.py`; logo "carimbado" no boot.
-- [x] Transição de cortina diagonal (entrada nas lutas).
-- [ ] Pulso no ritmo da música, "reduzir movimento" dedicado.
+- [x] Curvas, mola, sequências e cascata; transição em cortina diagonal; pulso no ritmo; "reduzir movimento".
 
 ## 03 Menu e abertura
-- [x] Panorama, logo em bloco, frase "splash", botão Continuar com resumo do save, dicas no boot, notícias com ícones.
-- [x] Easter egg (código Konami) na v0.8.0.
-- [ ] Modo atração.
+- [x] Panorama, logo em bloco, splash, Continuar, dicas, notícias; modo atração (45 s parado: luta de demonstração com IA); código Konami.
 
 ## 04 Saves, personagens, hub
-- [x] Steve fixo, Álbum de Lendas (raridade, desafios, silhuetas), aparências desbloqueáveis, ícone de arma por nível.
-- [x] Busca por texto no Álbum (v0.8.0).
-- [ ] Comparação, estações do hub, mapa de rodadas visual.
+- [x] Steve fixo, Álbum com raridade/desafios/silhuetas, busca por texto, comparação (tecla de ataque), aparências, estações do hub (cenário por horário), mapa da escada.
 
 ## 05 Arena e HUD
-- [x] Corações, comida, armadura e barra de chefe (tema Minecraft), partículas do Minecraft, anel de timing para todos os golpes, nota S-D.
-- [x] Hotbar de golpes (ataque, defesa, esquiva, contra-ataque) no tema Minecraft.
-- [ ] Estilos alternativos de HUD, câmera com zoom dinâmico, plateia reativa.
+- [x] Corações/comida/armadura/chefe, hotbar, partículas do Minecraft, anel de timing, nota S-D, câmera dinâmica, plateia reativa, estilo de HUD (completo/mínimo).
 
 ## 06 Resultados, pausa, diálogos
-- [x] Nota S-D com carimbo, dicas na derrota, conquistas (26) + tela, toasts de avanço, pausa com resumo/reiniciar/ajuda.
-- [ ] Contadores animados e orbes de XP voando, árvore de avanços com ligações.
+- [x] Nota com carimbo, contador de ouro animado e orbes de XP, árvore de conquistas com ligações, toasts, pausa com resumo.
 
 ## 07 Opções, ajuda, estatísticas
-- [x] Busca nas Opções, auxílio de timing, estatísticas com radar e histórico, créditos com atribuição.
-- [ ] Prévia ao vivo das opções, tutorial interativo, diagnóstico, reverter vídeo em 10 s.
+- [x] Busca, prévia ao vivo, reverter vídeo em 10 s, tutorial interativo, diagnóstico (copiar informações do sistema), radar e histórico.
 
 ## 08 Instalador e atualizador
-- [x] Instalador gráfico completo já existente (assistente, atalhos, desinstalar, SHA-256); versão Android (APK) criada.
-- [ ] Redesenho visual do instalador no estilo Minecraft, pausar/retomar download, rollback, canais.
+- [x] Instalador no visual Minecraft (paleta pedra/grama), pausar/retomar download (Range), backup + rollback (`--rollback`, Opções > Sistema), canal beta.
 
 ## 09 Conteúdo, áudio, acessibilidade
-- [x] Arena Infinita, Desafio do Dia (5 modificadores, recompensa dobrada 1x/dia), raridades/desbloqueios, conquistas.
-- [ ] Loja de cosméticos, música dinâmica, música dinâmica.
-- [x] Legendas de efeitos sonoros e modo foto (F12) na v0.8.0.
+- [x] Arena Infinita, Desafio do Dia, raridades, conquistas, loja de cosméticos, música dinâmica (versão acelerada na reta final), legendas de efeitos sonoros, modo foto (F12).
 
 ## 10 Assets de Minecraft
-- [x] Assets em `assets/mc/` (no GitHub), loader com 9-slice/escala inteira/tint, uso em UI, HUD, partículas, ícones.
-- [ ] Atlas único e manifesto com SHA-256 dedicado (a verificação de integridade geral já cobre os arquivos).
+- [x] Assets em `assets/mc/`, loader 9-slice/tint, manifesto SHA-256 (`tools/make_mc_manifest.py`).
+- Nota: o "atlas único" foi dispensado: o loader já guarda cada sprite em cache, sem ganho mensurável.

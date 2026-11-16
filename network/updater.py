@@ -37,6 +37,27 @@ def local_version() -> str:
         return "0.0.0"
 
 
+def channel_branch(cfg: dict) -> str:
+    """Canal de atualização: "estavel" lê o branch principal; "beta" lê o branch `beta` (se existir)."""
+    return "beta" if cfg.get("channel") == "beta" else cfg.get("branch", "main")
+
+
+def can_rollback() -> bool:
+    return can_self_update() and rt.has_backup(install_dir())
+
+
+def start_rollback() -> bool:
+    """Lança o instalador em modo --rollback e retorna True se o jogo deve fechar agora."""
+    if not can_rollback():
+        return False
+    st = install_dir()
+    exe = st / ("UCDM-Installer.exe" if sys.platform == "win32" else "UCDM-Installer")
+    cmd = [str(exe)] if exe.exists() else [sys.executable, str(st / "installer" / "ucdm_installer.py")]
+    cmd += ["--rollback", "--target", str(st), "--relaunch"]
+    rt.launch_detached(cmd, paths.UPDATE_DIR)
+    return True
+
+
 def can_self_update() -> bool:
     return paths.FROZEN or os.environ.get("UCDM_FORCE_UPDATE") == "1"
 
@@ -56,6 +77,7 @@ class UpdateTask:
         self.info: UpdateInfo | None = None
         self.staging: Path | None = None
         self._cancel = False
+        self._pause = False
         self._thread: threading.Thread | None = None
 
     @property
@@ -77,6 +99,19 @@ class UpdateTask:
     def cancel(self) -> None:
         self._cancel = True
 
+    def pause(self) -> None:
+        """Pausa o download mantendo o que já foi baixado (.part)."""
+        if self.state == "downloading":
+            self._pause = True
+
+    def resume(self) -> None:
+        if self.state == "paused":
+            self._pause = False
+            self.start_download()
+
+    def toggle_pause(self) -> None:
+        self.resume() if self.state == "paused" else self.pause()
+
     def _run(self, fn) -> None:
         self._thread = threading.Thread(target=self._guard, args=(fn,), daemon=True)
         self._thread.start()
@@ -84,13 +119,18 @@ class UpdateTask:
     def _guard(self, fn) -> None:
         try:
             fn()
+        except InterruptedError:
+            if self._pause and not self._cancel:
+                self.state, self.message = "paused", "Download pausado"
+            else:
+                self.state, self.message = "error", "Download cancelado"
         except Exception as e:  # rede caiu, release incompleto etc.: o jogo segue offline
             self.state, self.message = "error", f"{type(e).__name__}: {e}"
             print(f"[update] {self.message}")
 
     def _check(self) -> None:
         self.state, self.message = "checking", "Procurando atualizações..."
-        repo, branch = self.cfg["repo"], self.cfg.get("branch", "main")
+        repo, branch = self.cfg["repo"], channel_branch(self.cfg)
         timeout = self.cfg.get("timeout", 6)
         remote = json.loads(rt.get_text(f"https://raw.githubusercontent.com/{repo}/{branch}/version.json", timeout))
         local = local_version()
@@ -113,7 +153,8 @@ class UpdateTask:
         def prog(done, total):
             self.progress = done / total if total else 0.0
 
-        rt.download(info.package_url, zip_path, prog, timeout, cancel=lambda: self._cancel)
+        self._pause = False
+        rt.download(info.package_url, zip_path, prog, timeout, cancel=lambda: self._cancel or self._pause)
         self.message = "Verificando integridade..."
         rt.verify_sha256(zip_path, sha_text)
         self.message = "Preparando arquivos..."

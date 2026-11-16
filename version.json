@@ -1,4 +1,4 @@
 {
-  "version": "0.8.0",
-  "notes": "Android: botoes de toque ligados desde o inicio, botao de pausa, salva e pausa ao minimizar. Busca por texto no Album, legendas dos efeitos sonoros (Opcoes, Audio), modo foto (F12) e um codigo secreto."
+  "version": "0.9.0",
+  "notes": "Loja de cosmeticos, tutorial interativo, modo atracao, fonte pixelada do Minecraft, camera dinamica, plateia reativa, musica dinamica, arvore de conquistas, mapa da escada, comparacao no Album, previa e reversao de video nas Opcoes, galeria de componentes, pausar download, voltar versao e canal beta no atualizador."
 }

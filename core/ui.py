@@ -12,12 +12,20 @@ from core import mcui, theme
 from core.i18n import tr
 from core.input import InputManager
 
-WHITE = (240, 240, 240)
-DARK = (22, 24, 34)
-ACCENT = (255, 196, 64)
-RED = (220, 70, 60)
-GREEN = (90, 200, 110)
-BLUE = (80, 150, 240)
+def _token(name: str, fallback: tuple) -> tuple:
+    """Cor do tema Torneio vinda de assets/data/theme.json (com padrão no código se o arquivo não tiver)."""
+    try:
+        return tuple(theme.themes()["torneio"].get(name, fallback))
+    except (OSError, KeyError, ValueError):
+        return fallback
+
+
+WHITE = _token("white", (240, 240, 240))
+DARK = _token("dark", (22, 24, 34))
+ACCENT = _token("accent", (255, 196, 64))
+RED = _token("red", (220, 70, 60))
+GREEN = _token("green", (90, 200, 110))
+BLUE = _token("blue", (80, 150, 240))
 
 #: definido pelo Game: função(nome_do_som). Mantém a UI independente do sistema de áudio.
 sound_hook: Callable[[str], None] | None = None
@@ -156,6 +164,8 @@ def backdrop(surf, t: float, animate: bool = True) -> None:
 def row(surf, rect, focused: bool = False, active: bool = False) -> None:
     """Linha de lista (opções etc.): degradê escuro; dourada e com brilho quando focada."""
     rect = pygame.Rect(rect)
+    if theme.mc() and not high_contrast and mcui.tab(surf, rect, focused, active):
+        return
     if focused:
         top, bot, edge = (96, 82, 44), (58, 48, 26), ACCENT
         surf.blit(_remember(("rowglow", rect.w, rect.h), lambda: _glow_surface(rect.size)), (rect.x - 18, rect.y - 18))
@@ -361,9 +371,9 @@ def _draw_mc(self, surf, r, font, small_font, lit, dt) -> None:
     if self._ripple:
         self._ripple = None
     cy = r.centery - (9 if self.sub and small_font else 0)
-    mcui.label(surf, font, tr(self.label), (r.centerx, cy + int(2 * self._press)), lit, self.enabled)
+    mcui.label(surf, font, tr(self.label), (r.centerx, cy + int(2 * self._press)), lit, self.enabled, r.w - 16)
     if self.sub and small_font:
-        mcui.label(surf, small_font, tr(self.sub), (r.centerx, r.centery + 16), False, self.enabled)
+        mcui.label(surf, small_font, tr(self.sub), (r.centerx, r.centery + 16), False, self.enabled, r.w - 16)
 
 
 Button._draw_mc = _draw_mc

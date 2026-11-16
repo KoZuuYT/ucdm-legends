@@ -28,8 +28,10 @@ def button(surf, rect: pygame.Rect, lit: bool, enabled: bool) -> bool:
     return True
 
 
-def label(surf, font, msg: str, center, lit: bool, enabled: bool) -> None:
+def label(surf, font, msg: str, center, lit: bool, enabled: bool, max_w: int = 0) -> None:
     """Texto do botão: branco com sombra dura; amarelo claro ao destacar (como no jogo original)."""
+    while max_w and getattr(font, "scale", 1) > 1 and font.size(msg)[0] > max_w:      # fonte pixelada: reduz até caber
+        font = type(font)(font.scale - 1)
     col = theme.color("text") if enabled and not lit else theme.color("text_hover") if enabled else theme.color("text_disabled")
     shadow = theme.color("shadow")
     body = font.render(msg, True, col)
@@ -135,4 +137,39 @@ def hotbar(surf, center_bottom: tuple[int, int], slots: list[dict], k: int = 3) 
             surf.blit(txt, pos)
         if s.get("active"):
             surf.blit(sel, (sx - 2 * k, r.y - k))
+    return True
+
+
+W = mc.GUI + "widget/"
+
+
+def tab(surf, rect: pygame.Rect, focused: bool, active: bool) -> bool:
+    """Aba/linha de lista com os sprites de aba do Minecraft."""
+    name = "tab_selected" if active else "tab"
+    if focused:
+        name += "_highlighted"
+    img = mc.nine(W + name + ".png", rect.size, 2)
+    if img is None:
+        return False
+    surf.blit(img, rect)
+    return True
+
+
+def checkbox(surf, midright: tuple[int, int], on: bool, focused: bool, k: int = 2) -> pygame.Rect | None:
+    name = "checkbox" + ("_selected" if on else "") + ("_highlighted" if focused else "")
+    img = mc.sprite(W + name + ".png", k)
+    if img is None:
+        return None
+    r = img.get_rect(midright=midright)
+    surf.blit(img, r)
+    return r
+
+
+def slider(surf, track: pygame.Rect, frac: float, focused: bool) -> bool:
+    bg = mc.nine(W + ("slider_highlighted.png" if focused else "slider.png"), track.size, 2)
+    handle = mc.nine(W + ("slider_handle_highlighted.png" if focused else "slider_handle.png"), (16, track.h), 2)
+    if bg is None or handle is None:
+        return False
+    surf.blit(bg, track)
+    surf.blit(handle, (track.x + int((track.w - 16) * max(0.0, min(1.0, frac))), track.y))
     return True

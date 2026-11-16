@@ -43,6 +43,10 @@ class BootScene(Scene):
             task.cancel()
             return self._to_menu()
         st = task.state
+        if st in ("downloading", "paused") and self.game.input.pressed("block"):
+            task.toggle_pause()
+        if st == "paused":
+            return
         if st in ("none", "error", "idle") and self.t >= self.MIN_TIME:
             return self._to_menu()
         if st == "checking" and self.t > self.CHECK_TIMEOUT:

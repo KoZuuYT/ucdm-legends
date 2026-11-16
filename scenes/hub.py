@@ -18,7 +18,10 @@ class HubScene(Scene):
         super().__init__(game)
         self.t = 0.0
         self.toast = ("", 0.0)
-        self.scenery = backdrop.Scenery(game, "meadow", 600)
+        import time as _time
+        hour = _time.localtime().tm_hour                  # "estações" do hub: o cenário segue o horário real
+        self.station = ("Manhã", "meadow") if 6 <= hour < 17 else ("Entardecer", "dusk") if 17 <= hour < 20 else ("Noite", "night")
+        self.scenery = backdrop.Scenery(game, self.station[1], 600)
         self._build()
 
     def _build(self) -> None:
@@ -57,8 +60,9 @@ class HubScene(Scene):
         dcid, dmod = roster.daily(p)
         buttons.append(ui.Button((x0, y0 + 386, 580, 52), "Desafio do Dia", self._daily,
                                  sub=f"{roster.character(dcid)['name']} · {tr(dmod['name'])}" + (" ✓" if did else " (x2 ouro)")))
-        buttons.append(ui.Button((x0, y0 + 446, 280, 52), "Estatísticas", self._stats))
-        buttons.append(ui.Button((x0 + 300, y0 + 446, 280, 52), "Ajuda", self._help))
+        buttons.append(ui.Button((x0, y0 + 446, 188, 52), "Estatísticas", self._stats))
+        buttons.append(ui.Button((x0 + 196, y0 + 446, 188, 52), "Loja", self._shop))
+        buttons.append(ui.Button((x0 + 392, y0 + 446, 188, 52), "Ajuda", self._help))
         buttons.append(ui.Button((x0, y0 + 506, 280, 52), "Opções", self._options))
         buttons.append(ui.Button((x0 + 300, y0 + 506, 280, 52), "Menu principal", self._to_menu))
         focus = self.menu.focus if hasattr(self, "menu") else 0
@@ -74,6 +78,10 @@ class HubScene(Scene):
         enemies = roster.enemies()
         stage = min(self.game.profile.arena_stage, len(enemies) - 1)
         self.game.scenes.push(ArenaScene(self.game, stage), fade="diag")
+
+    def _shop(self) -> None:
+        from scenes.shop import ShopScene
+        self.game.scenes.push(ShopScene(self.game), fade="slide")
 
     def _daily(self) -> None:
         from scenes.arena import ArenaScene
@@ -117,6 +125,24 @@ class HubScene(Scene):
         self.game.save.save(self.game.profile)
         from scenes.menu import MenuScene
         self.game.scenes.reset(MenuScene(self.game))
+
+    def _ladder_map(self, surf, p, a) -> None:
+        """Mapa das rodadas: um nó por luta da escada (verde = vencida, dourado = atual, cinza = futura)."""
+        en = roster.enemies()
+        n = len(en)
+        x0, y0, step = 40, 664, min(52, 380 // max(1, n - 1))
+        for i in range(n - 1):
+            pygame.draw.line(surf, (30, 30, 40), (x0 + i * step, y0), (x0 + (i + 1) * step, y0), 6)
+        for i, e in enumerate(en):
+            cx = x0 + i * step
+            done, cur = i < p.arena_stage, i == p.arena_stage
+            col = (96, 200, 90) if done else (255, 200, 64) if cur else (90, 92, 110)
+            r = 13 + (3 * math.sin(self.t * 4) if cur else 0)
+            rar = roster.rarity_info(roster.rarity(e["character"]))["color"]
+            pygame.draw.circle(surf, tuple(rar), (cx, y0), int(r) + 4)
+            pygame.draw.circle(surf, col, (cx, y0), int(r))
+            ui.text(surf, a.font(15), "✓" if done else str(i + 1), (cx, y0), (15, 15, 20), "center", False)
+        ui.text(surf, a.font(16), tr("Escada da Arena"), (x0 - 16, y0 - 38), (235, 235, 235))
 
     # --- ciclo ------------------------------------------------------------------------
     def enter(self) -> None:
@@ -167,6 +193,8 @@ class HubScene(Scene):
             ui.text(surf, a.font(20), f"{bal[stat]['label']}  nv {s.level}", (74, y))
             ui.bar(surf, (44, y + 24, 360, 14), s.xp / xp_to_next(s.level), col)
 
+        self._ladder_map(surf, p, a)
+        ui.text(surf, a.font(18), tr(self.station[0]), (1260, 700), (235, 235, 235), "bottomright")
         ui.text(surf, a.font(40), "Campo de Treino", (760, 80), ui.WHITE, "midtop")
         self.menu.draw(surf, a.font(28), a.font(18, bold=False))
         if self.toast[1] > 0:

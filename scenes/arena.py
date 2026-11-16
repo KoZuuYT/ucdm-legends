@@ -15,7 +15,7 @@ import random
 
 import pygame
 
-from core import compat
+from core import compat, paths
 
 from core import config, mcui, theme, ui
 from core import mcassets as mc
@@ -90,6 +90,10 @@ class ArenaScene(Scene):
         self._warned = False
         self._vignette: pygame.Surface | None = None
         self.now = 0.0
+        self.hype = 0.0                                  # animação da plateia (sobe com golpes fortes)
+        self._cz = 1.0                                   # zoom suavizado da câmera dinâmica
+        self.music_hot = False
+        self.attract = False
         self._counted_windup = False
         self.over = 0.0          # tempo desde o fim da luta
         self.result: str | None = None
@@ -188,7 +192,7 @@ class ArenaScene(Scene):
 
     def _set_touch_buttons(self) -> None:
         W, H = self.game.display.canvas_w, self.game.display.height
-        s, m = 100, 18
+        s, m = (116, 36) if paths.ANDROID else (100, 18)      # celular: botões maiores e longe das bordas (entalhe/gestos)
         self.game.input.set_virtual_buttons([
             VirtualButton("left", pygame.Rect(m, H - s - m, s, s), "<"),
             VirtualButton("right", pygame.Rect(m * 2 + s, H - s - m, s, s), ">"),
@@ -311,6 +315,12 @@ class ArenaScene(Scene):
     # --- lógica -------------------------------------------------------------------------
     def update(self, dt: float) -> None:
         self.now += dt
+        self.hype = max(0.0, self.hype - dt * 0.45)
+        hot = (self.result is None and not self.in_intro and
+               min(self.player.hp / max(1.0, self.player.max_hp), self.enemy.hp / max(1.0, self.enemy.max_hp)) < 0.35)
+        if hot != self.music_hot:                        # música dinâmica: mais rápida na reta final da luta
+            self.music_hot = hot
+            self.game.audio.music("arena_hot" if hot else "arena", 300)
         inp = self.game.input
         p, e = self.player, self.enemy
         if inp.pressed("back") and self.result is None:
@@ -406,23 +416,29 @@ class ArenaScene(Scene):
         self._warned = danger
 
     # --- resolução de golpes ----------------------------------------------------------------
-    def _mc_fx(self, kind: str, x: float, y: float, facing: int = 1) -> None:
-        """Efeitos com os sprites de partícula do Minecraft (só no tema Minecraft)."""
+    def _cosmetic(self, slot: str):
+        from scenes import shop
+        return shop.color_of(self.game.profile.equipped.get(slot, ""), self.now)
+
+    def _mc_fx(self, kind: str, x: float, y: float, facing: int = 1, mine_fx: bool = False) -> None:
+        """Efeitos com os sprites de partícula do Minecraft (só no tema Minecraft). mine_fx: golpe do jogador (cosmético)."""
         if not theme.mc() or ui.high_contrast or self.game.low_perf:
             return
         fx = self.fx
+        own = self._cosmetic("fx_hit") if mine_fx else None
         if kind == "hit":
-            fx.anim(x, y, "particle/sweep", 8, k=4, flip=facing < 0, tint=(255, 235, 225))
-            fx.icons(x, y, "particle/damage.png", n=5, speed=300, k=4, direction=facing, tint=(235, 70, 55))
+            fx.anim(x, y, "particle/sweep", 8, k=4, flip=facing < 0, tint=own or (255, 235, 225))
+            fx.icons(x, y, "particle/damage.png", n=5, speed=300, k=4, direction=facing, tint=own or (235, 70, 55))
         elif kind == "crit":
-            fx.anim(x, y, "particle/sweep", 8, k=6, flip=facing < 0, tint=(255, 225, 120))
-            fx.icons(x, y, "particle/critical_hit.png", n=10, speed=420, k=5, direction=facing, tint=(255, 215, 90))
+            fx.anim(x, y, "particle/sweep", 8, k=6, flip=facing < 0, tint=own or (255, 225, 120))
+            fx.icons(x, y, "particle/critical_hit.png", n=10, speed=420, k=5, direction=facing, tint=own or (255, 215, 90))
         elif kind == "parry":
             fx.icons(x, y, "particle/enchanted_hit.png", n=12, speed=380, k=5, tint=(150, 215, 255))
             fx.anim(x, y, "particle/spark", 8, k=7, fps=26, tint=(255, 215, 120))
         elif kind == "dodge":
-            fx.anim(x, y, "particle/spark", 8, k=6, fps=28, tint=(140, 215, 255))
-            fx.icons(x, y, "particle/glint.png", n=6, speed=260, k=4, gravity=0, tint=(190, 235, 255))
+            c = self._cosmetic("fx_dodge")
+            fx.anim(x, y, "particle/spark", 8, k=6, fps=28, tint=c or (140, 215, 255))
+            fx.icons(x, y, "particle/glint.png", n=6, speed=260, k=4, gravity=0, tint=c or (190, 235, 255))
         elif kind == "break":
             fx.anim(x, y, "particle/explosion", 16, k=8, fps=36, tint=(255, 200, 110))
             fx.icons(x, y, "particle/critical_hit.png", n=8, speed=380, k=4, tint=(255, 215, 90))
@@ -447,6 +463,7 @@ class ArenaScene(Scene):
                 self._poise_broken(att)
             else:
                 att.stun(self.parry_stun if mine else 1.0)
+            self.hype = min(1.0, self.hype + 0.6)
             self._mc_fx("parry", x, y)
             if mine:
                 self.st["parries"] += 1
@@ -537,7 +554,8 @@ class ArenaScene(Scene):
                 self.st["dealt"] += res.damage
                 self.st["hits_landed"] += 1
             col = (255, 215, 90) if crit else (255, 90, 70)
-            self._mc_fx("crit" if crit else "hit", x, y, facing)
+            self.hype = min(1.0, self.hype + (0.5 if crit else 0.2))
+            self._mc_fx("crit" if crit else "hit", x, y, facing, mine_fx=not mine)
             fx.burst(x, y, (255, 230, 120) if crit else (235, 70, 55), n=22 if crit else 13, speed=430, streak=True,
                      direction=facing)
             fx.burst(x, y, (255, 255, 255), n=6, speed=200, size=4)
@@ -690,9 +708,18 @@ class ArenaScene(Scene):
 
     # --- render -------------------------------------------------------------------------
     def _zoom(self) -> float:
-        """Zoom do mundo (não do HUD): leve aproximação no KO que volta ao normal."""
-        if self.result is None or self.fb.reduce_motion or self.fb.intensity <= 0 or self.game.low_perf:
+        """Zoom do mundo (não do HUD): aproximação suave quando os lutadores estão perto + leve zoom no KO."""
+        if self.fb.reduce_motion or self.fb.intensity <= 0 or self.game.low_perf:
             return 1.0
+        if self.result is None:
+            if not self.game.cfg.get("display", {}).get("dynamic_camera", True) or paths.ANDROID:
+                return 1.0
+            gap = abs(self.player.pos.x - self.enemy.pos.x)
+            want = 1.0 + 0.07 * max(0.0, min(1.0, (360 - gap) / 220)) * min(1.0, self.fb.intensity)
+            self._cz += (want - self._cz) * 0.06                     # suaviza (sem trancos)
+            if self.hype > 0.5:
+                return self._cz + 0.02 * self.hype
+            return self._cz
         return 1.0 + 0.08 * min(1.0, self.fb.intensity) * math.sin(math.pi * ease_in_out_sine(min(1.0, self.over / 1.4)))
 
     def draw(self, surf: pygame.Surface) -> None:
@@ -702,13 +729,18 @@ class ArenaScene(Scene):
             if self._buf is None or self._buf.get_size() != (W, H):
                 self._buf = pygame.Surface((W, H))
             self._draw_world(self._buf)
-            ko = self.enemy if self.result == "win" else self.player
-            fx, fy = self.camera.to_screen(ko.pos.x, ko.pos.y - ko.height * 0.5)
+            if self.result is None:                       # câmera dinâmica: foca o meio entre os dois
+                mx = (self.player.pos.x + self.enemy.pos.x) / 2
+                fx, fy = self.camera.to_screen(mx, self.player.pos.y - self.player.height * 0.5)
+            else:
+                ko = self.enemy if self.result == "win" else self.player
+                fx, fy = self.camera.to_screen(ko.pos.x, ko.pos.y - ko.height * 0.5)
             cw, ch = int(W / z), int(H / z)
             crop = pygame.Rect(0, 0, cw, ch)
             crop.center = (int(fx), int(fy))
             crop.clamp_ip(self._buf.get_rect())
-            pygame.transform.smoothscale(self._buf.subsurface(crop), (W, H), surf)
+            (pygame.transform.smoothscale if self.result is not None else pygame.transform.scale)(
+                self._buf.subsurface(crop), (W, H), surf)
         else:
             self._draw_world(surf)
         if self.intro >= INTRO_COUNT_START - 0.3:
@@ -736,7 +768,8 @@ class ArenaScene(Scene):
             x, y = cam.to_screen(d.x, d.y)
             if d.kind == "crowd":
                 img = self._dark(d.sprite, d.h, d.flip)
-                surf.blit(img, img.get_rect(midbottom=(x, y + d.h)))
+                hop = -abs(math.sin(self.now * 9 + d.x * 0.37)) * 14 * self.hype if self.hype > 0.05 else 0
+                surf.blit(img, img.get_rect(midbottom=(x, y + d.h + hop)))
             elif d.kind == "flag":
                 pygame.draw.line(surf, (80, 60, 40), (x, y), (x, y - d.h), 5)
                 pygame.draw.polygon(surf, d.color, [(x, y - d.h), (x + 50, y - d.h + 18), (x, y - d.h + 36)])
@@ -854,7 +887,7 @@ class ArenaScene(Scene):
                     ui.text(surf, self.small, tr("ARMADURA"), (bx + 300 - 6, 88), (215, 190, 110), "topright")
                 ui.text(surf, self.small, self.edef.get("title", ""), (bx + 420, 74), ui.ACCENT, "topright")
         self._status_chips(surf, 106, 94)
-        if theme.mc() and not ui.high_contrast:
+        if theme.mc() and not ui.high_contrast and self.game.cfg.get("display", {}).get("hud_style", "completo") != "minimo":
             self._hotbar(surf)
         label = (f"{tr('Desafio do Dia')} · {tr(self.daily['name'])}" if self.daily else
                  f"{tr('Arena Infinita')} · {tr('Onda')} {self.endless}" if self.endless else

@@ -116,9 +116,17 @@ class MenuScene(Scene):
 
     def update(self, dt: float) -> None:
         self.t += dt
-        if self.game.input.pressed("back"):
+        inp = self.game.input
+        if inp.pressed("back"):
             return self._ask_quit()
-        self.menu.update(self.game.input)
+        active = inp.moved or inp.taps or inp.wheel or any(inp.pressed(a) for a in
+                                                           ("confirm", "left", "right", "up", "down", "attack", "block", "dodge"))
+        self.idle = 0.0 if active else getattr(self, "idle", 0.0) + dt
+        if self.idle > 45.0 and not self.game.headless:      # modo atração
+            self.idle = 0.0
+            from scenes.attract import AttractScene
+            return self.game.scenes.push(AttractScene(self.game), fade="diag")
+        self.menu.update(inp)
 
     def _title_shine(self, surf: pygame.Surface, rect: pygame.Rect, title: str) -> None:
         """Faixa de luz que atravessa as letras do título de tempos em tempos (só dentro do desenho do texto)."""

@@ -57,6 +57,8 @@ class Game:
 
         self.tick_rate = disp.get("tick_rate", 60)
         self.fps_cap = disp.get("fps_cap", 144) or 0   # 0 = sem limite
+        if paths.ANDROID:
+            self.fps_cap = 60                         # celular: 60 FPS poupa bateria e aquece menos
         self.show_debug = bool(disp.get("show_fps", False))
         self.update_notice: str | None = None       # versão nova encontrada pela checagem em segundo plano
         self._bg_task = None
@@ -95,6 +97,11 @@ class Game:
                                high_contrast_mode=acc.get("high_contrast", False))
         self.assets.set_font_scale(acc.get("text_scale", 1.0))
         theme.set_theme(self.cfg.get("ui", {}).get("theme", "torneio"))
+        bitmap = bool(self.cfg.get("ui", {}).get("bitmap_font", True))
+        if bitmap != self.assets.bitmap_enabled or getattr(self, "_font_theme", None) != theme.name:
+            self.assets.bitmap_enabled = bitmap
+            self._font_theme = theme.name
+            self.assets._fonts.clear()
 
     def apply_settings(self) -> None:
         """Relê settings.json e aplica o que dá para mudar sem reiniciar."""
