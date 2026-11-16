@@ -41,7 +41,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
-          V=$(python -c "import json;print(json.load(open('version.json'))['version'])")
+          V=$(python -c "import json;print(json.load(open('version.json',encoding='utf-8'))['version'])")
           [ "v$V" = "${GITHUB_REF_NAME}" ] || { echo "Tag ${GITHUB_REF_NAME} != version.json v$V"; exit 1; }
       - run: python installer/build_release.py --platform windows --repo ${{ github.repository }}
       - uses: actions/upload-artifact@v4
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { path: out, merge-multiple: true }
       - name: Notas da versão
-        run: python -c "import json;print(json.load(open('version.json')).get('notes',''))" > notes.md
+        run: python -c "import json;print(json.load(open('version.json',encoding='utf-8')).get('notes',''))" > notes.md
       - uses: softprops/action-gh-release@v2
         with:
           files: out/*
