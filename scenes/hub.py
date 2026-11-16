@@ -47,12 +47,20 @@ class HubScene(Scene):
                                  sub=f"{len(p.collection)}/{len(roster.characters())} cartas"))
         last = p.last_training if p.last_training in REGISTRY else ""
         again = mg[last]["title"] if last else ""
-        buttons.append(ui.Button((x0, y0 + 326, 580, 52), "Treinar de novo", lambda: self._train(last), enabled=bool(last),
+        buttons.append(ui.Button((x0, y0 + 326, 280, 52), "Treinar de novo", lambda: self._train(last), enabled=bool(last),
                                  sub=again))
-        buttons.append(ui.Button((x0, y0 + 386, 280, 52), "Estatísticas", self._stats))
-        buttons.append(ui.Button((x0 + 300, y0 + 386, 280, 52), "Ajuda", self._help))
-        buttons.append(ui.Button((x0, y0 + 446, 280, 52), "Opções", self._options))
-        buttons.append(ui.Button((x0 + 300, y0 + 446, 280, 52), "Menu principal", self._to_menu))
+        open_inf = p.arena_stage >= roster.ENDLESS_UNLOCK_STAGE
+        buttons.append(ui.Button((x0 + 300, y0 + 326, 280, 52), "Arena Infinita", self._endless, enabled=open_inf,
+                                 sub=(f"Recorde: onda {p.counters.get('endless_best', 0)}" if open_inf
+                                      else f"Abre na luta {roster.ENDLESS_UNLOCK_STAGE + 1}")))
+        did = p.counters.get("daily_done", 0) == roster.today_key()
+        dcid, dmod = roster.daily(p)
+        buttons.append(ui.Button((x0, y0 + 386, 580, 52), "Desafio do Dia", self._daily,
+                                 sub=f"{roster.character(dcid)['name']} · {tr(dmod['name'])}" + (" ✓" if did else " (x2 ouro)")))
+        buttons.append(ui.Button((x0, y0 + 446, 280, 52), "Estatísticas", self._stats))
+        buttons.append(ui.Button((x0 + 300, y0 + 446, 280, 52), "Ajuda", self._help))
+        buttons.append(ui.Button((x0, y0 + 506, 280, 52), "Opções", self._options))
+        buttons.append(ui.Button((x0 + 300, y0 + 506, 280, 52), "Menu principal", self._to_menu))
         focus = self.menu.focus if hasattr(self, "menu") else 0
         self.menu = ui.Menu(buttons, columns=2)
         self.menu.focus = min(focus, len(buttons) - 1)
@@ -65,7 +73,18 @@ class HubScene(Scene):
         from scenes.arena import ArenaScene
         enemies = roster.enemies()
         stage = min(self.game.profile.arena_stage, len(enemies) - 1)
-        self.game.scenes.push(ArenaScene(self.game, stage), fade="iris")
+        self.game.scenes.push(ArenaScene(self.game, stage), fade="diag")
+
+    def _daily(self) -> None:
+        from scenes.arena import ArenaScene
+        cid, mod = roster.daily(self.game.profile)
+        self.game.scenes.push(ArenaScene(self.game, 0, challenger=cid, daily=mod), fade="diag")
+
+    def _endless(self) -> None:
+        import random
+        from scenes.arena import ArenaScene
+        first = roster.endless_pick(1, random.Random())
+        self.game.scenes.push(ArenaScene(self.game, 0, challenger=first, endless=1), fade="diag")
 
     def _upgrade(self) -> None:
         p = self.game.profile

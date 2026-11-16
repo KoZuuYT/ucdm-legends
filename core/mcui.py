@@ -107,3 +107,32 @@ def boss_bar(surf, rect: pygame.Rect, frac: float, color: str = "red", notches: 
         if nfg is not None:
             surf.blit(nfg, (rect.x + src.x, rect.y), src)
     return True
+
+
+def hotbar(surf, center_bottom: tuple[int, int], slots: list[dict], k: int = 3) -> bool:
+    """Hotbar de golpes. Cada slot: {icon, active, dim (0..1 escurecimento), label}. Usa hotbar.png (9 espaços de 20 px)."""
+    bar = mc.sprite(HUD + "hotbar.png", k)
+    sel = mc.sprite(HUD + "hotbar_selection.png", k)
+    if bar is None or sel is None:
+        return False
+    r = bar.get_rect(midbottom=center_bottom)
+    surf.blit(bar, r)
+    font = pygame.font.Font(None, 16 + 2 * k)
+    for i, s in enumerate(slots):
+        sx = r.x + (3 + i * 20) * k
+        icon = mc.sprite(s["icon"], k) if s.get("icon") else None
+        if icon is not None:
+            if s.get("dim"):
+                icon = icon.copy()
+                v = int(255 * (1 - s["dim"]))
+                icon.fill((v, v, v), special_flags=pygame.BLEND_RGB_MULT)
+            surf.blit(icon, (sx + k, r.y + 3 * k))
+        if s.get("label"):
+            txt = font.render(s["label"], True, (235, 235, 235))
+            sh = font.render(s["label"], True, (30, 30, 30))
+            pos = (sx + 9 * k - txt.get_width() // 2, r.bottom + 2)
+            surf.blit(sh, (pos[0] + 1, pos[1] + 1))
+            surf.blit(txt, pos)
+        if s.get("active"):
+            surf.blit(sel, (sx - 2 * k, r.y - k))
+    return True

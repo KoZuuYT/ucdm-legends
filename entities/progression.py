@@ -39,6 +39,7 @@ class Profile:
     character: str = "steve"            # id da aparência (skin) do jogador; o lutador é sempre o Steve
     collection: dict[str, int] = field(default_factory=dict)   # lendas UCDM derrotadas -> vezes
     achievements: list[str] = field(default_factory=list)      # ids das conquistas liberadas
+    history: list[str] = field(default_factory=list)           # últimas lutas: "W" (vitória) / "L" (derrota)
     skins_seen: list[str] = field(default_factory=lambda: ["steve"])   # aparências já anunciadas como desbloqueadas
     gold: int = 0
     weapon_level: int = 1
@@ -76,7 +77,7 @@ class Profile:
             "character": self.character, "gold": self.gold, "weapon_level": self.weapon_level,
             "arena_stage": self.arena_stage, "wins": self.wins, "best_scores": self.best_scores,
             "playtime": round(self.playtime, 1), "name": self.name, "seen_help": self.seen_help, "last_training": self.last_training,
-            "counters": self.counters, "collection": self.collection, "skins_seen": self.skins_seen, "achievements": self.achievements,
+            "counters": self.counters, "collection": self.collection, "skins_seen": self.skins_seen, "achievements": self.achievements, "history": self.history[-20:],
             "stats": {k: {"level": v.level, "xp": v.xp} for k, v in self.stats.items()},
         }
 
@@ -92,7 +93,8 @@ class Profile:
                 seen_help=bool(d.get("seen_help", False)), last_training=str(d.get("last_training", "")), counters=dict(d.get("counters", {})),
                 collection={str(k): int(v) for k, v in dict(d.get("collection", {})).items()},
                 skins_seen=[str(x) for x in d.get("skins_seen", ["steve"])],
-                achievements=[str(x) for x in d.get("achievements", [])])
+                achievements=[str(x) for x in d.get("achievements", [])],
+                history=[str(x) for x in d.get("history", []) if x in ("W", "L")][-20:])
         for k in STATS:
             s = d.get("stats", {}).get(k, {})
             p.stats[k] = StatProgress(s.get("level", 1), s.get("xp", 0))

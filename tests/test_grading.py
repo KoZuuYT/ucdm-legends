@@ -121,3 +121,127 @@ class McParticleTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AchievementsAndEndlessTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from core.engine import Game
+        cls.game = Game(headless=True)
+
+    def test_achievements_unlock_once_and_persist(self):
+        from entities.progression import Profile
+        from systems import achievements
+        p = Profile()
+        self.assertEqual(achievements.check(p), [])
+        p.wins = 1
+        new = achievements.check(p)
+        self.assertEqual([d["id"] for d in new], ["first_blood"])
+        self.assertEqual(achievements.check(p), [])                       # não repete
+        p.counters["parries"] = 60
+        ids = [d["id"] for d in achievements.check(p)]
+        self.assertIn("parry_5", ids)
+        self.assertIn("parry_50", ids)
+        q = Profile.from_dict(p.to_dict())
+        self.assertEqual(q.achievements, p.achievements)
+        cur, need = achievements.progress(p, achievements.defs()[3])
+        self.assertLessEqual(cur, need)
+
+    def test_all_achievements_reference_existing_icons(self):
+        from core import mcassets as mc
+        for d in __import__("systems.achievements", fromlist=["defs"]).defs():
+            self.assertIsNotNone(mc.load(f"item/{d['icon']}.png"), d["id"])
+
+    def test_screens_render(self):
+        from entities.progression import Profile
+        from scenes.achievements_screen import AchievementsScene
+        from scenes.stats import StatsScene
+        self.game.profile = Profile()
+        self.game.profile.history = ["W", "L", "W"]
+        surf = pygame.Surface((1280, 720))
+        for cls in (AchievementsScene, StatsScene):
+            sc = cls(self.game)
+            for _ in range(10):
+                sc.update(1 / 60)
+            sc.draw(surf)
+
+    def test_endless_waves_scale_and_use_rarity_bands(self):
+        import random
+        from entities import roster
+        rng = random.Random(1)
+        self.assertEqual(roster.endless_rarity(1), "comum")
+        self.assertEqual(roster.endless_rarity(5), "raro")
+        self.assertEqual(roster.endless_rarity(99), "lendario")
+        c1 = roster.endless_pick(1, rng)
+        e1 = roster.endless_edef(1, c1)
+        e9 = roster.endless_edef(9, roster.endless_pick(9, rng))
+        self.assertGreater(e9["hp"], e1["hp"])
+        self.assertGreater(e9["gold"], e1["gold"])
+        self.assertNotEqual(roster.endless_pick(3, rng, avoid=c1), None)
+
+    def test_endless_win_chains_to_next_wave_and_records(self):
+        from entities import roster
+        from entities.progression import Profile
+        from scenes.arena import ArenaScene
+        from scenes.results import ResultsOverlay
+        self.game.profile = Profile()
+        a = ArenaScene(self.game, 0, challenger=roster.endless_pick(1, __import__("random").Random(2)), endless=1)
+        a.result = "win"
+        self.game.scenes.stack.clear()
+        self.game.scenes.push(a)
+        self.game.scenes.flush()
+        a._finish()
+        self.game.scenes.flush()
+        top = self.game.scenes.current
+        self.assertIsInstance(top, ResultsOverlay)
+        self.assertEqual(self.game.profile.counters["endless_best"], 1)
+        top._close()
+        for _ in range(3):
+            self.game.scenes.flush()
+        cur = self.game.scenes.current
+        for _ in range(60):
+            self.game.scenes.update(1 / 60)
+        self.assertIsInstance(self.game.scenes.current, ArenaScene)
+        self.assertEqual(self.game.scenes.current.endless, 2)
+
+
+class DailyChallengeTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from core.engine import Game
+        cls.game = Game(headless=True)
+
+    def test_daily_is_deterministic_and_respects_unlocked_tiers(self):
+        from entities import roster
+        from entities.progression import Profile
+        p = Profile()
+        a = roster.daily(p, 20261116)
+        self.assertEqual(a, roster.daily(p, 20261116))
+        self.assertEqual(roster.rarity(a[0]), "comum")             # só raridades abertas
+        seen = {roster.daily(p, 20260101 + i)[1]["id"] for i in range(40)}
+        self.assertGreater(len(seen), 2)                          # os modificadores variam por dia
+
+    def test_daily_modifiers_apply_and_reward_once_per_day(self):
+        from entities import roster
+        from entities.progression import Profile
+        from scenes.arena import ArenaScene
+        mods = {m["id"]: m for m in __import__("core.config", fromlist=["load"]).load("daily")["modifiers"]}
+        self.game.profile = Profile()
+        cid, _ = roster.daily(self.game.profile)
+        base = ArenaScene(self.game, 0, challenger=cid)
+        tank = ArenaScene(self.game, 0, challenger=cid, daily=mods["tank"])
+        glass = ArenaScene(self.game, 0, challenger=cid, daily=mods["glass"])
+        self.assertAlmostEqual(tank.enemy.max_hp, base.enemy.max_hp * 2)
+        self.assertAlmostEqual(glass.player.hp, glass.player.max_hp * 0.5)
+        gains = []
+        for _ in range(2):
+            a = ArenaScene(self.game, 0, challenger=cid, daily=mods["brute"])
+            a.result = "win"
+            self.game.scenes.stack.clear()
+            self.game.scenes.push(a)
+            self.game.scenes.flush()
+            before = self.game.profile.gold
+            a._finish()
+            gains.append(self.game.profile.gold - before)
+        self.assertGreater(gains[0], gains[1])                    # 2ª vez no dia rende menos
+        self.assertEqual(self.game.profile.counters["dailies"], 1)

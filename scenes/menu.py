@@ -11,7 +11,7 @@ from core.scene import Scene
 from entities import roster
 from entities.progression import Profile
 from core import config, theme
-from systems import backdrop, menu_fx
+from systems import backdrop, menu_fx, pulse
 
 
 def _read_version() -> str:
@@ -155,6 +155,9 @@ class MenuScene(Scene):
         title = self.game.cfg["title"]
         if mc_look:
             logo = menu_fx.extruded_title(a.font(88), title)
+            if not self.game.feedback.reduce_motion:            # o logo "bate" no ritmo
+                k = 1.0 + 0.025 * pulse.beat(self.t)
+                logo = pygame.transform.smoothscale(logo, (int(logo.get_width() * k), int(logo.get_height() * k)))
             lr = logo.get_rect(midtop=(W // 2, 100 + int(4 * math.sin(self.t * 2))))
             surf.blit(logo, lr)
             sp = menu_fx.splash(a.font(24), tr(self.splash_text), self.t, self.game.feedback.reduce_motion)

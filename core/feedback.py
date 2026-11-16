@@ -8,6 +8,8 @@ from collections import deque
 
 import pygame
 
+from core import mcassets, theme
+
 from core import config
 from core.i18n import tr
 
@@ -124,9 +126,27 @@ class Feedback:
             self._overlay.set_alpha(int(255 * self._flash_alpha))
             surf.blit(self._overlay, (0, 0))
         y = h - 24
+        mc_look = theme.mc()
         for t in reversed(self.toasts):
             k = max(0.0, min(1.0, t.life / 0.35, (t.total - t.life) / 0.2 + 0.001))
             img = font.render(tr(t.msg), True, t.color)
+            if mc_look:                      # toast de "avanço" do Minecraft (placa 160x32 esticada)
+                box = img.get_rect().inflate(96, 26)
+                box.midbottom = (w // 2, y + int((1 - k) * 18))
+                plate = mcassets.stretch(mcassets.GUI + "toast/advancement.png", box.size)
+                if plate is not None:
+                    plate = plate.copy()
+                    plate.set_alpha(int(255 * k))
+                    surf.blit(plate, box)
+                    img.set_alpha(int(255 * k))
+                    surf.blit(img, img.get_rect(midleft=(box.x + 70, box.centery)))
+                    icon = mcassets.sprite("item/experience_bottle.png" if t.msg.startswith("Conquista") else "item/book.png", 2)
+                    if icon is not None:
+                        icon = icon.copy()
+                        icon.set_alpha(int(255 * k))
+                        surf.blit(icon, icon.get_rect(center=(box.x + 38, box.centery)))
+                    y -= box.h + 8
+                    continue
             box = img.get_rect().inflate(36, 18)
             box.midbottom = (w // 2, y + int((1 - k) * 18))
             s = pygame.Surface(box.size, pygame.SRCALPHA)

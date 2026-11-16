@@ -1,0 +1,40 @@
+{
+  "_doc": "Modificadores do Desafio do Dia. Um é sorteado por data. player_hp/enemy_hp/enemy_damage/enemy_windup/enemy_poise = multiplicadores; reward = multiplicador do ouro.",
+  "modifiers": [
+    {
+      "id": "glass",
+      "name": "Vidro",
+      "desc": "Você começa com 50% de vida.",
+      "player_hp": 0.5,
+      "reward": 1.8
+    },
+    {
+      "id": "tank",
+      "name": "Muralha",
+      "desc": "O inimigo tem o dobro de vida.",
+      "enemy_hp": 2.0,
+      "reward": 1.6
+    },
+    {
+      "id": "swift",
+      "name": "Ligeiro",
+      "desc": "Os golpes inimigos são 25% mais rápidos.",
+      "enemy_windup": 0.75,
+      "reward": 1.7
+    },
+    {
+      "id": "brute",
+      "name": "Bruto",
+      "desc": "O inimigo causa 50% mais dano.",
+      "enemy_damage": 1.5,
+      "reward": 1.6
+    },
+    {
+      "id": "armored",
+      "name": "Blindado",
+      "desc": "O inimigo tem o dobro de armadura (poise).",
+      "enemy_poise": 2.0,
+      "reward": 1.5
+    }
+  ]
+}

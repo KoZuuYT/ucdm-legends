@@ -112,7 +112,7 @@ class CollectionScene(Scene):
                           else "Requer vencer o chefe da arena", 2.5)
             return ui.sfx("error")
         from scenes.arena import ArenaScene
-        self.game.scenes.push(ArenaScene(self.game, 0, challenger=item["id"]), fade="iris")
+        self.game.scenes.push(ArenaScene(self.game, 0, challenger=item["id"]), fade="diag")
 
     def resume(self) -> None:
         self._rebuild()

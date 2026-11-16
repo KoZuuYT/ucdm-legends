@@ -1,7 +1,7 @@
 """Novidades da versão: aparece uma vez no menu depois de uma atualização."""
 import pygame
 
-from core import ui
+from core import mcassets as mc, ui
 from scenes.help import _Panel
 
 
@@ -38,7 +38,13 @@ class NewsOverlay(_Panel):
             for j, line in enumerate(wrap_text(font, sentence, pr.w - 110)):
                 if y > pr.bottom - 70:
                     break
-                ui.text(surf, font, ("•  " if j == 0 else "    ") + line, (pr.x + 40, y))
+                if j == 0:
+                    em = mc.sprite("item/emerald.png", 2)
+                    if em is not None:
+                        surf.blit(em, (pr.x + 36, y - 3))
+                    else:
+                        ui.text(surf, font, "•", (pr.x + 40, y))
+                ui.text(surf, font, line, (pr.x + 76, y))
                 y += 28
             y += 8
         ui.text(surf, a.font(18, bold=False), "Enter para continuar", (pr.centerx, pr.bottom - 36), (190, 190, 200), "midtop")

@@ -42,7 +42,7 @@ class Scene:
 class SceneManager:
     FADE_TIME = 0.18
     #: duração relativa por tipo de transição ("fade" é o padrão; True == "fade")
-    KINDS = {"fade": 1.0, "slide": 1.5, "iris": 1.8}
+    KINDS = {"fade": 1.0, "slide": 1.5, "iris": 1.8, "diag": 1.6}
 
     def __init__(self) -> None:
         self.stack: list[Scene] = []
@@ -188,6 +188,20 @@ class SceneManager:
             # cortina que entra pela esquerda e sai pela direita
             bw = int(w * k)
             surf.fill((0, 0, 0), (0, 0, bw, h) if self._fade_dir > 0 else (w - bw, 0, bw, h))
+        elif self._kind == "diag":
+            # cortina de faixas inclinadas: listras alternadas descem e sobem até cobrir a tela
+            n, slant = 8, h * 0.35
+            bw = (w + slant) / n
+            for i in range(n):
+                local = max(0.0, min(1.0, k * 1.6 - 0.6 * i / (n - 1)))
+                if local <= 0.0:
+                    continue
+                ya, yb = (0.0, h * local) if i % 2 == 0 else (h * (1 - local), float(h))
+                xi = i * bw
+                pts = [(xi - slant * ya / h, ya), (xi + bw + 1 - slant * ya / h, ya),
+                       (xi + bw + 1 - slant * yb / h, yb), (xi - slant * yb / h, yb)]
+                pygame.draw.polygon(surf, (12, 14, 26), pts)
+                pygame.draw.line(surf, (255, 196, 64), pts[0], pts[3], 3)
         elif self._kind == "iris":
             if self._overlay is None or self._overlay.get_size() != (w, h):
                 self._overlay = pygame.Surface((w, h))

@@ -96,6 +96,51 @@ def weapon_name(level: int) -> str:
     return WEAPON_TIERS[weapon_tier(level)][1]
 
 
+def today_key(now=None) -> int:
+    """Data de hoje como inteiro AAAAMMDD (muda à meia-noite local)."""
+    import time
+    t = time.localtime(now)
+    return t.tm_year * 10000 + t.tm_mon * 100 + t.tm_mday
+
+
+def daily(profile: Profile, key: int | None = None) -> tuple[str, dict]:
+    """Desafio do Dia: (id da lenda, modificador). Igual para todos no mesmo dia; só sorteia raridades já abertas."""
+    import hashlib
+    key = key or today_key()
+    h = int(hashlib.md5(f"ucdm-daily:{key}".encode()).hexdigest(), 16)
+    pool = [c["id"] for c in characters() if tier_unlocked(profile, c.get("rarity", "comum"))]
+    cid = pool[h % len(pool)]
+    mods = config.load("daily")["modifiers"]
+    return cid, mods[(h >> 16) % len(mods)]
+
+
+ENDLESS_UNLOCK_STAGE = 3          # a Arena Infinita abre ao chegar à luta 4 da escada
+
+
+def endless_rarity(wave: int) -> str:
+    """Raridade do desafiante da onda `wave` (1-based): sobe a cada 2 ondas."""
+    order = rarity_order()
+    return order[min(len(order) - 1, (wave - 1) // 2)]
+
+
+def endless_pick(wave: int, rng, avoid: str = "") -> str:
+    pool = [c["id"] for c in characters() if c.get("rarity", "comum") == endless_rarity(wave) and c["id"] != avoid]
+    return rng.choice(pool or [c["id"] for c in characters()])
+
+
+def endless_edef(wave: int, cid: str) -> dict:
+    """Desafiante da Arena Infinita: molde da raridade, mais forte a cada onda; ouro cresce com a onda."""
+    e = challenge_edef(cid)
+    k = 1.0 + 0.07 * max(0, wave - 1)
+    e["hp"] = round(e["hp"] * k)
+    e["damage"] = max(1, round(e["damage"] * (1.0 + 0.05 * max(0, wave - 1))))
+    e["poise"] = float(e["poise"]) * k
+    e["gold"] = 15 + 8 * wave
+    e["title"] = f"Onda {wave}"
+    e["endless"] = True
+    return e
+
+
 def unlocked_skin(profile: Profile, s: dict) -> bool:
     u = s.get("unlock", {})
     if "wins" in u and profile.wins < u["wins"]:

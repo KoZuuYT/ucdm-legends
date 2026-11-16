@@ -146,3 +146,53 @@ class CompatTest(unittest.TestCase):
         v2.clamp_ip(pygame.FRect(*world))
         self.assertEqual(tuple(v1), tuple(v2))
         self.assertEqual(tuple(fb(a)), tuple(a))            # construção a partir de outro retângulo
+
+
+class OptionsSearchTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from core.engine import Game
+        cls.game = Game(headless=True)
+
+    def test_search_finds_options_across_tabs_without_accents(self):
+        from scenes.options import SEARCH, OptionsScene
+        o = OptionsScene(self.game, SEARCH)
+        self.assertEqual(o.rows[0].kind, "search")
+        o.query = "contraste"
+        o._build()
+        labels = [r.label for r in o.rows]
+        self.assertIn("Alto contraste", labels)
+        o.query = "tema"                      # aparece pela etiqueta, em outra aba
+        o._build()
+        self.assertTrue(any(r.path == "ui.theme" for r in o.rows))
+        o.query = "zzzz"
+        o._build()
+        self.assertTrue(any(r.kind == "info" for r in o.rows))
+        surf = pygame.Surface((1280, 720))
+        o.draw(surf)
+
+    def test_typing_mode_edits_query(self):
+        from scenes.options import SEARCH, OptionsScene
+        o = OptionsScene(self.game, SEARCH)
+        o._start_typing()
+        inp = self.game.input
+        inp.text_input.extend(list("fps"))
+        o._type(inp)
+        self.assertEqual(o.query, "fps")
+        self.assertTrue(any(r.path == "display.show_fps" for r in o.rows))
+        inp.text_input.clear()
+        inp.captured = "backspace"
+        o._type(inp)
+        self.assertEqual(o.query, "fp")
+        inp.captured = "return"
+        o._type(inp)
+        self.assertFalse(o.typing)
+
+
+class PulseTest(unittest.TestCase):
+    def test_beat_peaks_on_the_beat_and_decays(self):
+        from systems import pulse
+        self.assertAlmostEqual(pulse.beat(0.0, 120), 1.0)
+        self.assertAlmostEqual(pulse.beat(0.5, 120), 1.0)          # 120 bpm = batida a cada 0,5 s
+        self.assertLess(pulse.beat(0.25, 120), 0.2)
+        self.assertTrue(0.0 <= pulse.phase(3.7, 100) < 1.0)

@@ -1,4 +1,4 @@
 {
-  "version": "0.6.0",
-  "notes": "Inicio do overhaul de design: tema Minecraft nas Opcoes (botoes, paineis e HUD de coracoes e barra de chefe com os graficos do jogo), novas curvas de animacao, mola e sequencias, e a base de assets de Minecraft com 9-slice."
+  "version": "0.7.0",
+  "notes": "Tema Minecraft nas Opcoes: botoes, paineis, coracoes de vida, barra de chefe, toasts de avanco e panorama no menu. Particulas de combate com os sprites do jogo (golpe, critico, parry, esquiva perfeita, armadura quebrada). Nota S-D depois de cada vitoria e dicas na derrota. 26 conquistas com tela propria. Arena Infinita com ondas cada vez mais fortes. Estatisticas com radar e historico de lutas. Opcoes com busca e auxilio de timing. Pausa com resumo e reinicio de luta. Espada do Steve evolui com a arma (madeira ate netherita). Versao Android (APK) com controles de toque."
 }

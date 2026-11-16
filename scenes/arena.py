@@ -46,16 +46,24 @@ class Decor:
 class ArenaScene(Scene):
     wide = True
 
-    def __init__(self, game, stage: int, challenger: str | None = None) -> None:
+    def __init__(self, game, stage: int, challenger: str | None = None, endless: int = 0,
+                 daily: dict | None = None) -> None:
         super().__init__(game)
+        self.daily = daily                               # modificador do Desafio do Dia (ou None)
         self.challenger = challenger                     # id de uma lenda do álbum (desafio fora da escada)
+        self.endless = endless                           # >0: onda atual da Arena Infinita
         self.stage = stage if challenger is None else -1
-        self.edef = roster.challenge_edef(challenger) if challenger else roster.enemies()[stage]
+        if endless:
+            self.edef = roster.endless_edef(endless, challenger)
+        else:
+            self.edef = roster.challenge_edef(challenger) if challenger else roster.enemies()[stage]
         mid = WORLD_W / 2
         self.mid = mid
         self.player = roster.build_player(game.profile, mid - 220, GROUND_Y)
         self.enemy = roster.build_enemy(self.edef, mid + 220, GROUND_Y)
         self._apply_gameplay_options()
+        if daily:
+            self._apply_daily(daily)
         self.brain = EnemyBrain(self.enemy, self.player, self.edef.get("ai", {}))
         W, H = game.display.canvas_w, game.display.height
         self.camera = Camera(W, H, pygame.Rect(0, -200, WORLD_W, H + 200))
@@ -138,6 +146,19 @@ class ArenaScene(Scene):
             self.enemy.attacks = [dataclasses.replace(a, windup=a.windup * 1.5) if (a.unblockable or a.guard_break) else a
                                   for a in self.enemy.attacks]
 
+    def _apply_daily(self, m: dict) -> None:
+        p, e = self.player, self.enemy
+        if m.get("player_hp"):
+            p.hp = p.max_hp * m["player_hp"]
+        if m.get("enemy_hp"):
+            e.max_hp = e.hp = e.max_hp * m["enemy_hp"]
+        if m.get("enemy_damage"):
+            e.damage *= m["enemy_damage"]
+        if m.get("enemy_poise"):
+            e.max_poise = e.poise = e.max_poise * m["enemy_poise"]
+        if m.get("enemy_windup"):
+            e.attacks = [dataclasses.replace(a, windup=a.windup * m["enemy_windup"]) for a in e.attacks]
+
     def _intro_enabled(self) -> bool:
         return not self.game.headless and self.game.cfg.get("gameplay", {}).get("battle_intro", True)
 
@@ -149,7 +170,11 @@ class ArenaScene(Scene):
     def _pause(self) -> None:
         from scenes.pause import PauseOverlay
         self.game.audio.play("pause")
-        self.game.scenes.push(PauseOverlay(self.game, on_quit=lambda: self.game.scenes.pop(fade="iris")))
+        p, e = self.player, self.enemy
+        info = [f"{self.enemy.name}  ·  {tr('Vida')}: {int(p.hp)}/{int(p.max_hp)} × {int(e.hp)}/{int(e.max_hp)}",
+                f"{tr('Tempo')}: {int(self.now // 60)}:{int(self.now % 60):02d}"]
+        self.game.scenes.push(PauseOverlay(self.game, on_quit=lambda: self.game.scenes.pop(fade="iris"),
+                                           on_restart=self._restart, info=info))
 
     def on_resize(self, canvas_w: int) -> None:
         self.camera.view.w = canvas_w
@@ -568,6 +593,12 @@ class ArenaScene(Scene):
     def _float(self, x, y, msg, color, font=None) -> None:
         self.fx.text(x, y, (font or self.dmg_font).render(tr(msg), True, color))
 
+    def _restart(self) -> None:
+        """Recomeça esta mesma luta (mesmo desafiante/onda)."""
+        self.game.scenes.replace(ArenaScene(self.game, max(self.stage, 0), challenger=self.challenger, endless=self.endless,
+                                             daily=self.daily),
+                                 fade="iris")
+
     def _fight_stats(self, won: bool) -> dict:
         p = self.player
         return {**self.st, "won": won, "time": self.now, "hp_frac": p.hp / max(1.0, p.max_hp),
@@ -586,8 +617,14 @@ class ArenaScene(Scene):
                 cid = self.edef["character"]
                 new_card = cid not in prof.collection
                 prof.collection[cid] = prof.collection.get(cid, 0) + 1
-            if not first:
+            if not first and not self.endless:
                 gold //= 3   # revanche rende menos
+            if self.daily:
+                today = roster.today_key()
+                if prof.counters.get("daily_done", 0) != today:        # 1ª vez hoje: recompensa multiplicada
+                    gold = int(max(gold, self.edef.get("gold", 20)) * self.daily.get("reward", 1.5))
+                    prof.counters["daily_done"] = today
+                    prof.bump("dailies")
             bonus = int(gold * min(0.5, 0.05 * self.style_total))       # recompensa por esquivar/aparar no tempo certo
             gold += bonus
             prof.gold += gold
@@ -596,8 +633,15 @@ class ArenaScene(Scene):
             if first and not self.challenger:
                 prof.arena_stage += 1
             lines = [f"Você derrotou {self.enemy.name}!", f"+{gold} ouro"]
+            if self.daily:
+                lines.append(f"Desafio do Dia ({self.daily['name']}) concluído!" if prof.counters.get("daily_done") == roster.today_key()
+                             else "Desafio do Dia")
             letter = grading.grade(self._fight_stats(True))
             lines.append(f"Nota: {letter}")
+            if self.endless:
+                prof.record("endless_best", self.endless)
+                lines.append(f"Onda {self.endless} superada! Próxima: onda {self.endless + 1}")
+            prof.history.append("W")
             prof.bump("gold_total", gold)
             prof.bump("armor_breaks", self.st["breaks"])
             prof.record("parries_fight", self.st["parries"])
@@ -622,6 +666,9 @@ class ArenaScene(Scene):
             title, color = "VITÓRIA", ui.ACCENT
         else:
             lines = [f"{self.enemy.name} venceu desta vez."]
+            prof.history.append("L")
+            if self.endless:
+                prof.record("endless_best", self.endless - 1)
             lines += grading.hints(self._fight_stats(False)) or ["Treine seus atributos e volte!"]
             title, color = "DERROTA", ui.RED
             letter = None
@@ -629,8 +676,15 @@ class ArenaScene(Scene):
             lines.append(f"Conquista: {d['name']}")
             self.game.feedback.toast(f"Conquista: {d['name']}", (255, 205, 70), 4.0)
         self.game.save.save(prof)
+        if self.endless and self.result == "win":
+            nxt = roster.endless_pick(self.endless + 1, random.Random(), avoid=self.challenger)
+            on_close = lambda: self.game.scenes.replace(ArenaScene(self.game, 0, challenger=nxt, endless=self.endless + 1), fade="iris")
+        else:
+            if self.endless:
+                lines.append(f"Você chegou à onda {self.endless}. Recorde: {prof.counters.get('endless_best', 0)}")
+            on_close = lambda: self.game.scenes.pop(fade=True)
         self.game.scenes.push(ResultsOverlay(self.game, title, lines,
-                                             on_close=lambda: self.game.scenes.pop(fade=True), color=color,
+                                             on_close=on_close, color=color,
                                              grade=letter if self.result == "win" else None))
 
     # --- render -------------------------------------------------------------------------
@@ -799,11 +853,36 @@ class ArenaScene(Scene):
                     ui.text(surf, self.small, tr("ARMADURA"), (bx + 300 - 6, 88), (215, 190, 110), "topright")
                 ui.text(surf, self.small, self.edef.get("title", ""), (bx + 420, 74), ui.ACCENT, "topright")
         self._status_chips(surf, 106, 94)
-        label = (f"{tr('Desafio')} · {roster.rarity_info(roster.rarity(self.challenger))['label']}" if self.challenger
+        if theme.mc() and not ui.high_contrast:
+            self._hotbar(surf)
+        label = (f"{tr('Desafio do Dia')} · {tr(self.daily['name'])}" if self.daily else
+                 f"{tr('Arena Infinita')} · {tr('Onda')} {self.endless}" if self.endless else
+                 f"{tr('Desafio')} · {roster.rarity_info(roster.rarity(self.challenger))['label']}" if self.challenger
                  else f"Luta {self.stage + 1}/{len(roster.enemies())}")
         ui.text(surf, self.small, label, (W // 2, 14), (210, 210, 225), "midtop")
         if not self.game.input.touch_mode and self.intro < INTRO_TOTAL + 6:
             self._hint(surf)
+
+    def _hotbar(self, surf: pygame.Surface) -> None:
+        """Hotbar do Minecraft com os 4 recursos de combate: ataque, defesa, esquiva e contra-ataque."""
+        p = self.player
+        b = self.game.input.bindings
+
+        def key(action: str) -> str:
+            ks = b.get(action, [])
+            k = pretty_key(ks[0]) if ks else ""
+            return {"MOUSE ESQ.": "LMB", "MOUSE DIR.": "RMB", "MOUSE MEIO": "MMB"}.get(k, k[:6])
+        busy = p.state
+        slots = [
+            {"icon": roster.weapon_icon(self.game.profile.weapon_level), "active": busy in ("windup", "active", "recover"),
+             "dim": min(0.7, max(0.0, (p.fatigue - 1.5) * 0.25)), "label": key("attack")},
+            {"icon": "item/iron_chestplate.png", "active": busy == "block", "label": key("block")},
+            {"icon": "item/feather.png", "active": p.invulnerable, "dim": 0.65 if p.stamina < p.dodge_cost else 0.0,
+             "label": key("dodge")},
+            {"icon": "item/totem_of_undying.png", "active": p.counter_ready, "dim": 0.0 if p.counter_ready else 0.75},
+        ]
+        W, H = surf.get_size()
+        mcui.hotbar(surf, (W // 2, H - 76), slots, k=3)
 
     def _hint(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()

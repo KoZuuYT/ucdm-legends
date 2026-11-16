@@ -45,6 +45,12 @@ panorama do menu e partículas de combate usam os gráficos de `assets/mc/`. Dep
 (vida restante, ritmo e jogadas de parry/esquiva perfeita) e, na derrota, dicas calculadas dos números da luta.
 O planejamento completo do overhaul está em `docs/planejamento/design/`.
 
+## Modos, conquistas e Android
+- **Arena Infinita** (abre na luta 4 da escada): ondas contínuas de lendas, cada onda mais forte; o recorde fica no save.
+- **26 conquistas** (Estatísticas → Conquistas), com ícones de itens do Minecraft; algumas são secretas.
+- **Android**: o APK (`UCDM-Legends-vX.Y.Z.apk`, anexado a cada Release) roda em tela cheia com controles de toque. Instale permitindo
+  "fontes desconhecidas". O jogo desktop e o APK usam o mesmo código; a atualização do APK é por novo download.
+
 ## Loop de jogo
 1. **Treinos** (cada um sobe um atributo): Golpe → Força, Escudo → Defesa, Esquiva → Agilidade, Mira → Foco.
 2. **Arena**: 8 desafiantes em sequência (até o chefe), com entrada animada (versus + contagem 3-2-1).

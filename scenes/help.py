@@ -125,7 +125,7 @@ class HelpOverlay(_Panel):
 
 class CreditsOverlay(_Panel):
     def __init__(self, game) -> None:
-        super().__init__(game, (820, 460))
+        super().__init__(game, (860, 560))
 
     def update(self, dt: float) -> None:
         self.t += dt
@@ -142,6 +142,9 @@ class CreditsOverlay(_Panel):
         ui.text(surf, a.font(52), self.game.cfg["title"], (pr.centerx, pr.y + 28), ui.ACCENT, "midtop")
         lines = [f"Versão {_read_version()}", "", "Personagens e universo UCDM: criados pelos amigos do UCDM.",
                  "Jogo feito com Python e pygame-ce.", "Sons e músicas gerados por código (tools/make_sfx.py).",
+                 "Gráficos de Minecraft © Mojang Studios / Microsoft.",
+                 "Projeto de fãs, gratuito e sem fins lucrativos; não afiliado à Mojang nem à Microsoft.",
                  "", "github.com/KoZuuYT/ucdm-legends"]
         for i, line in enumerate(lines):
-            ui.text(surf, a.font(24, bold=False), line, (pr.centerx, pr.y + 120 + i * 40), anchor="midtop")
+            for j, part in enumerate(ui.wrap_text(a.font(22, bold=False), tr(line), pr.w - 80)):
+                ui.text(surf, a.font(22, bold=False), part, (pr.centerx, pr.y + 112 + i * 38 + j * 24), anchor="midtop")
