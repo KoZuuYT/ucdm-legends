@@ -8,7 +8,7 @@ source.include_patterns = assets/*,version.json
 source.exclude_dirs = dist,build,docs,installer,tests,tools,.github,.git,__pycache__,bin,.buildozer
 # (a versão é ajustada pelo CI a partir de version.json)
 version = 0.0.0
-requirements = python3,pygame
+requirements = hostpython3==3.11.5,python3==3.11.5,pygame
 orientation = landscape
 fullscreen = 1
 icon.filename = %(source.dir)s/assets/sprites/ui/icon.png
@@ -16,6 +16,9 @@ android.permissions = INTERNET
 android.api = 33
 android.minapi = 24
 android.archs = arm64-v8a
+android.ndk = 25b
+android.ndk_api = 24
+p4a.branch = v2024.01.21
 android.accept_sdk_license = True
 android.allow_backup = True
 android.logcat_filters = *:S python:D
