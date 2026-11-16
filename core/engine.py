@@ -5,9 +5,10 @@ import time
 
 import pygame
 
-from core import config, paths
+from core import config, paths, settings, ui
 from core.display import Display
 from core.events import EventBus
+from core.feedback import Feedback
 from core.input import InputManager
 from core.scene import Scene, SceneManager
 
@@ -27,6 +28,7 @@ class Game:
                                vsync=disp.get("vsync", True), headless=headless)
         self.screen = self.display.surface
         self.events = EventBus()
+        self.feedback = Feedback(self.cfg)
         self.input = InputManager(self.display, self.cfg["input"])
         self.scenes = SceneManager()
 
@@ -36,8 +38,11 @@ class Game:
         from systems.save import SaveManager
         self.assets = AssetManager()
         self.audio = AudioManager(self.assets, self.cfg.get("audio", {}))
-        self.save = SaveManager()
+        self._SaveManager = SaveManager
+        self.slot = self.cfg.get("last_slot", "slot1")
+        self.save = SaveManager(self.slot, on_saved=self.feedback.saved)
         self.profile = None  # entities.progression.Profile, definido no menu
+        ui.sound_hook = self.audio.play   # botões tocam hover/click sem conhecer o jogo
 
         self.tick_rate = disp.get("tick_rate", 60)
         self.fps_cap = disp.get("fps_cap", 144) or 0   # 0 = sem limite
@@ -45,6 +50,29 @@ class Game:
         self.running = False
         self.time = 0.0
         self.fps = 0.0
+
+    # --- slots e preferências ---------------------------------------------------------
+    def use_slot(self, slot: str) -> None:
+        """Troca o slot de save ativo (grava o perfil atual antes, se houver)."""
+        if self.profile is not None:
+            self.save.save(self.profile)
+        self.slot = slot
+        self.profile = None
+        self.save = self._SaveManager(slot, on_saved=self.feedback.saved)
+        settings.set_value("last_slot", slot)
+
+    def apply_settings(self) -> None:
+        """Relê settings.json e aplica o que dá para mudar sem reiniciar."""
+        self.cfg = config.load("game", reload=True)
+        disp = self.cfg["display"]
+        self.fps_cap = disp.get("fps_cap", 144) or 0
+        self.show_debug = bool(disp.get("show_fps", False))
+        if not self.headless and bool(disp.get("fullscreen", False)) != self.display.fullscreen:
+            self.display.toggle_fullscreen()
+        self.audio.configure(self.cfg.get("audio", {}))
+        self.audio.apply_volumes()
+        self.feedback.reload(self.cfg)
+        self.input.set_bindings(self.cfg["input"])
 
     def run(self, first_scene: Scene, *, max_frames: int | None = None) -> None:
         self.scenes.push(first_scene)
@@ -69,21 +97,30 @@ class Game:
                     self.show_debug = not self.show_debug
                 elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_F11:
                     self.display.toggle_fullscreen()
+                elif ev.type == pygame.WINDOWFOCUSLOST and self.cfg.get("gameplay", {}).get("auto_pause", True):
+                    if self.scenes.current:
+                        self.scenes.current.on_focus_lost()
             if self.input.quit_requested:
                 self.quit()
 
             # Lógica a 60 Hz fixos. Ações "pressed" valem só no 1º passo do frame.
+            self.feedback.update(frame_dt)
+            self.audio.update(frame_dt)
+            if self.profile is not None:
+                self.profile.playtime += frame_dt
+            scale = self.feedback.time_scale(frame_dt)   # hitstop / câmera lenta (só visual)
             first = True
             while acc >= step:
                 if not first:
                     self.input.consume_step()
-                self.scenes.update(step)
+                self.scenes.update(step * scale)
                 self.time += step
                 acc -= step
                 first = False
 
             self.screen.fill((0, 0, 0))
             self.scenes.draw(self.screen)
+            self.feedback.draw(self.screen, self.assets.font(24))
             if self.show_debug:
                 self._draw_debug()
             self.display.present()

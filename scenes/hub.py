@@ -41,7 +41,10 @@ class HubScene(Scene):
         buttons.append(ui.Button((x0, y0 + 320, 280, 70), f"Arma nv {p.weapon_level + 1}", self._upgrade,
                                  enabled=p.gold >= cost, sub=f"{cost} ouro"))
         buttons.append(ui.Button((x0 + 300, y0 + 320, 280, 70), "Trocar lutador", self._change_char))
-        buttons.append(ui.Button((x0 + 150, y0 + 410, 280, 60), "Menu principal", self._to_menu))
+        buttons.append(ui.Button((x0, y0 + 396, 280, 52), "Estatísticas", self._stats))
+        buttons.append(ui.Button((x0 + 300, y0 + 396, 280, 52), "Ajuda", self._help))
+        buttons.append(ui.Button((x0, y0 + 458, 280, 52), "Opções", self._options))
+        buttons.append(ui.Button((x0 + 300, y0 + 458, 280, 52), "Menu principal", self._to_menu))
         focus = self.menu.focus if hasattr(self, "menu") else 0
         self.menu = ui.Menu(buttons, columns=2)
         self.menu.focus = min(focus, len(buttons) - 1)
@@ -54,7 +57,7 @@ class HubScene(Scene):
         from scenes.arena import ArenaScene
         enemies = roster.enemies()
         stage = min(self.game.profile.arena_stage, len(enemies) - 1)
-        self.game.scenes.push(ArenaScene(self.game, stage), fade=True)
+        self.game.scenes.push(ArenaScene(self.game, stage), fade="iris")
 
     def _upgrade(self) -> None:
         p = self.game.profile
@@ -69,7 +72,19 @@ class HubScene(Scene):
 
     def _change_char(self) -> None:
         from scenes.character_select import CharacterSelectScene
-        self.game.scenes.push(CharacterSelectScene(self.game, new_game=False), fade=True)
+        self.game.scenes.push(CharacterSelectScene(self.game, new_game=False), fade="slide")
+
+    def _stats(self) -> None:
+        from scenes.stats import StatsScene
+        self.game.scenes.push(StatsScene(self.game), fade="slide")
+
+    def _help(self) -> None:
+        from scenes.help import HelpOverlay
+        self.game.scenes.push(HelpOverlay(self.game))
+
+    def _options(self) -> None:
+        from scenes.options import OptionsScene
+        self.game.scenes.push(OptionsScene(self.game), fade="slide")
 
     def _to_menu(self) -> None:
         self.game.save.save(self.game.profile)
@@ -79,6 +94,12 @@ class HubScene(Scene):
     # --- ciclo ------------------------------------------------------------------------
     def enter(self) -> None:
         self.game.audio.music("hub")
+        p = self.game.profile
+        if p is not None and not p.seen_help:     # tutorial da primeira vez (pode ser pulado com Esc)
+            p.seen_help = True
+            self.game.save.save(p)
+            from scenes.help import HelpOverlay
+            self.game.scenes.push(HelpOverlay(self.game))
 
     def resume(self) -> None:
         self.game.audio.music("hub")

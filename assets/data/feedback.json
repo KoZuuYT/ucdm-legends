@@ -1,0 +1,12 @@
+{
+  "intensity": 1.0,
+  "screen_shake": true,
+  "flash": true,
+  "hitstop": true,
+  "reduce_motion": false,
+  "flash_max_hz": 3,
+  "hitstop_time": { "hit": 0.04, "crit": 0.07, "parry": 0.1, "ko": 0.16 },
+  "hitstop_scale": 0.06,
+  "shake": { "hit": 5, "crit": 10, "parry": 6, "ko": 14 },
+  "ko_slowmo": { "scale": 0.3, "time": 0.7 }
+}

@@ -7,6 +7,8 @@ Avisos vermelhos (!!) são imbloqueáveis: esquive!
 O cenário é largo e cheio de decoração/plateia; tudo passa pelo SpatialGrid
 e só o que a câmera enxerga é desenhado (veja F3 -> "decoração desenhada").
 """
+import dataclasses
+import math
 import random
 
 import pygame
@@ -40,11 +42,18 @@ class ArenaScene(Scene):
         mid = WORLD_W / 2
         self.player = roster.build_player(game.profile, mid - 220, GROUND_Y)
         self.enemy = roster.build_enemy(self.edef, mid + 220, GROUND_Y)
+        self._apply_gameplay_options()
         self.brain = EnemyBrain(self.enemy, self.player, self.edef.get("ai", {}))
         W, H = game.display.width, game.display.height
         self.camera = Camera(W, H, pygame.Rect(0, -200, WORLD_W, H + 200))
         self.camera.view.center = (mid, GROUND_Y - 260)
         self.fx = ParticleSystem(500)
+        self.fx.scale = 0.0 if game.feedback.intensity <= 0 else min(1.5, game.feedback.intensity)
+        self.fb = game.feedback
+        self.big_font = game.assets.font(46)
+        self.ghost_p = self.ghost_e = 1.0       # barras "fantasma" de vida (escorrem após o dano)
+        self._warned = False
+        self._vignette: pygame.Surface | None = None
         self.font = game.assets.font(26)
         self.small = game.assets.font(18)
         self.dmg_font = game.assets.font(34)
@@ -84,7 +93,26 @@ class ArenaScene(Scene):
             self._dark_cache[key] = s
         return s
 
+    def _apply_gameplay_options(self) -> None:
+        """Dificuldade e aviso estendido (Opções -> Jogo). Só mexem em números, nunca nas regras."""
+        gp = self.game.cfg.get("gameplay", {})
+        enemy_dmg, parry = {"easy": (0.75, 1.25), "hard": (1.25, 0.85)}.get(gp.get("difficulty", "normal"), (1.0, 1.0))
+        self.enemy.damage *= enemy_dmg
+        self.player.parry_window *= parry
+        if gp.get("extended_warning"):
+            self.enemy.attacks = [dataclasses.replace(a, windup=a.windup * 1.5) if a.unblockable else a
+                                  for a in self.enemy.attacks]
+
     # --- ciclo de vida ------------------------------------------------------------------
+    def on_focus_lost(self) -> None:
+        if self.result is None and self.game.scenes.current is self:
+            self._pause()
+
+    def _pause(self) -> None:
+        from scenes.pause import PauseOverlay
+        self.game.audio.play("pause")
+        self.game.scenes.push(PauseOverlay(self.game, on_quit=lambda: self.game.scenes.pop(fade="iris")))
+
     def enter(self) -> None:
         self.game.audio.music("arena")
         W, H = self.game.display.width, self.game.display.height
@@ -107,7 +135,7 @@ class ArenaScene(Scene):
         inp = self.game.input
         p, e = self.player, self.enemy
         if inp.pressed("back") and self.result is None:
-            self.game.scenes.pop(fade=True)
+            self._pause()
             return
 
         if self.result is None and p.state != "dead":
@@ -127,12 +155,27 @@ class ArenaScene(Scene):
         for att, dfn in ((p, e), (e, p)):
             if att.pending_hit:
                 self._resolve(att, dfn)
+        self._warning_cues(e)
+        self.ghost_p = max(p.hp / p.max_hp, self.ghost_p - 0.45 * dt)
+        self.ghost_e = max(e.hp / e.max_hp, self.ghost_e - 0.45 * dt)
         self.fx.update(dt)
         self.camera.follow((p.pos.x + e.pos.x) / 2, GROUND_Y - 260, dt)
         self.camera.update(dt)
 
         if self.result is None and (p.state == "dead" or e.state == "dead"):
             self.result = "win" if e.state == "dead" else "lose"
+            ko = e if self.result == "win" else p
+            x, y = ko.pos.x, ko.pos.y - ko.height * 0.5
+            self.fx.burst(x, y, (255, 240, 200), n=34, speed=420, size=6)
+            self.fx.ring(x, y, (255, 240, 200), radius=260, life=0.6, width=8)
+            self.fb.ko()
+            self.fb.flash((255, 255, 255), 0.55)
+            self.camera.shake(self.fb.shake_power("ko"), 0.35)
+            self.game.audio.play("ko")
+            self.game.audio.duck(1.4)
+            self.game.profile.bump("fights")
+            if self.result == "lose":
+                self.game.profile.bump("losses")
         if self.result:
             self.over += dt
             if self.over >= 1.4 and self.game.scenes.current is self:
@@ -147,35 +190,64 @@ class ArenaScene(Scene):
             p.pos.x -= push
             e.pos.x += push
 
+    def _warning_cues(self, e) -> None:
+        """Golpe imbloqueável (!!) do inimigo: som de alerta uma vez por golpe."""
+        danger = e.state == "windup" and e.attack is not None and e.attack.unblockable
+        if danger and not self._warned:
+            self.game.audio.play("warning")
+            self.fb.flash((255, 60, 50), 0.22)
+        self._warned = danger
+
     def _resolve(self, att, dfn) -> None:
         atk, att.pending_hit = att.pending_hit, None
         if abs(dfn.pos.x - att.pos.x) > att.reach + 20:
             return
         res = dfn.receive(atk, att, self.now)
         x, y = dfn.pos.x, dfn.pos.y - dfn.height * 0.6
-        audio = self.game.audio
+        audio, fb, prof = self.game.audio, self.fb, self.game.profile
+        mine = dfn is self.player           # o jogador é quem está se defendendo
         if res.outcome == "parry":
             att.stun(self.parry_stun)
             self.fx.burst(x, y, ui.ACCENT, n=24, speed=360)
-            self._float(x, y, "PARRY!", ui.ACCENT)
-            self.camera.shake(6)
+            self.fx.ring(x, y, (150, 220, 255), radius=170, life=0.4, width=7)
+            self._float(x, y, "PARRY!", ui.ACCENT, self.big_font)
+            self.camera.shake(fb.shake_power("parry"))
+            fb.hitstop("parry")
+            fb.flash((150, 220, 255), 0.3)
             audio.play("parry")
+            audio.duck(0.5)
+            if mine:
+                prof.bump("parries")
         elif res.outcome == "dodge":
             self._float(x, y, "ESQUIVA", ui.GREEN)
-            audio.play("miss")
+            audio.play("whoosh")
+            if mine:
+                prof.bump("dodges")
         elif res.outcome == "block":
             self.fx.burst(x, y, ui.BLUE, n=8)
             self._float(x, y, f"-{res.damage}", ui.BLUE)
             audio.play("block")
+            fb.hitstop("hit")
         elif res.outcome in ("hit", "crit"):
             crit = res.outcome == "crit"
             self.fx.burst(x, y, (255, 230, 120) if crit else (230, 60, 50), n=20 if crit else 12)
-            self._float(x, y, f"-{res.damage}" + (" CRÍTICO" if crit else ""), ui.ACCENT if crit else ui.RED)
-            self.camera.shake(10 if crit else 5)
+            if crit:
+                self.fx.ring(x, y, (255, 215, 90), radius=140, life=0.35, width=6)
+                fb.flash((255, 215, 90), 0.25)
+            self._float(x, y, f"-{res.damage}" + (" CRÍTICO" if crit else ""), ui.ACCENT if crit else ui.RED,
+                        self.big_font if crit else None)
+            self.camera.shake(fb.shake_power("crit" if crit else "hit"))
+            fb.hitstop("crit" if crit else "hit")
             audio.play("crit" if crit else "hit")
+            if not mine:
+                prof.bump("hits_landed")
+                prof.bump("damage_dealt", res.damage)
+                prof.record("max_hit", res.damage)
+                if crit:
+                    prof.bump("crits")
 
-    def _float(self, x, y, msg, color) -> None:
-        self.fx.text(x, y, self.dmg_font.render(msg, True, color))
+    def _float(self, x, y, msg, color, font=None) -> None:
+        self.fx.text(x, y, (font or self.dmg_font).render(msg, True, color))
 
     def _finish(self) -> None:
         prof = self.game.profile
@@ -187,6 +259,7 @@ class ArenaScene(Scene):
                 gold //= 3   # revanche rende menos
             prof.gold += gold
             prof.wins += 1
+            prof.bump("fights_won")
             if first:
                 prof.arena_stage += 1
             lines = [f"Você derrotou {self.enemy.name}!", f"+{gold} ouro"]
@@ -238,18 +311,36 @@ class ArenaScene(Scene):
         self._hud(surf)
         self.game.input.draw_virtual_buttons(surf, self.font)
 
+    def _danger_vignette(self, surf: pygame.Surface) -> None:
+        """Borda vermelha pulsando enquanto o inimigo prepara um golpe imbloqueável (máx. ~1,5 Hz)."""
+        e = self.enemy
+        if not (e.state == "windup" and e.attack is not None and e.attack.unblockable) or self.fb.intensity <= 0:
+            return
+        W, H = surf.get_size()
+        if self._vignette is None or self._vignette.get_size() != (W, H):
+            v = pygame.Surface((W, H), pygame.SRCALPHA)
+            for i in range(46):
+                pygame.draw.rect(v, (255, 40, 30, int(150 * (1 - i / 46) ** 2)), (i, i, W - 2 * i, H - 2 * i), 1)
+            self._vignette = v
+        pulse = 0.75 if self.fb.reduce_motion else 0.55 + 0.45 * math.sin(self.now * math.tau * 1.5)
+        self._vignette.set_alpha(int(255 * max(0.2, min(1.0, pulse * min(1.0, self.fb.intensity)))))
+        surf.blit(self._vignette, (0, 0))
+
     def _hud(self, surf: pygame.Surface) -> None:
         W = surf.get_width()
         p, e = self.player, self.enemy
+        self._danger_vignette(surf)
         ui.text(surf, self.font, p.name, (24, 16))
-        ui.bar(surf, (24, 48, 420, 22), p.hp / p.max_hp, ui.RED)
+        ui.bar(surf, (24, 48, 420, 22), p.hp / p.max_hp, ui.RED, ghost=self.ghost_p)
         ui.text(surf, self.small, f"{int(p.hp)}/{int(p.max_hp)}", (234, 50), anchor="midtop")
-        ui.bar(surf, (24, 76, 300, 12), p.stamina / p.max_stamina, ui.GREEN)
+        low = p.stamina < p.dodge_cost
+        sta_col = (255, 150, 50) if low and int(self.now * 6) % 2 == 0 else ui.GREEN
+        ui.bar(surf, (24, 76, 300, 12), p.stamina / p.max_stamina, sta_col)
         ui.text(surf, self.font, e.name, (W - 24, 16), anchor="topright")
-        ui.bar(surf, (W - 444, 48, 420, 22), e.hp / e.max_hp, ui.RED)
+        ui.bar(surf, (W - 444, 48, 420, 22), e.hp / e.max_hp, ui.RED, ghost=self.ghost_e)
         ui.text(surf, self.small, self.edef.get("title", ""), (W - 24, 76), ui.ACCENT, "topright")
         if not self.game.input.touch_mode and self.now < 6:
-            ui.text(surf, self.small, "Mover: setas/AD   Atacar: J   Defender: K (segure)   Esquivar: L / Shift",
+            ui.text(surf, self.small, "Mover: setas/AD   Atacar: J   Defender: K (segure)   Esquivar: L / Shift   Pausa: Esc",
                     (W // 2, 110), anchor="midtop")
 
     def debug_info(self) -> str:

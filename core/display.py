@@ -11,6 +11,8 @@ class Display:
     def __init__(self, width: int, height: int, title: str, *, fullscreen: bool = False,
                  vsync: bool = True, headless: bool = False) -> None:
         self.width, self.height = width, height
+        self.headless = headless
+        self.fullscreen = bool(fullscreen and not headless)
         pygame.display.set_caption(title)
         if not headless:
             self._set_icon()
@@ -54,7 +56,10 @@ class Display:
         return self.window_to_virtual(nx * ww, ny * wh)
 
     def toggle_fullscreen(self) -> None:
+        if self.headless:
+            return
         pygame.display.toggle_fullscreen()
+        self.fullscreen = not self.fullscreen
 
     def present(self) -> None:
         pygame.display.flip()

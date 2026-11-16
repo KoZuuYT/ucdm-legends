@@ -25,7 +25,7 @@ class CharacterSelectScene(Scene):
         rows = (len(self.chars) + COLS - 1) // COLS
         self.max_scroll = max(0, rows * CELL_H - GRID_H)
         self.confirm_btn = ui.Button((1280 - 330, 600, 290, 70), "Escolher", self._confirm)
-        self.back_btn = ui.Button((1280 - 330, 30, 290, 56), "Voltar", lambda: self.game.scenes.pop(fade=True))
+        self.back_btn = ui.Button((1280 - 330, 30, 290, 56), "Voltar", lambda: self.game.scenes.pop(fade="slide"))
         self._ensure_visible()
 
     def _ensure_visible(self) -> None:
@@ -41,11 +41,11 @@ class CharacterSelectScene(Scene):
         if self.new_game:
             self.game.profile = Profile(character=cid)
             self.game.save.save(self.game.profile)
-            self.game.scenes.reset(HubScene(self.game))
+            self.game.scenes.reset(HubScene(self.game), fade="iris")
         else:
             self.game.profile.character = cid
             self.game.save.save(self.game.profile)
-            self.game.scenes.pop(fade=True)
+            self.game.scenes.pop(fade="slide")
 
     def exit(self) -> None:
         # libera as imagens originais; miniaturas ficam no LRU e expiram sozinhas
@@ -74,7 +74,7 @@ class CharacterSelectScene(Scene):
         if inp.pressed("confirm"):
             return self._confirm()
         if inp.pressed("back"):
-            return self.game.scenes.pop(fade=True)
+            return self.game.scenes.pop(fade="slide")
         self.scroll -= inp.wheel * 60
         if inp.pointers:
             self.scroll -= inp.drag_delta.y

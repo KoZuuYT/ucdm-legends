@@ -15,6 +15,7 @@ python main.py
 | `python -m unittest discover -s tests -v` | testes headless (rodam no CI) |
 | **F3** no jogo | FPS, uso de texturas e quantos objetos o culling desenhou |
 | **F11** | tela cheia |
+| **Esc** | pausa (treino/arena) e volta nas telas |
 
 ## Controles
 | Ação | Teclado | Toque |
@@ -29,6 +30,17 @@ python main.py
    Aviso **vermelho (!!)** = golpe imbloqueável: esquive.
 3. **Ouro** das lutas e treinos melhora a arma.
 
+## Saves, opções e ajuda
+- **3 slots de save** (menu → *Saves*): jogar, novo jogo, renomear treinador, copiar para outro slot, exportar
+  (`%APPDATA%\UCDM\exports\*.ucdmsave`), importar o arquivo mais recente dessa pasta e apagar (segure o botão para confirmar).
+  O save antigo continua no Slot 1. Antes de migrar um save de formato antigo, o jogo guarda `slotN.vX.bak`.
+- **Opções** (menu ou Campo de Treino): tela cheia, limite de FPS, volumes, **remapear teclas** (Esc é reservado),
+  dificuldade (fácil/normal/difícil), aviso do golpe imbloqueável mais longo, pausar ao perder o foco e acessibilidade
+  (intensidade dos efeitos, tremor, flashes, congelar no impacto e *reduzir movimento*). Só a chave alterada vai para `settings.json`.
+- **Ajuda**: tutorial na primeira vez (pulável), *Ajuda* no Campo de Treino e **Estatísticas** (parries, esquivas, críticos, recordes, diário da arena).
+- **Sons e músicas** são gerados por `python tools/make_sfx.py` (sem licença). Troque qualquer arquivo em `assets/audio/`
+  ou aponte outro em `game.json → audio`.
+
 ## Arquitetura
 ```
 core/        loop de timestep fixo, cenas em pilha, input abstrato (teclado/mouse/toque), display escalável, config, eventos, UI
@@ -39,7 +51,7 @@ scenes/      boot/update, menu, seleção de personagem, hub, arena, overlays
 network/     checagem de versão, download seguro e aplicação de updates via GitHub
 installer/   instalador gráfico, desinstalador e patcher (só stdlib + tkinter) e o script que monta o Release
 assets/      data/*.json (todo o balanceamento), sprites/, audio/, fonts/
-tools/       import_characters.py, make_installer_art.py
+tools/       import_characters.py, make_installer_art.py, make_sfx.py
 ```
 
 **Desempenho**

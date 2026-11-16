@@ -30,37 +30,52 @@ class MenuScene(Scene):
 
     def _build(self) -> None:
         W = self.game.display.width
+        focus = self.menu.focus if hasattr(self, "menu") else 0
         buttons = []
-        y = 360
+        y = 330
         if self.game.save.exists():
-            buttons.append(ui.Button((W // 2 - 170, y, 340, 60), "Continuar", self._continue))
-            y += 76
-        buttons.append(ui.Button((W // 2 - 170, y, 340, 60), "Novo jogo", self._new))
-        buttons.append(ui.Button((W // 2 - 170, y + 76, 340, 60), "Sair", self.game.quit))
+            buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Continuar", self._continue))
+            y += 68
+        buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Saves", self._saves))
+        buttons.append(ui.Button((W // 2 - 170, y + 68, 340, 58), "Opções", self._options))
+        buttons.append(ui.Button((W // 2 - 170, y + 136, 340, 58), "Sair", self._ask_quit))
         self.menu = ui.Menu(buttons)
+        self.menu.focus = min(focus, len(buttons) - 1)
 
     def enter(self) -> None:
         self.game.audio.music("menu")
 
     def resume(self) -> None:
+        self.game.audio.music("menu")
         self._build()
 
     def _continue(self) -> None:
         data = self.game.save.load_raw()
         if data is None:
-            return self._new()
+            return self._saves()
         self.game.profile = Profile.from_dict(data)
+        if data.get("_from_backup"):
+            self.game.feedback.toast("Save principal corrompido: carregado do backup.", ui.ACCENT, 4.0)
         from scenes.hub import HubScene
-        self.game.scenes.replace(HubScene(self.game))
+        self.game.scenes.replace(HubScene(self.game), fade="iris")
 
-    def _new(self) -> None:
-        from scenes.character_select import CharacterSelectScene
-        self.game.scenes.push(CharacterSelectScene(self.game, new_game=True), fade=True)
+    def _saves(self) -> None:
+        from scenes.save_select import SaveSelectScene
+        self.game.scenes.push(SaveSelectScene(self.game), fade="slide")
+
+    def _options(self) -> None:
+        from scenes.options import OptionsScene
+        self.game.scenes.push(OptionsScene(self.game), fade="slide")
+
+    def _ask_quit(self) -> None:
+        from scenes.dialogs import ConfirmDialog
+        self.game.scenes.push(ConfirmDialog(self.game, "Sair do jogo?", "Seu progresso já está salvo.",
+                                            on_yes=self.game.quit, yes_label="Sair"))
 
     def update(self, dt: float) -> None:
         self.t += dt
         if self.game.input.pressed("back"):
-            self.game.quit()
+            return self._ask_quit()
         self.menu.update(self.game.input)
 
     def draw(self, surf: pygame.Surface) -> None:

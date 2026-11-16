@@ -1,4 +1,4 @@
 {
-  "version": "0.1.2",
-  "notes": "Corrige o jogo que fechava sozinho ao abrir. Instalador novo com janela: escolha de pasta, atalhos, configurações de tela, áudio e atualizações, e desinstalação pelo Windows. Erros agora ficam salvos em %APPDATA%/UCDM/logs. Executáveis com informações de versão e compilação própria, para evitar alarme falso de antivírus."
+  "version": "0.2.0",
+  "notes": "Atualização Visual e Qualidade de Vida. Efeitos de impacto (congelamento no golpe, tremor, ondas de choque, flash, rastro de esquiva, números de dano animados), sons e músicas, transições novas e botões animados. Três slots de save com seletor (renomear, copiar, exportar/importar, apagar com confirmação), tela de Opções (vídeo, áudio, remapear teclas, dificuldade, acessibilidade), pausa, tutorial, estatísticas e diário da arena. Seu save atual continua no Slot 1."
 }

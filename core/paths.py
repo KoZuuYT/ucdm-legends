@@ -39,5 +39,8 @@ SETTINGS_FILE = USER_DIR / "settings.json"   # preferências do jogador (escrita
 
 
 def ensure_user_dirs() -> None:
-    for d in (USER_DIR, SAVE_DIR, MODS_DIR, UPDATE_DIR, LOG_DIR):
+    for d in (USER_DIR, SAVE_DIR, MODS_DIR, UPDATE_DIR, LOG_DIR, EXPORT_DIR):
         d.mkdir(parents=True, exist_ok=True)
+
+SAVE_SLOTS = ("slot1", "slot2", "slot3")
+EXPORT_DIR = USER_DIR / "exports"     # saves exportados (.ucdmsave) — também de onde o jogo importa

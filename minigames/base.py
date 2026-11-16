@@ -95,7 +95,7 @@ class TrainingGame(Scene):
     def fail(self, x: float, y: float, label: str = "ERROU") -> None:
         self.combo = 0
         self.lives -= 1
-        self.shake = 0.25
+        self.shake = 0.25 if self.game.feedback.shake_power("hit") > 0 else 0.0
         self.fx.burst(x, y, ui.RED, n=16, speed=280)
         self.fx.text(x, y - 30, self.small.render(label, True, ui.RED))
         self.game.audio.play("miss")
@@ -139,7 +139,7 @@ class TrainingGame(Scene):
         if self.finished:
             return
         if inp.pressed("back"):
-            self.game.scenes.pop(fade=True)
+            self._pause()
             return
         if self.countdown > 0:
             self.countdown -= dt
@@ -155,11 +155,21 @@ class TrainingGame(Scene):
         if self.elapsed >= self.duration and not self.finished:
             self.finish()
 
+    def on_focus_lost(self) -> None:
+        if not self.finished and self.game.scenes.current is self:
+            self._pause()
+
+    def _pause(self) -> None:
+        from scenes.pause import PauseOverlay
+        self.game.audio.play("pause")
+        self.game.scenes.push(PauseOverlay(self.game, on_quit=lambda: self.game.scenes.pop(fade=True)))
+
     def finish(self) -> None:
         if self.finished:
             return
         self.finished = True
         prof = self.game.profile
+        prof.bump("trainings")
         bonus = 1 + 0.05 * (self.level - 1)
         xp = int(self.score * self.cfg["xp_per_point"] * bonus)
         gold = int(self.score * self.cfg["gold_per_point"])

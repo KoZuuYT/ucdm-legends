@@ -39,10 +39,10 @@ class InputManager:
     def __init__(self, display, bindings: dict[str, list[str]]) -> None:
         self.display = display
         self._key_to_actions: dict[int, list[str]] = {}
-        for action, keys in bindings.items():
-            for name in keys:
-                code = pygame.key.key_code(name)
-                self._key_to_actions.setdefault(code, []).append(action)
+        self.bindings: dict[str, list[str]] = {}
+        self.capture = False                 # True: próxima tecla vira `captured` (tela de rebind)
+        self.captured: str | None = None
+        self.set_bindings(bindings)
         self._held: set[str] = set()
         self._pressed: set[str] = set()
         self._released: set[str] = set()
@@ -56,6 +56,19 @@ class InputManager:
         self.wheel = 0                                     # rolagem do mouse neste frame
         self.drag_delta = pygame.Vector2()                 # arrasto do ponteiro neste frame
         self._time = 0.0
+
+    def set_bindings(self, bindings: dict[str, list[str]]) -> None:
+        """(Re)monta o mapa tecla -> ações. Nome de tecla inválido é ignorado, nunca derruba o jogo."""
+        self.bindings = {a: list(k) for a, k in bindings.items()}
+        self._key_to_actions = {}
+        for action, keys in self.bindings.items():
+            for name in keys:
+                try:
+                    code = pygame.key.key_code(name)
+                except ValueError:
+                    print(f"[input] tecla inválida ignorada: {name!r} ({action})")
+                    continue
+                self._key_to_actions.setdefault(code, []).append(action)
 
     # --- API de consulta ------------------------------------------------------------
     def pressed(self, action: str) -> bool:
@@ -179,6 +192,9 @@ class InputManager:
             self.quit_requested = True
         elif t == pygame.KEYDOWN:
             self.touch_mode = False
+            if self.capture:
+                self.captured = pygame.key.name(event.key)
+                return
             for a in self._key_to_actions.get(event.key, ()):
                 self._press(a)
         elif t == pygame.KEYUP:

@@ -87,6 +87,8 @@ class Fighter(Entity):
         self.flash = 0.0
         self.anim_t = random.random() * 10
         self._flash_cache: dict = {}
+        self.ghosts: list[list] = []         # rastro de esquiva: [x, y, vida, superfície]
+        self._ghost_cd = 0.0
 
     # --- comandos ---------------------------------------------------------------------
     @property
@@ -143,6 +145,11 @@ class Fighter(Entity):
         self.anim_t += dt
         self.timer += dt
         self.flash = max(0.0, self.flash - dt)
+        self._ghost_cd = max(0.0, self._ghost_cd - dt)
+        if self.ghosts:
+            for g in self.ghosts:
+                g[2] -= dt
+            self.ghosts = [g for g in self.ghosts if g[2] > 0]
         self._combo_timer = max(0.0, self._combo_timer - dt)
         regen = self.stamina_regen * (0.35 if self.state == "block" else 1.0)
         self.stamina = min(self.max_stamina, self.stamina + regen * dt)
@@ -247,6 +254,15 @@ class Fighter(Entity):
         if s == "dodge":
             img = img.copy()
             img.set_alpha(140)
+
+        # rastro de esquiva (até 5 "fantasmas" que somem)
+        if s == "dodge" and self._ghost_cd <= 0 and len(self.ghosts) < 5:
+            self._ghost_cd = 0.045
+            self.ghosts.append([self.pos.x, self.pos.y, 0.22, img.copy()])
+        for gx, gy, life, gimg in self.ghosts:
+            gsx, gsy = camera.to_screen(gx, gy)
+            gimg.set_alpha(int(120 * life / 0.22))
+            surf.blit(gimg, gimg.get_rect(midbottom=(gsx, gsy + 4)))
 
         # sombra
         surf.blit(_shadow(), (sx - 60, sy - 12))

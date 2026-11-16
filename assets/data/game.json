@@ -1,36 +1,93 @@
 {
   "title": "UCDM Legends",
-  "display": { "width": 1280, "height": 720, "fullscreen": false, "vsync": true, "tick_rate": 60, "fps_cap": 144 },
+  "display": {
+    "width": 1280,
+    "height": 720,
+    "fullscreen": false,
+    "vsync": true,
+    "tick_rate": 60,
+    "fps_cap": 144,
+    "show_fps": false
+  },
   "input": {
-    "left":    ["left", "a"],
-    "right":   ["right", "d"],
-    "up":      ["up", "w"],
-    "down":    ["down", "s"],
-    "confirm": ["return", "space"],
-    "back":    ["escape", "backspace"],
-    "attack":  ["j", "z"],
-    "block":   ["k", "x"],
-    "dodge":   ["l", "c", "left shift"]
+    "left": [
+      "left",
+      "a"
+    ],
+    "right": [
+      "right",
+      "d"
+    ],
+    "up": [
+      "up",
+      "w"
+    ],
+    "down": [
+      "down",
+      "s"
+    ],
+    "confirm": [
+      "return",
+      "space"
+    ],
+    "back": [
+      "escape",
+      "backspace"
+    ],
+    "attack": [
+      "j",
+      "z"
+    ],
+    "block": [
+      "k",
+      "x"
+    ],
+    "dodge": [
+      "l",
+      "c",
+      "left shift"
+    ]
   },
   "audio": {
     "sfx_volume": 0.8,
     "music_volume": 0.5,
     "sfx": {
-      "hit": "audio/sfx/hit.ogg",
-      "crit": "audio/sfx/crit.ogg",
-      "block": "audio/sfx/block.ogg",
-      "parry": "audio/sfx/parry.ogg",
-      "miss": "audio/sfx/miss.ogg",
-      "coin": "audio/sfx/coin.ogg",
-      "levelup": "audio/sfx/levelup.ogg",
-      "click": "audio/sfx/click.ogg"
+      "hit": [
+        "audio/sfx/hit1.wav",
+        "audio/sfx/hit2.wav",
+        "audio/sfx/hit3.wav"
+      ],
+      "block": [
+        "audio/sfx/block1.wav",
+        "audio/sfx/block2.wav",
+        "audio/sfx/block3.wav"
+      ],
+      "whoosh": [
+        "audio/sfx/whoosh1.wav",
+        "audio/sfx/whoosh2.wav",
+        "audio/sfx/whoosh3.wav"
+      ],
+      "crit": "audio/sfx/crit.wav",
+      "parry": "audio/sfx/parry.wav",
+      "miss": "audio/sfx/miss.wav",
+      "coin": "audio/sfx/coin.wav",
+      "levelup": "audio/sfx/levelup.wav",
+      "click": "audio/sfx/click.wav",
+      "hover": "audio/sfx/hover.wav",
+      "confirm": "audio/sfx/confirm.wav",
+      "back": "audio/sfx/back.wav",
+      "ko": "audio/sfx/ko.wav",
+      "warning": "audio/sfx/warning.wav",
+      "pause": "audio/sfx/pause.wav",
+      "save": "audio/sfx/save.wav"
     },
     "music": {
-      "menu": "audio/music/menu.ogg",
-      "hub": "audio/music/hub.ogg",
-      "training": "audio/music/training.ogg",
-      "arena": "audio/music/arena.ogg"
-    }
+      "menu": "audio/music/menu.wav",
+      "hub": "audio/music/hub.wav",
+      "training": "audio/music/training.wav",
+      "arena": "audio/music/arena.wav"
+    },
+    "mute_on_focus_loss": false
   },
   "update": {
     "enabled": true,
@@ -39,5 +96,11 @@
     "asset_pattern": "UCDM-{platform}-v{version}.zip",
     "timeout": 6
   },
-  "default_character": "kozu"
+  "default_character": "kozu",
+  "gameplay": {
+    "difficulty": "normal",
+    "extended_warning": false,
+    "auto_pause": true
+  },
+  "feedback": {}
 }
