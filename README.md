@@ -30,6 +30,15 @@ python main.py
 Tudo pode ser remapeado em *Opções → Controles* (inclusive os botões do mouse). Controle/gamepad: A confirma/ataca,
 B esquiva, X defende, Start volta.
 
+## Steve, lendas e raridades
+Você joga como o **Steve**. As **lendas do UCDM** são os adversários e têm raridade: **Comum, Incomum, Raro, Épico e Lendário**.
+- A **escada da arena** (8 lutas) abre as raridades: Incomum na luta 3, Raro na 5, Épico na 7 e Lendário ao vencer o chefe.
+- No **Álbum de Lendas** (hub) você **desafia** qualquer lenda de raridade liberada; a 1ª vitória adiciona a carta ao álbum e paga ouro cheio.
+- **Aparências do Steve** (Alex, Ari, Efe, Kai, Makena, Noor, Sunny, Zuri) desbloqueiam por vitórias, estágio da arena e tamanho da coleção.
+- Saves antigos continuam válidos (o lutador antigo vira Steve; atributos, ouro e progresso são mantidos).
+
+Os gráficos de Minecraft ficam em `assets/mc/` (projeto de fãs gratuito, sem afiliação com a Mojang/Microsoft).
+
 ## Loop de jogo
 1. **Treinos** (cada um sobe um atributo): Golpe → Força, Escudo → Defesa, Esquiva → Agilidade, Mira → Foco.
 2. **Arena**: 8 desafiantes em sequência (até o chefe), com entrada animada (versus + contagem 3-2-1).

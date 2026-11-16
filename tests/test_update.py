@@ -97,7 +97,7 @@ class SaveSlotsTest(unittest.TestCase):
 
     def _profile(self, **kw):
         from entities.progression import Profile
-        return Profile(character="kozu", **kw)
+        return Profile(**kw)
 
     def test_slots_are_isolated(self):
         a, b = SaveManager("slot1"), SaveManager("slot2")
@@ -261,7 +261,7 @@ class GameFlowTest(unittest.TestCase):
         from core.engine import Game
         from entities.progression import Profile
         cls.game = Game(headless=True)
-        cls.game.profile = Profile(character="kozu")
+        cls.game.profile = Profile()
 
     def setUp(self):
         paths.SETTINGS_FILE.unlink(missing_ok=True)
@@ -406,7 +406,7 @@ class GameFlowTest(unittest.TestCase):
         self.assertEqual(config.load("game", reload=True)["last_slot"], "slot2")
         g.use_slot("slot1")
         from entities.progression import Profile
-        g.profile = Profile(character="kozu")
+        g.profile = Profile()
 
 
 if __name__ == "__main__":

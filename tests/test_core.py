@@ -97,7 +97,7 @@ class SystemsTest(unittest.TestCase):
 
     def test_profile(self):
         from entities.progression import Profile
-        p = Profile(character="kozu")
+        p = Profile()
         gained = p.stats["strength"].add_xp(10_000)
         self.assertGreater(gained, 3)
         p2 = Profile.from_dict(p.to_dict())
@@ -110,7 +110,7 @@ class GameTest(unittest.TestCase):
         from core.engine import Game
         from entities.progression import Profile
         cls.game = Game(headless=True)
-        cls.game.profile = Profile(character="kozu")
+        cls.game.profile = Profile()
 
     def _run(self, scene, frames=240, keys=()):
         g = self.game
@@ -168,7 +168,7 @@ class GameTest(unittest.TestCase):
     def test_scenes_smoke(self):
         from minigames import REGISTRY
         from scenes.arena import ArenaScene
-        from scenes.character_select import CharacterSelectScene
+        from scenes.collection import CollectionScene
         from scenes.hub import HubScene
         from scenes.menu import MenuScene
         keys = (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, pygame.K_j, pygame.K_k, pygame.K_l)
@@ -178,7 +178,7 @@ class GameTest(unittest.TestCase):
         self._run(ArenaScene(self.game, 0), 60 * 30, keys)
         self._run(HubScene(self.game), 30)
         self._run(MenuScene(self.game), 30)
-        sel = CharacterSelectScene(self.game, new_game=False)
+        sel = CollectionScene(self.game)
         self._run(sel, 120, (pygame.K_DOWN,))
         self.assertLess(sel.drawn, 60)   # culling: nunca desenha os 160
 

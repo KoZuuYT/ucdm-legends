@@ -173,7 +173,7 @@ class CombatRulesTest(unittest.TestCase):
         from entities import roster
         from entities.progression import Profile
         random.seed(1)
-        self.p = roster.build_player(Profile(character="kozu"), 0, 0)
+        self.p = roster.build_player(Profile(), 0, 0)
         self.e = roster.build_enemy(roster.enemies()[3], 100, 0)
         self.e.facing = -1
 
@@ -325,7 +325,7 @@ class ArenaFlowTest(unittest.TestCase):
         from core.engine import Game
         from entities.progression import Profile
         cls.game = Game(headless=True)
-        cls.game.profile = Profile(character="kozu")
+        cls.game.profile = Profile()
 
     def setUp(self):
         from scenes.arena import ArenaScene

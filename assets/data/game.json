@@ -141,7 +141,7 @@
     "background_check": true,
     "background_minutes": 30
   },
-  "default_character": "kozu",
+  "default_character": "steve",
   "gameplay": {
     "difficulty": "normal",
     "extended_warning": false,

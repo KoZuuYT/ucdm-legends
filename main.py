@@ -61,7 +61,7 @@ def _main(argv: list[str] | None = None) -> int:
     if args.scene:
         from entities.progression import Profile
         data = game.save.load_raw()
-        game.profile = Profile.from_dict(data) if data else Profile(character=game.cfg["default_character"])
+        game.profile = Profile.from_dict(data) if data else Profile()
         first = _dev_scene(game, args.scene)
     elif args.skip_update:
         from scenes.menu import MenuScene
@@ -81,9 +81,9 @@ def _dev_scene(game, name: str):
         from entities import roster
         from scenes.arena import ArenaScene
         return ArenaScene(game, min(game.profile.arena_stage, len(roster.enemies()) - 1))
-    if name == "select":
-        from scenes.character_select import CharacterSelectScene
-        return CharacterSelectScene(game, new_game=False)
+    if name in ("select", "collection"):
+        from scenes.collection import CollectionScene
+        return CollectionScene(game)
     from scenes.hub import HubScene
     return HubScene(game)
 

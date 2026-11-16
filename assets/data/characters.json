@@ -1,1125 +1,1285 @@
 {
-  "_doc": "faces: para onde a arte original olha (-1 = esquerda, 1 = direita). O jogo espelha a imagem conforme o lado da luta.",
+  "_doc": "faces: para onde a arte original olha (-1 = esquerda, 1 = direita). O jogo espelha a imagem conforme o lado da luta. rarity: comum/incomum/raro/epico/lendario (define dificuldade e recompensa do desafio).",
   "characters": [
     {
       "id": "abacanhao",
       "name": "Abacanhão",
       "sprite": "sprites/characters/abacanhao.png",
       "faces": -1,
-      "source": "Abacanhão.png"
+      "source": "Abacanhão.png",
+      "rarity": "comum"
     },
     {
       "id": "abacaxitos",
       "name": "Abacaxitos",
       "sprite": "sprites/characters/abacaxitos.png",
       "faces": -1,
-      "source": "abacaxitos.png"
+      "source": "abacaxitos.png",
+      "rarity": "comum"
     },
     {
       "id": "aero_lurker",
       "name": "Aero Lurker",
       "sprite": "sprites/characters/aero_lurker.png",
       "faces": -1,
-      "source": "Aero Lurker.png"
+      "source": "Aero Lurker.png",
+      "rarity": "incomum"
     },
     {
       "id": "aerocolossus",
       "name": "Aerocolossus",
       "sprite": "sprites/characters/aerocolossus.png",
       "faces": -1,
-      "source": "aerocolossus.png"
+      "source": "aerocolossus.png",
+      "rarity": "epico"
     },
     {
       "id": "alexandre_barbosa",
       "name": "Alexandre Barbosa",
       "sprite": "sprites/characters/alexandre_barbosa.png",
       "faces": -1,
-      "source": "Alexandre Barbosa.png"
+      "source": "Alexandre Barbosa.png",
+      "rarity": "comum"
     },
     {
       "id": "alpha_speedon",
       "name": "Alpha Speedon",
       "sprite": "sprites/characters/alpha_speedon.png",
       "faces": -1,
-      "source": "Alpha Speedon.png"
+      "source": "Alpha Speedon.png",
+      "rarity": "epico"
     },
     {
       "id": "angummy",
       "name": "Angummy",
       "sprite": "sprites/characters/angummy.png",
       "faces": -1,
-      "source": "Angummy.png"
+      "source": "Angummy.png",
+      "rarity": "incomum"
     },
     {
       "id": "anker",
       "name": "Anker",
       "sprite": "sprites/characters/anker.png",
       "faces": -1,
-      "source": "Anker.png"
+      "source": "Anker.png",
+      "rarity": "incomum"
     },
     {
       "id": "anna_hardy",
       "name": "Anna Hardy",
       "sprite": "sprites/characters/anna_hardy.png",
       "faces": -1,
-      "source": "Anna Hardy.png"
+      "source": "Anna Hardy.png",
+      "rarity": "incomum"
     },
     {
       "id": "applenite",
       "name": "Applenite",
       "sprite": "sprites/characters/applenite.png",
       "faces": -1,
-      "source": "Applenite.png"
+      "source": "Applenite.png",
+      "rarity": "comum"
     },
     {
       "id": "arkarnis_remastered",
       "name": "Arkarnis (Remastered)",
       "sprite": "sprites/characters/arkarnis_remastered.png",
       "faces": -1,
-      "source": "Arkarnis (Remastered).png"
+      "source": "Arkarnis (Remastered).png",
+      "rarity": "epico"
     },
     {
       "id": "arthur_uno",
       "name": "Arthur Uno",
       "sprite": "sprites/characters/arthur_uno.png",
       "faces": -1,
-      "source": "Arthur Uno.png"
+      "source": "Arthur Uno.png",
+      "rarity": "epico"
     },
     {
       "id": "arvoris",
       "name": "Arvoris",
       "sprite": "sprites/characters/arvoris.png",
       "faces": -1,
-      "source": "Arvoris.png"
+      "source": "Arvoris.png",
+      "rarity": "comum"
     },
     {
       "id": "aslon",
       "name": "Aslon",
       "sprite": "sprites/characters/aslon.png",
       "faces": -1,
-      "source": "aslon.png"
+      "source": "aslon.png",
+      "rarity": "comum"
     },
     {
       "id": "augusto",
       "name": "Augusto",
       "sprite": "sprites/characters/augusto.png",
       "faces": -1,
-      "source": "augusto.png"
+      "source": "augusto.png",
+      "rarity": "comum"
     },
     {
       "id": "bananosaurus",
       "name": "Bananosaurus",
       "sprite": "sprites/characters/bananosaurus.png",
       "faces": -1,
-      "source": "bananosaurus.png"
+      "source": "bananosaurus.png",
+      "rarity": "comum"
     },
     {
       "id": "barrettoi",
       "name": "Barrettoi",
       "sprite": "sprites/characters/barrettoi.png",
       "faces": -1,
-      "source": "barrettoi.png"
+      "source": "barrettoi.png",
+      "rarity": "raro"
     },
     {
       "id": "beast",
       "name": "Beast",
       "sprite": "sprites/characters/beast.png",
       "faces": -1,
-      "source": "Beast.png"
+      "source": "Beast.png",
+      "rarity": "comum"
     },
     {
       "id": "benzo",
       "name": "Benzo",
       "sprite": "sprites/characters/benzo.png",
       "faces": -1,
-      "source": "benzo.png"
+      "source": "benzo.png",
+      "rarity": "incomum"
     },
     {
       "id": "berinkong",
       "name": "Berinkong",
       "sprite": "sprites/characters/berinkong.png",
       "faces": -1,
-      "source": "Berinkong.png"
+      "source": "Berinkong.png",
+      "rarity": "incomum"
     },
     {
       "id": "beterabix",
       "name": "Beterabix",
       "sprite": "sprites/characters/beterabix.png",
       "faces": -1,
-      "source": "beterabix.png"
+      "source": "beterabix.png",
+      "rarity": "raro"
     },
     {
       "id": "bogaras",
       "name": "Bogaras",
       "sprite": "sprites/characters/bogaras.png",
       "faces": -1,
-      "source": "Bogaras.png"
+      "source": "Bogaras.png",
+      "rarity": "comum"
     },
     {
       "id": "boongalong",
       "name": "Boongalong",
       "sprite": "sprites/characters/boongalong.png",
       "faces": -1,
-      "source": "Boongalong.png"
+      "source": "Boongalong.png",
+      "rarity": "raro"
     },
     {
       "id": "buffalo",
       "name": "Buffalo",
       "sprite": "sprites/characters/buffalo.png",
       "faces": -1,
-      "source": "buffalo.png"
+      "source": "buffalo.png",
+      "rarity": "epico"
     },
     {
       "id": "cabelinho",
       "name": "Cabelinho",
       "sprite": "sprites/characters/cabelinho.png",
       "faces": -1,
-      "source": "cabelinho.png"
+      "source": "cabelinho.png",
+      "rarity": "comum"
     },
     {
       "id": "cadu",
       "name": "Cadu",
       "sprite": "sprites/characters/cadu.png",
       "faces": -1,
-      "source": "cadu.png"
+      "source": "cadu.png",
+      "rarity": "incomum"
     },
     {
       "id": "cadutapir",
       "name": "Cadutapir",
       "sprite": "sprites/characters/cadutapir.png",
       "faces": -1,
-      "source": "cadutapir.png"
+      "source": "cadutapir.png",
+      "rarity": "comum"
     },
     {
       "id": "caiopinto",
       "name": "Caiopinto",
       "sprite": "sprites/characters/caiopinto.png",
       "faces": -1,
-      "source": "caiopinto.png"
+      "source": "caiopinto.png",
+      "rarity": "epico"
     },
     {
       "id": "careco",
       "name": "Careco",
       "sprite": "sprites/characters/careco.png",
       "faces": -1,
-      "source": "careco.png"
+      "source": "careco.png",
+      "rarity": "incomum"
     },
     {
       "id": "carecossauro",
       "name": "Carecossauro",
       "sprite": "sprites/characters/carecossauro.png",
       "faces": -1,
-      "source": "carecossauro.png"
+      "source": "carecossauro.png",
+      "rarity": "comum"
     },
     {
       "id": "cerascape",
       "name": "Cerascape",
       "sprite": "sprites/characters/cerascape.png",
       "faces": -1,
-      "source": "Cerascape.png"
+      "source": "Cerascape.png",
+      "rarity": "comum"
     },
     {
       "id": "chupacabra_rework",
       "name": "Chupacabra (Rework)",
       "sprite": "sprites/characters/chupacabra_rework.png",
       "faces": -1,
-      "source": "Chupacabra (Rework).png"
+      "source": "Chupacabra (Rework).png",
+      "rarity": "raro"
     },
     {
       "id": "chupagozao",
       "name": "Chupagozao",
       "sprite": "sprites/characters/chupagozao.png",
       "faces": -1,
-      "source": "Chupagozao.png"
+      "source": "Chupagozao.png",
+      "rarity": "comum"
     },
     {
       "id": "clorus",
       "name": "Clorus",
       "sprite": "sprites/characters/clorus.png",
       "faces": -1,
-      "source": "Clorus.png"
+      "source": "Clorus.png",
+      "rarity": "raro"
     },
     {
       "id": "continha_contoba",
       "name": "Continha contoba",
       "sprite": "sprites/characters/continha_contoba.png",
       "faces": -1,
-      "source": "continha contoba.png"
+      "source": "continha contoba.png",
+      "rarity": "raro"
     },
     {
       "id": "cryoloft",
       "name": "Cryoloft",
       "sprite": "sprites/characters/cryoloft.png",
       "faces": -1,
-      "source": "cryoloft.png"
+      "source": "cryoloft.png",
+      "rarity": "incomum"
     },
     {
       "id": "curiga",
       "name": "CURIGA",
       "sprite": "sprites/characters/curiga.png",
       "faces": -1,
-      "source": "CURIGA.png"
+      "source": "CURIGA.png",
+      "rarity": "comum"
     },
     {
       "id": "dani_koko_seko",
       "name": "Dani Koko Seko",
       "sprite": "sprites/characters/dani_koko_seko.png",
       "faces": -1,
-      "source": "Dani Koko Seko.png"
+      "source": "Dani Koko Seko.png",
+      "rarity": "comum"
     },
     {
       "id": "danibarretto",
       "name": "Danibarretto",
       "sprite": "sprites/characters/danibarretto.png",
       "faces": -1,
-      "source": "danibarretto.png"
+      "source": "danibarretto.png",
+      "rarity": "comum"
     },
     {
       "id": "dark_lurker",
       "name": "Dark Lurker",
       "sprite": "sprites/characters/dark_lurker.png",
       "faces": -1,
-      "source": "Dark Lurker.png"
+      "source": "Dark Lurker.png",
+      "rarity": "incomum"
     },
     {
       "id": "darkoko",
       "name": "Darkoko",
       "sprite": "sprites/characters/darkoko.png",
       "faces": -1,
-      "source": "darkoko.png"
+      "source": "darkoko.png",
+      "rarity": "raro"
     },
     {
       "id": "dryoskel",
       "name": "Dryoskel",
       "sprite": "sprites/characters/dryoskel.png",
       "faces": -1,
-      "source": "Dryoskel.png"
+      "source": "Dryoskel.png",
+      "rarity": "incomum"
     },
     {
       "id": "dunkler",
       "name": "Dunkler",
       "sprite": "sprites/characters/dunkler.png",
       "faces": -1,
-      "source": "Dunkler.png"
+      "source": "Dunkler.png",
+      "rarity": "comum"
     },
     {
       "id": "electrobrute",
       "name": "Electrobrute",
       "sprite": "sprites/characters/electrobrute.png",
       "faces": -1,
-      "source": "electrobrute.png"
+      "source": "electrobrute.png",
+      "rarity": "raro"
     },
     {
       "id": "electronite",
       "name": "Electronite",
       "sprite": "sprites/characters/electronite.png",
       "faces": -1,
-      "source": "Electronite.png"
+      "source": "Electronite.png",
+      "rarity": "comum"
     },
     {
       "id": "enrique_tortoise",
       "name": "Enrique Tortoise",
       "sprite": "sprites/characters/enrique_tortoise.png",
       "faces": -1,
-      "source": "Enrique Tortoise.png"
+      "source": "Enrique Tortoise.png",
+      "rarity": "raro"
     },
     {
       "id": "evolvedchupacabra",
       "name": "Evolvedchupacabra",
       "sprite": "sprites/characters/evolvedchupacabra.png",
       "faces": -1,
-      "source": "evolvedchupacabra.png"
+      "source": "evolvedchupacabra.png",
+      "rarity": "comum"
     },
     {
       "id": "ezechiel",
       "name": "Ezechiel",
       "sprite": "sprites/characters/ezechiel.png",
       "faces": -1,
-      "source": "Ezechiel.png"
+      "source": "Ezechiel.png",
+      "rarity": "raro"
     },
     {
       "id": "fire_lurker",
       "name": "Fire Lurker",
       "sprite": "sprites/characters/fire_lurker.png",
       "faces": -1,
-      "source": "Fire Lurker.png"
+      "source": "Fire Lurker.png",
+      "rarity": "raro"
     },
     {
       "id": "flighter",
       "name": "Flighter",
       "sprite": "sprites/characters/flighter.png",
       "faces": -1,
-      "source": "Flighter.png"
+      "source": "Flighter.png",
+      "rarity": "comum"
     },
     {
       "id": "gabriel_dragon",
       "name": "Gabriel Dragon",
       "sprite": "sprites/characters/gabriel_dragon.png",
       "faces": -1,
-      "source": "Gabriel Dragon.png"
+      "source": "Gabriel Dragon.png",
+      "rarity": "comum"
     },
     {
       "id": "gaiarework",
       "name": "GaiaRework",
       "sprite": "sprites/characters/gaiarework.png",
       "faces": -1,
-      "source": "GaiaRework.png"
+      "source": "GaiaRework.png",
+      "rarity": "raro"
     },
     {
       "id": "gatito",
       "name": "Gatito",
       "sprite": "sprites/characters/gatito.png",
       "faces": -1,
-      "source": "gatito.png"
+      "source": "gatito.png",
+      "rarity": "comum"
     },
     {
       "id": "geolichen",
       "name": "Geolichen",
       "sprite": "sprites/characters/geolichen.png",
       "faces": -1,
-      "source": "Geolichen.png"
+      "source": "Geolichen.png",
+      "rarity": "comum"
     },
     {
       "id": "gigahorn",
       "name": "Gigahorn",
       "sprite": "sprites/characters/gigahorn.png",
       "faces": -1,
-      "source": "gigahorn.png"
+      "source": "gigahorn.png",
+      "rarity": "comum"
     },
     {
       "id": "gigalurker",
       "name": "Gigalurker",
       "sprite": "sprites/characters/gigalurker.png",
       "faces": -1,
-      "source": "gigalurker.png"
+      "source": "gigalurker.png",
+      "rarity": "comum"
     },
     {
       "id": "gozao_remastered",
       "name": "Gozao (Remastered)",
       "sprite": "sprites/characters/gozao_remastered.png",
       "faces": -1,
-      "source": "Gozao (Remastered).png"
+      "source": "Gozao (Remastered).png",
+      "rarity": "comum"
     },
     {
       "id": "grimlhiso",
       "name": "Grimlhiso",
       "sprite": "sprites/characters/grimlhiso.png",
       "faces": -1,
-      "source": "Grimlhiso.png"
+      "source": "Grimlhiso.png",
+      "rarity": "raro"
     },
     {
       "id": "grimlurker",
       "name": "Grimlurker",
       "sprite": "sprites/characters/grimlurker.png",
       "faces": -1,
-      "source": "grimlurker.png"
+      "source": "grimlurker.png",
+      "rarity": "comum"
     },
     {
       "id": "gugas",
       "name": "Gugas",
       "sprite": "sprites/characters/gugas.png",
       "faces": -1,
-      "source": "gugas.png"
+      "source": "gugas.png",
+      "rarity": "incomum"
     },
     {
       "id": "harker_rework",
       "name": "Harker (Rework)",
       "sprite": "sprites/characters/harker_rework.png",
       "faces": -1,
-      "source": "Harker (Rework).png"
+      "source": "Harker (Rework).png",
+      "rarity": "epico"
     },
     {
       "id": "heydex",
       "name": "Heydex",
       "sprite": "sprites/characters/heydex.png",
       "faces": -1,
-      "source": "heydex.png"
+      "source": "heydex.png",
+      "rarity": "incomum"
     },
     {
       "id": "hydroterastios_remastered",
       "name": "Hydroterastios (Remastered)",
       "sprite": "sprites/characters/hydroterastios_remastered.png",
       "faces": -1,
-      "source": "Hydroterastios (Remastered).png"
+      "source": "Hydroterastios (Remastered).png",
+      "rarity": "raro"
     },
     {
       "id": "ian",
       "name": "Ian",
       "sprite": "sprites/characters/ian.png",
       "faces": -1,
-      "source": "ian.png"
+      "source": "ian.png",
+      "rarity": "incomum"
     },
     {
       "id": "icelurker",
       "name": "Icelurker",
       "sprite": "sprites/characters/icelurker.png",
       "faces": -1,
-      "source": "icelurker.png"
+      "source": "icelurker.png",
+      "rarity": "comum"
     },
     {
       "id": "jagunsusmilenius",
       "name": "Jagunsusmilenius",
       "sprite": "sprites/characters/jagunsusmilenius.png",
       "faces": -1,
-      "source": "jagunsusmilenius.png"
+      "source": "jagunsusmilenius.png",
+      "rarity": "comum"
     },
     {
       "id": "jessica_vortex",
       "name": "Jessica Vortex",
       "sprite": "sprites/characters/jessica_vortex.png",
       "faces": -1,
-      "source": "Jessica Vortex.png"
+      "source": "Jessica Vortex.png",
+      "rarity": "incomum"
     },
     {
       "id": "jumpy_lurker",
       "name": "Jumpy Lurker",
       "sprite": "sprites/characters/jumpy_lurker.png",
       "faces": -1,
-      "source": "Jumpy Lurker.png"
+      "source": "Jumpy Lurker.png",
+      "rarity": "raro"
     },
     {
       "id": "junior_stensel",
       "name": "Junior Stensel",
       "sprite": "sprites/characters/junior_stensel.png",
       "faces": -1,
-      "source": "Junior Stensel.png"
+      "source": "Junior Stensel.png",
+      "rarity": "raro"
     },
     {
       "id": "kakareko",
       "name": "Kakareko",
       "sprite": "sprites/characters/kakareko.png",
       "faces": -1,
-      "source": "Kakareko.png"
+      "source": "Kakareko.png",
+      "rarity": "epico"
     },
     {
       "id": "killerkazuo",
       "name": "Killerkazuo",
       "sprite": "sprites/characters/killerkazuo.png",
       "faces": -1,
-      "source": "killerkazuo.png"
+      "source": "killerkazuo.png",
+      "rarity": "incomum"
     },
     {
       "id": "kinglurker",
       "name": "KingLurker",
       "sprite": "sprites/characters/kinglurker.png",
       "faces": -1,
-      "source": "KingLurker.png"
+      "source": "KingLurker.png",
+      "rarity": "incomum"
     },
     {
       "id": "kira_ancient",
       "name": "Kira Ancient",
       "sprite": "sprites/characters/kira_ancient.png",
       "faces": -1,
-      "source": "Kira Ancient.png"
+      "source": "Kira Ancient.png",
+      "rarity": "comum"
     },
     {
       "id": "koko_king_remastered",
       "name": "Koko King (Remastered)",
       "sprite": "sprites/characters/koko_king_remastered.png",
       "faces": -1,
-      "source": "Koko King (Remastered).png"
+      "source": "Koko King (Remastered).png",
+      "rarity": "incomum"
     },
     {
       "id": "koko_sentry",
       "name": "Koko Sentry",
       "sprite": "sprites/characters/koko_sentry.png",
       "faces": -1,
-      "source": "Koko Sentry.png"
+      "source": "Koko Sentry.png",
+      "rarity": "comum"
     },
     {
       "id": "kokoking",
       "name": "Kokoking",
       "sprite": "sprites/characters/kokoking.png",
       "faces": -1,
-      "source": "kokoking.png"
+      "source": "kokoking.png",
+      "rarity": "comum"
     },
     {
       "id": "kokokow",
       "name": "Kokokow",
       "sprite": "sprites/characters/kokokow.png",
       "faces": -1,
-      "source": "Kokokow.png"
+      "source": "Kokokow.png",
+      "rarity": "comum"
     },
     {
       "id": "kokoseko",
       "name": "Kokoseko",
       "sprite": "sprites/characters/kokoseko.png",
       "faces": -1,
-      "source": "kokoseko.png"
+      "source": "kokoseko.png",
+      "rarity": "incomum"
     },
     {
       "id": "kozu",
       "name": "Kozu",
       "sprite": "sprites/characters/kozu.png",
       "faces": -1,
-      "source": "kozu.png"
+      "source": "kozu.png",
+      "rarity": "lendario"
     },
     {
       "id": "kozuu_spark",
       "name": "KoZuu Spark",
       "sprite": "sprites/characters/kozuu_spark.png",
       "faces": -1,
-      "source": "KoZuu Spark.png"
+      "source": "KoZuu Spark.png",
+      "rarity": "incomum"
     },
     {
       "id": "limenis",
       "name": "Limenis",
       "sprite": "sprites/characters/limenis.png",
       "faces": -1,
-      "source": "limenis.png"
+      "source": "limenis.png",
+      "rarity": "comum"
     },
     {
       "id": "lipee_anime",
       "name": "Lipee Anime",
       "sprite": "sprites/characters/lipee_anime.png",
       "faces": -1,
-      "source": "Lipee Anime.png"
+      "source": "Lipee Anime.png",
+      "rarity": "comum"
     },
     {
       "id": "lord_golem",
       "name": "Lord Golem",
       "sprite": "sprites/characters/lord_golem.png",
       "faces": -1,
-      "source": "Lord Golem.png"
+      "source": "Lord Golem.png",
+      "rarity": "lendario"
     },
     {
       "id": "loyko_kato",
       "name": "Loyko Kato",
       "sprite": "sprites/characters/loyko_kato.png",
       "faces": -1,
-      "source": "Loyko Kato.png"
+      "source": "Loyko Kato.png",
+      "rarity": "incomum"
     },
     {
       "id": "luiz_zenor",
       "name": "Luiz Zenor",
       "sprite": "sprites/characters/luiz_zenor.png",
       "faces": -1,
-      "source": "Luiz Zenor.png"
+      "source": "Luiz Zenor.png",
+      "rarity": "comum"
     },
     {
       "id": "lushfiend",
       "name": "Lushfiend",
       "sprite": "sprites/characters/lushfiend.png",
       "faces": -1,
-      "source": "Lushfiend.png"
+      "source": "Lushfiend.png",
+      "rarity": "incomum"
     },
     {
       "id": "lushzard",
       "name": "Lushzard",
       "sprite": "sprites/characters/lushzard.png",
       "faces": -1,
-      "source": "Lushzard.png"
+      "source": "Lushzard.png",
+      "rarity": "comum"
     },
     {
       "id": "madara_cat",
       "name": "Madara Cat",
       "sprite": "sprites/characters/madara_cat.png",
       "faces": -1,
-      "source": "Madara Cat.png"
+      "source": "Madara Cat.png",
+      "rarity": "raro"
     },
     {
       "id": "made_in_sauron_remastered",
       "name": "Made In Sauron Remastered",
       "sprite": "sprites/characters/made_in_sauron_remastered.png",
       "faces": -1,
-      "source": "Made In Sauron Remastered.png"
+      "source": "Made In Sauron Remastered.png",
+      "rarity": "comum"
     },
     {
       "id": "malosaurus",
       "name": "Malosaurus",
       "sprite": "sprites/characters/malosaurus.png",
       "faces": -1,
-      "source": "malosaurus.png"
+      "source": "malosaurus.png",
+      "rarity": "incomum"
     },
     {
       "id": "mason",
       "name": "Mason",
       "sprite": "sprites/characters/mason.png",
       "faces": -1,
-      "source": "Mason.png"
+      "source": "Mason.png",
+      "rarity": "comum"
     },
     {
       "id": "mason_megalos",
       "name": "Mason Megalos",
       "sprite": "sprites/characters/mason_megalos.png",
       "faces": -1,
-      "source": "Mason Megalos.png"
+      "source": "Mason Megalos.png",
+      "rarity": "comum"
     },
     {
       "id": "masterovenator",
       "name": "Masterovenator",
       "sprite": "sprites/characters/masterovenator.png",
       "faces": -1,
-      "source": "Masterovenator.png"
+      "source": "Masterovenator.png",
+      "rarity": "comum"
     },
     {
       "id": "matheus_nite",
       "name": "Matheus Nite",
       "sprite": "sprites/characters/matheus_nite.png",
       "faces": -1,
-      "source": "Matheus Nite.png"
+      "source": "Matheus Nite.png",
+      "rarity": "incomum"
     },
     {
       "id": "megahorn",
       "name": "Megahorn",
       "sprite": "sprites/characters/megahorn.png",
       "faces": -1,
-      "source": "Megahorn.png"
+      "source": "Megahorn.png",
+      "rarity": "epico"
     },
     {
       "id": "megaloraptor",
       "name": "Megaloraptor",
       "sprite": "sprites/characters/megaloraptor.png",
       "faces": -1,
-      "source": "Megaloraptor.png"
+      "source": "Megaloraptor.png",
+      "rarity": "comum"
     },
     {
       "id": "megonha",
       "name": "Megonha",
       "sprite": "sprites/characters/megonha.png",
       "faces": -1,
-      "source": "Megonha.png"
+      "source": "Megonha.png",
+      "rarity": "raro"
     },
     {
       "id": "megonha_alternative",
       "name": "Megonha (Alternative)",
       "sprite": "sprites/characters/megonha_alternative.png",
       "faces": -1,
-      "source": "Megonha (Alternative).png"
+      "source": "Megonha (Alternative).png",
+      "rarity": "comum"
     },
     {
       "id": "michael_high",
       "name": "Michael High",
       "sprite": "sprites/characters/michael_high.png",
       "faces": -1,
-      "source": "Michael High.png"
+      "source": "Michael High.png",
+      "rarity": "incomum"
     },
     {
       "id": "miguel_counter",
       "name": "Miguel Counter",
       "sprite": "sprites/characters/miguel_counter.png",
       "faces": -1,
-      "source": "Miguel Counter.png"
+      "source": "Miguel Counter.png",
+      "rarity": "incomum"
     },
     {
       "id": "mimi",
       "name": "Mimi",
       "sprite": "sprites/characters/mimi.png",
       "faces": -1,
-      "source": "Mimi.png"
+      "source": "Mimi.png",
+      "rarity": "incomum"
     },
     {
       "id": "mogger",
       "name": "Mogger",
       "sprite": "sprites/characters/mogger.png",
       "faces": -1,
-      "source": "mogger.png"
+      "source": "mogger.png",
+      "rarity": "incomum"
     },
     {
       "id": "moggerqueen",
       "name": "Moggerqueen",
       "sprite": "sprites/characters/moggerqueen.png",
       "faces": -1,
-      "source": "moggerqueen.png"
+      "source": "moggerqueen.png",
+      "rarity": "comum"
     },
     {
       "id": "monochromatic_rework",
       "name": "Monochromatic Rework",
       "sprite": "sprites/characters/monochromatic_rework.png",
       "faces": -1,
-      "source": "Monochromatic Rework.png"
+      "source": "Monochromatic Rework.png",
+      "rarity": "comum"
     },
     {
       "id": "mothok_remastered",
       "name": "Mothok Remastered",
       "sprite": "sprites/characters/mothok_remastered.png",
       "faces": -1,
-      "source": "Mothok Remastered.png"
+      "source": "Mothok Remastered.png",
+      "rarity": "comum"
     },
     {
       "id": "mothokremastered",
       "name": "MothokRemastered",
       "sprite": "sprites/characters/mothokremastered.png",
       "faces": -1,
-      "source": "MothokRemastered.png"
+      "source": "MothokRemastered.png",
+      "rarity": "comum"
     },
     {
       "id": "mun",
       "name": "Mun",
       "sprite": "sprites/characters/mun.png",
       "faces": -1,
-      "source": "mun.png"
+      "source": "mun.png",
+      "rarity": "comum"
     },
     {
       "id": "nagatitan",
       "name": "Nagatitan",
       "sprite": "sprites/characters/nagatitan.png",
       "faces": -1,
-      "source": "Nagatitan.png"
+      "source": "Nagatitan.png",
+      "rarity": "incomum"
     },
     {
       "id": "nexcau",
       "name": "Nexcau",
       "sprite": "sprites/characters/nexcau.png",
       "faces": -1,
-      "source": "nexcau.png"
+      "source": "nexcau.png",
+      "rarity": "raro"
     },
     {
       "id": "nexus_drake_rework",
       "name": "Nexus Drake Rework",
       "sprite": "sprites/characters/nexus_drake_rework.png",
       "faces": -1,
-      "source": "Nexus Drake Rework.png"
+      "source": "Nexus Drake Rework.png",
+      "rarity": "incomum"
     },
     {
       "id": "pancake",
       "name": "Pancake",
       "sprite": "sprites/characters/pancake.png",
       "faces": -1,
-      "source": "Pancake.png"
+      "source": "Pancake.png",
+      "rarity": "comum"
     },
     {
       "id": "pedroca",
       "name": "Pedroca",
       "sprite": "sprites/characters/pedroca.png",
       "faces": -1,
-      "source": "pedroca.png"
+      "source": "pedroca.png",
+      "rarity": "comum"
     },
     {
       "id": "penasyd",
       "name": "Penasyd",
       "sprite": "sprites/characters/penasyd.png",
       "faces": -1,
-      "source": "Penasyd.png"
+      "source": "Penasyd.png",
+      "rarity": "comum"
     },
     {
       "id": "penasyd_all_out",
       "name": "Penasyd (All Out)",
       "sprite": "sprites/characters/penasyd_all_out.png",
       "faces": -1,
-      "source": "Penasyd (All Out).png"
+      "source": "Penasyd (All Out).png",
+      "rarity": "comum"
     },
     {
       "id": "peruzin",
       "name": "Peruzin",
       "sprite": "sprites/characters/peruzin.png",
       "faces": -1,
-      "source": "Peruzin.png"
+      "source": "Peruzin.png",
+      "rarity": "comum"
     },
     {
       "id": "phoenix",
       "name": "Phoenix",
       "sprite": "sprites/characters/phoenix.png",
       "faces": -1,
-      "source": "Phoenix.png"
+      "source": "Phoenix.png",
+      "rarity": "epico"
     },
     {
       "id": "pietro_hardy",
       "name": "Pietro Hardy",
       "sprite": "sprites/characters/pietro_hardy.png",
       "faces": -1,
-      "source": "Pietro Hardy.png"
+      "source": "Pietro Hardy.png",
+      "rarity": "comum"
     },
     {
       "id": "pipimentox",
       "name": "Pipimentox",
       "sprite": "sprites/characters/pipimentox.png",
       "faces": -1,
-      "source": "Pipimentox.png"
+      "source": "Pipimentox.png",
+      "rarity": "incomum"
     },
     {
       "id": "power_lurker",
       "name": "Power Lurker",
       "sprite": "sprites/characters/power_lurker.png",
       "faces": -1,
-      "source": "Power Lurker.png"
+      "source": "Power Lurker.png",
+      "rarity": "incomum"
     },
     {
       "id": "primal_sauron",
       "name": "Primal Sauron",
       "sprite": "sprites/characters/primal_sauron.png",
       "faces": -1,
-      "source": "Primal Sauron.png"
+      "source": "Primal Sauron.png",
+      "rarity": "comum"
     },
     {
       "id": "pyrotitan",
       "name": "Pyrotitan",
       "sprite": "sprites/characters/pyrotitan.png",
       "faces": -1,
-      "source": "pyrotitan.png"
+      "source": "pyrotitan.png",
+      "rarity": "raro"
     },
     {
       "id": "redbull",
       "name": "Redbull",
       "sprite": "sprites/characters/redbull.png",
       "faces": -1,
-      "source": "redbull.png"
+      "source": "redbull.png",
+      "rarity": "comum"
     },
     {
       "id": "repolhiso",
       "name": "Repolhiso",
       "sprite": "sprites/characters/repolhiso.png",
       "faces": -1,
-      "source": "Repolhiso.png"
+      "source": "Repolhiso.png",
+      "rarity": "comum"
     },
     {
       "id": "repolhiso_rework",
       "name": "Repolhiso (rework)",
       "sprite": "sprites/characters/repolhiso_rework.png",
       "faces": -1,
-      "source": "repolhiso (rework).png"
+      "source": "repolhiso (rework).png",
+      "rarity": "comum"
     },
     {
       "id": "repolhao",
       "name": "Repolhão",
       "sprite": "sprites/characters/repolhao.png",
       "faces": -1,
-      "source": "Repolhão.png"
+      "source": "Repolhão.png",
+      "rarity": "epico"
     },
     {
       "id": "rick",
       "name": "Rick",
       "sprite": "sprites/characters/rick.png",
       "faces": -1,
-      "source": "rick.png"
+      "source": "rick.png",
+      "rarity": "comum"
     },
     {
       "id": "rocket_tyrant",
       "name": "Rocket Tyrant",
       "sprite": "sprites/characters/rocket_tyrant.png",
       "faces": -1,
-      "source": "Rocket Tyrant.png"
+      "source": "Rocket Tyrant.png",
+      "rarity": "raro"
     },
     {
       "id": "royal_saurophaganax",
       "name": "Royal saurophaganax",
       "sprite": "sprites/characters/royal_saurophaganax.png",
       "faces": -1,
-      "source": "royal saurophaganax.png"
+      "source": "royal saurophaganax.png",
+      "rarity": "comum"
     },
     {
       "id": "rusted",
       "name": "Rusted",
       "sprite": "sprites/characters/rusted.png",
       "faces": -1,
-      "source": "Rusted.png"
+      "source": "Rusted.png",
+      "rarity": "comum"
     },
     {
       "id": "sageki",
       "name": "Sageki",
       "sprite": "sprites/characters/sageki.png",
       "faces": -1,
-      "source": "sageki.png"
+      "source": "sageki.png",
+      "rarity": "incomum"
     },
     {
       "id": "sappovarudo",
       "name": "Sappovarudo",
       "sprite": "sprites/characters/sappovarudo.png",
       "faces": -1,
-      "source": "sappovarudo.png"
+      "source": "sappovarudo.png",
+      "rarity": "comum"
     },
     {
       "id": "sauron_z",
       "name": "Sauron Z",
       "sprite": "sprites/characters/sauron_z.png",
       "faces": -1,
-      "source": "Sauron Z.png"
+      "source": "Sauron Z.png",
+      "rarity": "raro"
     },
     {
       "id": "sauronyx",
       "name": "Sauronyx",
       "sprite": "sprites/characters/sauronyx.png",
       "faces": -1,
-      "source": "sauronyx.png"
+      "source": "sauronyx.png",
+      "rarity": "comum"
     },
     {
       "id": "scathrax",
       "name": "Scathrax",
       "sprite": "sprites/characters/scathrax.png",
       "faces": -1,
-      "source": "Scathrax.png"
+      "source": "Scathrax.png",
+      "rarity": "comum"
     },
     {
       "id": "shogalla",
       "name": "Shogalla",
       "sprite": "sprites/characters/shogalla.png",
       "faces": -1,
-      "source": "Shogalla.png"
+      "source": "Shogalla.png",
+      "rarity": "comum"
     },
     {
       "id": "skeleto",
       "name": "Skeleto",
       "sprite": "sprites/characters/skeleto.png",
       "faces": -1,
-      "source": "skeleto.png"
+      "source": "skeleto.png",
+      "rarity": "comum"
     },
     {
       "id": "snakarrot",
       "name": "Snakarrot",
       "sprite": "sprites/characters/snakarrot.png",
       "faces": -1,
-      "source": "snakarrot.png"
+      "source": "snakarrot.png",
+      "rarity": "raro"
     },
     {
       "id": "speedon",
       "name": "Speedon",
       "sprite": "sprites/characters/speedon.png",
       "faces": -1,
-      "source": "Speedon.png"
+      "source": "Speedon.png",
+      "rarity": "incomum"
     },
     {
       "id": "spiderock_rework",
       "name": "Spiderock Rework",
       "sprite": "sprites/characters/spiderock_rework.png",
       "faces": -1,
-      "source": "Spiderock Rework.png"
+      "source": "Spiderock Rework.png",
+      "rarity": "comum"
     },
     {
       "id": "stegas",
       "name": "Stegas",
       "sprite": "sprites/characters/stegas.png",
       "faces": -1,
-      "source": "Stegas.png"
+      "source": "Stegas.png",
+      "rarity": "comum"
     },
     {
       "id": "stony",
       "name": "Stony",
       "sprite": "sprites/characters/stony.png",
       "faces": -1,
-      "source": "Stony.png"
+      "source": "Stony.png",
+      "rarity": "comum"
     },
     {
       "id": "sukito",
       "name": "Sukito",
       "sprite": "sprites/characters/sukito.png",
       "faces": -1,
-      "source": "Sukito.png"
+      "source": "Sukito.png",
+      "rarity": "comum"
     },
     {
       "id": "taiker",
       "name": "Taiker",
       "sprite": "sprites/characters/taiker.png",
       "faces": -1,
-      "source": "Taiker.png"
+      "source": "Taiker.png",
+      "rarity": "epico"
     },
     {
       "id": "terrachio",
       "name": "Terrachio",
       "sprite": "sprites/characters/terrachio.png",
       "faces": -1,
-      "source": "terrachio.png"
+      "source": "terrachio.png",
+      "rarity": "comum"
     },
     {
       "id": "thermius_avunsus",
       "name": "Thermius Avunsus",
       "sprite": "sprites/characters/thermius_avunsus.png",
       "faces": -1,
-      "source": "Thermius Avunsus.png"
+      "source": "Thermius Avunsus.png",
+      "rarity": "incomum"
     },
     {
       "id": "thogays",
       "name": "Thogays",
       "sprite": "sprites/characters/thogays.png",
       "faces": -1,
-      "source": "thogays.png"
+      "source": "thogays.png",
+      "rarity": "comum"
     },
     {
       "id": "thomas",
       "name": "Thomas",
       "sprite": "sprites/characters/thomas.png",
       "faces": -1,
-      "source": "thomas.png"
+      "source": "thomas.png",
+      "rarity": "incomum"
     },
     {
       "id": "tubaronic",
       "name": "Tubaronic",
       "sprite": "sprites/characters/tubaronic.png",
       "faces": -1,
-      "source": "Tubaronic.png"
+      "source": "Tubaronic.png",
+      "rarity": "incomum"
     },
     {
       "id": "turcrab",
       "name": "Turcrab",
       "sprite": "sprites/characters/turcrab.png",
       "faces": -1,
-      "source": "Turcrab.png"
+      "source": "Turcrab.png",
+      "rarity": "raro"
     },
     {
       "id": "ulliemurus_rework",
       "name": "Ulliemurus (Rework)",
       "sprite": "sprites/characters/ulliemurus_rework.png",
       "faces": -1,
-      "source": "Ulliemurus (Rework).png"
+      "source": "Ulliemurus (Rework).png",
+      "rarity": "comum"
     },
     {
       "id": "umbranodon",
       "name": "Umbranodon",
       "sprite": "sprites/characters/umbranodon.png",
       "faces": -1,
-      "source": "umbranodon.png"
+      "source": "umbranodon.png",
+      "rarity": "incomum"
     },
     {
       "id": "umbraseeker",
       "name": "Umbraseeker",
       "sprite": "sprites/characters/umbraseeker.png",
       "faces": -1,
-      "source": "Umbraseeker.png"
+      "source": "Umbraseeker.png",
+      "rarity": "incomum"
     },
     {
       "id": "vankyu",
       "name": "Vankyu",
       "sprite": "sprites/characters/vankyu.png",
       "faces": -1,
-      "source": "Vankyu.png"
+      "source": "Vankyu.png",
+      "rarity": "comum"
     },
     {
       "id": "violet_sandict",
       "name": "Violet Sandict",
       "sprite": "sprites/characters/violet_sandict.png",
       "faces": -1,
-      "source": "Violet Sandict.png"
+      "source": "Violet Sandict.png",
+      "rarity": "lendario"
     },
     {
       "id": "vivian_frost",
       "name": "Vivian Frost",
       "sprite": "sprites/characters/vivian_frost.png",
       "faces": -1,
-      "source": "Vivian Frost.png"
+      "source": "Vivian Frost.png",
+      "rarity": "comum"
     },
     {
       "id": "vonda",
       "name": "Vonda",
       "sprite": "sprites/characters/vonda.png",
       "faces": -1,
-      "source": "Vonda.png"
+      "source": "Vonda.png",
+      "rarity": "raro"
     },
     {
       "id": "winter_monarch",
       "name": "Winter Monarch",
       "sprite": "sprites/characters/winter_monarch.png",
       "faces": -1,
-      "source": "Winter Monarch.png"
+      "source": "Winter Monarch.png",
+      "rarity": "lendario"
     },
     {
       "id": "xalthurion",
       "name": "Xalthurion",
       "sprite": "sprites/characters/xalthurion.png",
       "faces": -1,
-      "source": "Xalthurion.png"
+      "source": "Xalthurion.png",
+      "rarity": "incomum"
     },
     {
       "id": "z",
       "name": "Z",
       "sprite": "sprites/characters/z.png",
       "faces": -1,
-      "source": "Z.png"
+      "source": "Z.png",
+      "rarity": "comum"
     },
     {
       "id": "zero",
       "name": "Zero",
       "sprite": "sprites/characters/zero.png",
       "faces": -1,
-      "source": "zero.png"
+      "source": "zero.png",
+      "rarity": "comum"
     }
   ]
 }

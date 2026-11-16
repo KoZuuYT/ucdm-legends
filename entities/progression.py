@@ -36,7 +36,9 @@ class StatProgress:
 
 @dataclass
 class Profile:
-    character: str = "kozu"
+    character: str = "steve"            # id da aparência (skin) do jogador; o lutador é sempre o Steve
+    collection: dict[str, int] = field(default_factory=dict)   # lendas UCDM derrotadas -> vezes
+    skins_seen: list[str] = field(default_factory=lambda: ["steve"])   # aparências já anunciadas como desbloqueadas
     gold: int = 0
     weapon_level: int = 1
     arena_stage: int = 0                # índice do próximo inimigo
@@ -60,6 +62,11 @@ class Profile:
         if value > self.counters.get(key, 0):
             self.counters[key] = value
 
+    def legends(self) -> int:
+        """Quantas lendas de raridade Lendária já foram derrotadas."""
+        from entities import roster
+        return sum(1 for cid in self.collection if roster.rarity(cid) == "lendario")
+
     def total_level(self) -> int:
         return sum(s.level for s in self.stats.values()) - len(STATS) + 1
 
@@ -68,17 +75,22 @@ class Profile:
             "character": self.character, "gold": self.gold, "weapon_level": self.weapon_level,
             "arena_stage": self.arena_stage, "wins": self.wins, "best_scores": self.best_scores,
             "playtime": round(self.playtime, 1), "name": self.name, "seen_help": self.seen_help, "last_training": self.last_training,
-            "counters": self.counters,
+            "counters": self.counters, "collection": self.collection, "skins_seen": self.skins_seen,
             "stats": {k: {"level": v.level, "xp": v.xp} for k, v in self.stats.items()},
         }
 
     @classmethod
     def from_dict(cls, d: dict) -> "Profile":
-        p = cls(character=d.get("character", "kozu"), gold=d.get("gold", 0),
+        skin_ids = {s["id"] for s in config.load("skins")["skins"]}
+        who = d.get("character", "steve")
+        p = cls(character=who if who in skin_ids else "steve",   # saves antigos (lutador UCDM) viram Steve
+                gold=d.get("gold", 0),
                 weapon_level=d.get("weapon_level", 1), arena_stage=d.get("arena_stage", 0),
                 wins=d.get("wins", 0), best_scores=d.get("best_scores", {}),
                 playtime=float(d.get("playtime", 0.0)), name=str(d.get("name", ""))[:16],
-                seen_help=bool(d.get("seen_help", False)), last_training=str(d.get("last_training", "")), counters=dict(d.get("counters", {})))
+                seen_help=bool(d.get("seen_help", False)), last_training=str(d.get("last_training", "")), counters=dict(d.get("counters", {})),
+                collection={str(k): int(v) for k, v in dict(d.get("collection", {})).items()},
+                skins_seen=[str(x) for x in d.get("skins_seen", ["steve"])])
         for k in STATS:
             s = d.get("stats", {}).get(k, {})
             p.stats[k] = StatProgress(s.get("level", 1), s.get("xp", 0))

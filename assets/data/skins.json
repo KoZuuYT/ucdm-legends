@@ -1,0 +1,76 @@
+{
+  "_doc": "Aparências jogáveis. O jogador é sempre o Steve; as demais skins desbloqueiam por metas. unlock: wins | stage | collection | legend (número mínimo).",
+  "default": "steve",
+  "skins": [
+    {
+      "id": "steve",
+      "name": "Steve",
+      "sprite": "sprites/characters/skin_steve.png",
+      "unlock": {}
+    },
+    {
+      "id": "alex",
+      "name": "Alex",
+      "sprite": "sprites/characters/skin_alex.png",
+      "unlock": {
+        "wins": 3
+      }
+    },
+    {
+      "id": "ari",
+      "name": "Ari",
+      "sprite": "sprites/characters/skin_ari.png",
+      "unlock": {
+        "stage": 4
+      }
+    },
+    {
+      "id": "efe",
+      "name": "Efe",
+      "sprite": "sprites/characters/skin_efe.png",
+      "unlock": {
+        "collection": 10
+      }
+    },
+    {
+      "id": "kai",
+      "name": "Kai",
+      "sprite": "sprites/characters/skin_kai.png",
+      "unlock": {
+        "collection": 25
+      }
+    },
+    {
+      "id": "makena",
+      "name": "Makena",
+      "sprite": "sprites/characters/skin_makena.png",
+      "unlock": {
+        "stage": 8
+      }
+    },
+    {
+      "id": "noor",
+      "name": "Noor",
+      "sprite": "sprites/characters/skin_noor.png",
+      "unlock": {
+        "collection": 50
+      }
+    },
+    {
+      "id": "sunny",
+      "name": "Sunny",
+      "sprite": "sprites/characters/skin_sunny.png",
+      "unlock": {
+        "legend": 1
+      }
+    },
+    {
+      "id": "zuri",
+      "name": "Zuri",
+      "sprite": "sprites/characters/skin_zuri.png",
+      "unlock": {
+        "collection": 100
+      }
+    }
+  ]
+}

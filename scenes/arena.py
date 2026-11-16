@@ -42,10 +42,11 @@ class Decor:
 class ArenaScene(Scene):
     wide = True
 
-    def __init__(self, game, stage: int) -> None:
+    def __init__(self, game, stage: int, challenger: str | None = None) -> None:
         super().__init__(game)
-        self.stage = stage
-        self.edef = roster.enemies()[stage]
+        self.challenger = challenger                     # id de uma lenda do álbum (desafio fora da escada)
+        self.stage = stage if challenger is None else -1
+        self.edef = roster.challenge_edef(challenger) if challenger else roster.enemies()[stage]
         mid = WORLD_W / 2
         self.mid = mid
         self.player = roster.build_player(game.profile, mid - 220, GROUND_Y)
@@ -93,7 +94,7 @@ class ArenaScene(Scene):
 
     # --- mundo --------------------------------------------------------------------------
     def _build_world(self) -> None:
-        rnd = random.Random(self.stage)
+        rnd = random.Random(self.challenger or self.stage)
         chars = roster.characters()
         # plateia: personagens UCDM em silhueta ao fundo, virados para o centro da arena
         for x in range(0, WORLD_W, 110):
@@ -516,7 +517,14 @@ class ArenaScene(Scene):
         from scenes.results import ResultsOverlay
         if self.result == "win":
             gold = self.edef.get("gold", 20)
-            first = self.stage == prof.arena_stage
+            if self.challenger:
+                first = self.challenger not in prof.collection
+                prof.collection[self.challenger] = prof.collection.get(self.challenger, 0) + 1
+            else:
+                first = self.stage == prof.arena_stage
+                cid = self.edef["character"]
+                new_card = cid not in prof.collection
+                prof.collection[cid] = prof.collection.get(cid, 0) + 1
             if not first:
                 gold //= 3   # revanche rende menos
             bonus = int(gold * min(0.5, 0.05 * self.style_total))       # recompensa por esquivar/aparar no tempo certo
@@ -524,12 +532,20 @@ class ArenaScene(Scene):
             prof.gold += gold
             prof.wins += 1
             prof.bump("fights_won")
-            if first:
+            if first and not self.challenger:
                 prof.arena_stage += 1
             lines = [f"Você derrotou {self.enemy.name}!", f"+{gold} ouro"]
+            rar = roster.rarity(self.edef["character"])
+            if (self.challenger and first) or (not self.challenger and new_card):
+                lines.append(f"Carta {roster.rarity_info(rar)['label']} adicionada ao álbum!")
+            for s in roster.skins():          # aparências recém-liberadas
+                if roster.unlocked_skin(prof, s) and s["id"] not in prof.skins_seen:
+                    prof.skins_seen.append(s["id"])
+                    if s["id"] != "steve":
+                        lines.append(f"Nova aparência: {s['name']}!")
             if bonus:
                 lines.append(f"Bônus de estilo: +{bonus} ouro")
-            if first and prof.arena_stage < len(roster.enemies()):
+            if first and not self.challenger and prof.arena_stage < len(roster.enemies()):
                 nxt = roster.character(roster.enemies()[prof.arena_stage]["character"])["name"]
                 lines.append(f"Próximo desafiante: {nxt}")
             self.game.audio.play("coin")
@@ -685,7 +701,9 @@ class ArenaScene(Scene):
                     ui.text(surf, self.small, tr("ARMADURA"), (bx + 300 - 6, 88), (215, 190, 110), "topright")
                 ui.text(surf, self.small, self.edef.get("title", ""), (bx + 420, 74), ui.ACCENT, "topright")
         self._status_chips(surf, 106, 94)
-        ui.text(surf, self.small, f"Luta {self.stage + 1}/{len(roster.enemies())}", (W // 2, 14), (210, 210, 225), "midtop")
+        label = (f"{tr('Desafio')} · {roster.rarity_info(roster.rarity(self.challenger))['label']}" if self.challenger
+                 else f"Luta {self.stage + 1}/{len(roster.enemies())}")
+        ui.text(surf, self.small, label, (W // 2, 14), (210, 210, 225), "midtop")
         if not self.game.input.touch_mode and self.intro < INTRO_TOTAL + 6:
             self._hint(surf)
 

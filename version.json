@@ -1,4 +1,4 @@
 {
-  "version": "0.4.0",
-  "notes": "Combate que premia reagir: esquiva perfeita e parry abrem contra-ataque, inimigos têm armadura que precisa ser quebrada, atacar sem parar causa fadiga e os inimigos leem o spam. Entrada animada nas lutas, personagens com animações e efeitos (agachar, esticar, rastros, escudo de energia, arco de corte) e feedback de ataque, defesa e dano bem mais claro. Botões animados com hover, clique e brilho, menus e HUD redesenhados. Teclas padrão: botão esquerdo do mouse ataca, F defende e Shift esquiva. A janela agora é redimensionável sem barras pretas. Corrige cliques e teclas que às vezes não eram registrados e o sentido em que alguns personagens olhavam."
+  "version": "0.5.0",
+  "notes": "Você agora joga como o Steve! As lendas do UCDM viraram adversários com raridade (Comum, Incomum, Raro, Épico e Lendário): derrote-as para completar o Álbum de Lendas. Cada raridade abre conforme você avança na arena. Novas aparências do Steve (Alex, Ari, Efe, Kai, Makena, Noor, Sunny e Zuri) desbloqueiam por metas. Assets de Minecraft incluídos no projeto (projeto de fãs, sem fins lucrativos)."
 }

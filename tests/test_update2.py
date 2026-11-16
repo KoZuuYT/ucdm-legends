@@ -197,7 +197,7 @@ class GameExtrasTest(unittest.TestCase):
         from core.engine import Game
         from entities.progression import Profile
         cls.game = Game(headless=True)
-        cls.game.profile = Profile(character="kozu")
+        cls.game.profile = Profile()
 
     def setUp(self):
         paths.SETTINGS_FILE.unlink(missing_ok=True)
@@ -362,7 +362,7 @@ class GameExtrasTest(unittest.TestCase):
 
     def test_stat_icons_and_scenery_in_screens(self):
         from minigames import REGISTRY
-        from scenes.character_select import CharacterSelectScene
+        from scenes.collection import CollectionScene
         from scenes.stats import StatsScene
         g = self.game
         settings.set_value("accessibility.colorblind", True)
@@ -370,7 +370,7 @@ class GameExtrasTest(unittest.TestCase):
         for cls in REGISTRY.values():
             self._run(cls(g), 30)
         self._run(StatsScene(g), 10)
-        sel = CharacterSelectScene(g, new_game=False)
+        sel = CollectionScene(g)
         self._run(sel, 40)
         self.assertLess(sel.drawn, 60)
 

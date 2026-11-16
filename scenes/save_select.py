@@ -143,10 +143,12 @@ class SlotMenu(Scene):
         g.scenes.reset(HubScene(g), fade="iris")
 
     def _new(self) -> None:
-        from scenes.character_select import CharacterSelectScene
-        self.game.use_slot(self.slot)
-        self.game.scenes.pop()
-        self.game.scenes.push(CharacterSelectScene(self.game, new_game=True), fade="slide")
+        from scenes.hub import HubScene
+        g = self.game
+        g.use_slot(self.slot)
+        g.profile = Profile()                    # o jogador é sempre o Steve
+        g.save.save(g.profile)
+        g.scenes.reset(HubScene(g), fade="iris")
 
     def _rename(self) -> None:
         def ok(name: str) -> None:

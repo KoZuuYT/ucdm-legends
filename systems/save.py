@@ -62,7 +62,7 @@ class SaveManager:
             mtime = max(p.stat().st_mtime for p in (self.path, self.path.with_suffix(".bak")) if p.exists())
         except ValueError:
             mtime = 0.0
-        return {"slot": self.slot, "name": data.get("name", ""), "character": data.get("character", "kozu"),
+        return {"slot": self.slot, "name": data.get("name", ""), "character": data.get("character", "steve"),
                 "level": max(1, total), "wins": int(data.get("wins", 0)), "arena_stage": int(data.get("arena_stage", 0)),
                 "gold": int(data.get("gold", 0)), "playtime": float(data.get("playtime", 0.0)), "mtime": mtime,
                 "from_backup": bool(data.get("_from_backup"))}

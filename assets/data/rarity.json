@@ -1,0 +1,85 @@
+{
+  "_doc": "Raridades. templates = índices da escada (enemies.json) usados como base do desafiante; unlock_stage = vitórias na escada necessárias para desafiar; gold = recompensa da 1ª vitória.",
+  "order": [
+    "comum",
+    "incomum",
+    "raro",
+    "epico",
+    "lendario"
+  ],
+  "tiers": {
+    "comum": {
+      "label": "Comum",
+      "color": [
+        200,
+        205,
+        215
+      ],
+      "templates": [
+        0,
+        1
+      ],
+      "unlock_stage": 0,
+      "gold": 30,
+      "scale": 0.95
+    },
+    "incomum": {
+      "label": "Incomum",
+      "color": [
+        90,
+        220,
+        120
+      ],
+      "templates": [
+        2,
+        3
+      ],
+      "unlock_stage": 2,
+      "gold": 70,
+      "scale": 0.95
+    },
+    "raro": {
+      "label": "Raro",
+      "color": [
+        80,
+        170,
+        255
+      ],
+      "templates": [
+        4,
+        5
+      ],
+      "unlock_stage": 4,
+      "gold": 140,
+      "scale": 0.95
+    },
+    "epico": {
+      "label": "Épico",
+      "color": [
+        190,
+        110,
+        255
+      ],
+      "templates": [
+        6
+      ],
+      "unlock_stage": 6,
+      "gold": 260,
+      "scale": 1.0
+    },
+    "lendario": {
+      "label": "Lendário",
+      "color": [
+        255,
+        190,
+        50
+      ],
+      "templates": [
+        7
+      ],
+      "unlock_stage": 8,
+      "gold": 520,
+      "scale": 1.0
+    }
+  }
+}

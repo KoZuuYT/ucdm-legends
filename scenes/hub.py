@@ -41,7 +41,8 @@ class HubScene(Scene):
         cost = weapon_cost(p.weapon_level)
         buttons.append(ui.Button((x0, y0 + 256, 280, 62), f"Arma nv {p.weapon_level + 1}", self._upgrade,
                                  enabled=p.gold >= cost, sub=f"{cost} ouro"))
-        buttons.append(ui.Button((x0 + 300, y0 + 256, 280, 62), "Trocar lutador", self._change_char))
+        buttons.append(ui.Button((x0 + 300, y0 + 256, 280, 62), "Álbum de Lendas", self._change_char,
+                                 sub=f"{len(p.collection)}/{len(roster.characters())} cartas"))
         last = p.last_training if p.last_training in REGISTRY else ""
         again = mg[last]["title"] if last else ""
         buttons.append(ui.Button((x0, y0 + 326, 580, 52), "Treinar de novo", lambda: self._train(last), enabled=bool(last),
@@ -76,8 +77,8 @@ class HubScene(Scene):
             self._build()
 
     def _change_char(self) -> None:
-        from scenes.character_select import CharacterSelectScene
-        self.game.scenes.push(CharacterSelectScene(self.game, new_game=False), fade="slide")
+        from scenes.collection import CollectionScene
+        self.game.scenes.push(CollectionScene(self.game), fade="slide")
 
     def _stats(self) -> None:
         from scenes.stats import StatsScene

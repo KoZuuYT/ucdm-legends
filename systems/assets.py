@@ -13,6 +13,8 @@ import pygame
 
 from core import paths
 
+PIXEL_PREFIXES = ("sprites/characters/skin_", "mc/")      # pixel-art: escala inteira (vizinho mais próximo)
+
 
 class AssetManager:
     def __init__(self, scaled_cache_bytes: int = 96 * 1024 * 1024) -> None:
@@ -78,8 +80,13 @@ class AssetManager:
             return surf
         src = self.image(rel)
         w, h = src.get_size()
-        width = max(1, round(w * height / max(h, 1)))
-        surf = pygame.transform.smoothscale(src, (width, height))
+        if rel.startswith(PIXEL_PREFIXES) and h <= 128:         # pixel-art: escala inteira, sem suavizar
+            k = max(1, round(height / h))
+            height, width = h * k, w * k
+            surf = pygame.transform.scale(src, (width, height))
+        else:
+            width = max(1, round(w * height / max(h, 1)))
+            surf = pygame.transform.smoothscale(src, (width, height))
         if flip:
             surf = pygame.transform.flip(surf, True, False)
         self._scaled[key] = surf
