@@ -5,12 +5,15 @@ e troca de tela deve ter resposta visual **e** sonora, com animações dinâmica
 arte de apresentação (thumbnails, cartões, telas de título) e conteúdo criativo que dê identidade
 a cada cenário.
 
-> **Status (v0.2.0, sem release publicada):** implementado: base de feedback (`core/feedback.py`, `systems/tween.py`,
-> `feedback.json`), hitstop/câmera lenta no KO, tremor, flash limitado a 3/s, ondas de choque, números de dano com "pop",
-> rastro de esquiva, barras de vida fantasma, borda vermelha no golpe imbloqueável, 26 sons e 4 músicas gerados por
-> `tools/make_sfx.py`, transições `fade`/`slide`/`iris`, botões animados, toasts, painéis que entram animados, opção *reduzir movimento*.
-> **Ficou para depois:** thumbnails (`tools/make_thumbs.py`), fundos com parallax/partículas ambientes por tema, cartões de
-> personagem animados, ícones de atributo, ducking além do KO/parry, variação de pitch (hoje há variações de arquivo) e zoom de câmera no KO.
+> **Status (v0.2.0 e v0.3.0):** tudo o que o plano previa foi implementado, exceto o que está listado abaixo como "fora".
+> v0.2.0: base de feedback (`core/feedback.py`, `systems/tween.py`, `feedback.json`), hitstop, câmera lenta no KO, tremor, flash limitado a
+> 3/s, ondas de choque, números de dano com "pop", rastro de esquiva, barras fantasma, borda vermelha no golpe imbloqueável, 26 sons e 4 músicas
+> (`tools/make_sfx.py`), transições `fade`/`slide`/`iris`, botões animados, toasts e *reduzir movimento*.
+> v0.3.0: miniaturas (`tools/make_thumbs.py`), cartões de personagem animados (moldura na cor do personagem, brilho e "respiração"),
+> fundos em camadas com parallax e partículas ambiente por tema (`systems/backdrop.py`, `systems/ambient.py`), ícones de atributo
+> (`core/icons.py`), zoom de câmera no KO, variação de tom nos sons (3 versões por som), música abaixa na pausa, no nível novo, no KO e no parry.
+> **Fora:** arte de fundo pintada à mão (os fundos continuam procedurais; `assets/sprites/backgrounds/<tema>.png` substitui), logo animado
+> da tela de título e contador de combo (o jogo não tem combo visível).
 > As decisões da seção 6 foram tomadas assim: sons gerados por código, UI no estilo atual.
 
 Planejamento original:

@@ -2,6 +2,9 @@
 
 Demonstra culling de UI: com 160+ personagens, só as linhas visíveis são
 desenhadas e só as miniaturas visíveis são geradas (cache LRU no AssetManager)."""
+import colorsys
+import math
+
 import pygame
 
 from core import ui
@@ -21,6 +24,8 @@ class CharacterSelectScene(Scene):
         current = game.profile.character if game.profile else game.cfg.get("default_character")
         self.index = next((i for i, c in enumerate(self.chars) if c["id"] == current), 0)
         self.scroll = 0.0
+        self.t = 0.0
+        self._tint: dict[str, tuple] = {}
         self.drawn = 0
         rows = (len(self.chars) + COLS - 1) // COLS
         self.max_scroll = max(0, rows * CELL_H - GRID_H)
@@ -50,12 +55,26 @@ class CharacterSelectScene(Scene):
     def exit(self) -> None:
         # libera as imagens originais; miniaturas ficam no LRU e expiram sozinhas
         self.game.assets.unload("sprites/characters/")
+        self.game.assets.unload("sprites/thumbs/")
 
     def _cell_rect(self, i: int) -> pygame.Rect:
         r, c = divmod(i, COLS)
         return pygame.Rect(GRID_X + c * CELL_W, GRID_Y + r * CELL_H - int(self.scroll), CELL_W - 10, CELL_H - 10)
 
+    def _color_of(self, char: dict) -> tuple:
+        """Cor da moldura: tom médio da arte, mais vivo (calculada uma vez por personagem)."""
+        c = self._tint.get(char["id"])
+        if c is None:
+            img = self.game.assets.image(self.game.assets.thumb_path(char))
+            r, g, b, a = pygame.transform.average_color(img, consider_alpha=True)
+            k = max(a, 1) / 255
+            h, s, v = colorsys.rgb_to_hsv(min(r / k, 255) / 255, min(g / k, 255) / 255, min(b / k, 255) / 255)
+            c = tuple(int(x * 255) for x in colorsys.hsv_to_rgb(h, min(1.0, 0.35 + s), max(0.75, v)))
+            self._tint[char["id"]] = c
+        return c
+
     def update(self, dt: float) -> None:
+        self.t += dt
         inp = self.game.input
         n = len(self.chars)
         moved = True
@@ -101,24 +120,34 @@ class CharacterSelectScene(Scene):
         last_row = int((self.scroll + GRID_H) // CELL_H)
         small = assets.font(15, bold=False)
         self.drawn = 0
+        reduce = self.game.feedback.reduce_motion or self.game.low_perf
         for i in range(first_row * COLS, min(len(self.chars), (last_row + 1) * COLS)):   # culling
             rect = self._cell_rect(i)
             sel = i == self.index
-            pygame.draw.rect(surf, (70, 64, 40) if sel else (44, 46, 62), rect, border_radius=10)
-            pygame.draw.rect(surf, ui.ACCENT if sel else (80, 84, 100), rect, 3 if sel else 1, border_radius=10)
-            img = assets.image_h(self.chars[i]["sprite"], 110)
-            if img.get_width() > rect.width - 10:
-                img = assets.image_h(self.chars[i]["sprite"], int(110 * (rect.width - 10) / img.get_width()))
+            ch = self.chars[i]
+            tint = self._color_of(ch)
+            if sel:      # cartão do foco: brilho pulsando na cor do personagem + moldura colorida
+                pulse = 0.5 + 0.5 * math.sin(self.t * 4) if not reduce else 1.0
+                glow = pygame.Surface((rect.w + 24, rect.h + 24), pygame.SRCALPHA)
+                pygame.draw.rect(glow, (*tint, int(40 + 50 * pulse)), glow.get_rect(), border_radius=18)
+                surf.blit(glow, glow.get_rect(center=rect.center))
+            base = tuple(int(c * 0.22) + 24 for c in tint) if sel else (44, 46, 62)
+            pygame.draw.rect(surf, base, rect, border_radius=10)
+            pygame.draw.rect(surf, tint if sel else (80, 84, 100), rect, 3 if sel else 1, border_radius=10)
+            size = 110
+            if sel and not reduce:      # "respira" (1.0 -> 1.06) só no selecionado
+                size = int(110 * (1.03 + 0.03 * math.sin(self.t * 3)))
+            img = assets.image_h(assets.thumb_path(ch), size)
             surf.blit(img, img.get_rect(midbottom=(rect.centerx, rect.bottom - 30)))
-            ui.text(surf, small, self.chars[i]["name"][:16], (rect.centerx, rect.bottom - 22), anchor="midtop",
-                    shadow=False)
+            ui.text(surf, small, ch["name"][:16], (rect.centerx, rect.bottom - 22), anchor="midtop", shadow=False)
             self.drawn += 1
         surf.set_clip(None)
         # painel de preview
         c = self.chars[self.index]
-        big = assets.image_h(c["sprite"], 300)
+        bh = 300 if reduce else int(300 * (1 + 0.012 * math.sin(self.t * 2)))
+        big = assets.image_h(c["sprite"], bh)
         if big.get_width() > 290:
-            big = assets.image_h(c["sprite"], int(300 * 290 / big.get_width()))
+            big = assets.image_h(c["sprite"], int(bh * 290 / big.get_width()))
         surf.blit(big, big.get_rect(midbottom=(1280 - 185, 560)))
         ui.text(surf, assets.font(30), c["name"], (1280 - 185, 120), anchor="midtop")
         self.confirm_btn.draw(surf, assets.font(32), True)

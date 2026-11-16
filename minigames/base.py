@@ -9,7 +9,8 @@ import random
 
 import pygame
 
-from core import config, ui
+from core import config, icons, ui
+from core.i18n import tr
 from core.input import VirtualButton
 from core.scene import Scene
 from entities import roster
@@ -60,6 +61,9 @@ class TrainingGame(Scene):
         self.objs: Pool[Obj] = Pool(Obj, 48)
         self.fx = ParticleSystem(400)
         self.shake = 0.0
+        self.scenery = backdrop.Scenery(game, self.theme, self.PLAYER_POS[1])
+        self.fx.scale = 0.4 if game.low_perf else min(1.5, game.feedback.intensity)
+        self.clock = 0.0
         self.font = game.assets.font(30)
         self.small = game.assets.font(20)
         self.big = game.assets.font(72)
@@ -89,7 +93,7 @@ class TrainingGame(Scene):
         self.combo += 1
         self.best_combo = max(self.best_combo, self.combo)
         self.fx.burst(x, y, color, n=10, speed=220, gravity=500)
-        self.fx.text(x, y - 30, self.small.render(f"{label} +{pts}".strip(), True, color))
+        self.fx.text(x, y - 30, self.small.render(f"{tr(label)} +{pts}".strip(), True, color))
         self.game.audio.play("hit")
 
     def fail(self, x: float, y: float, label: str = "ERROU") -> None:
@@ -97,7 +101,7 @@ class TrainingGame(Scene):
         self.lives -= 1
         self.shake = 0.25 if self.game.feedback.shake_power("hit") > 0 else 0.0
         self.fx.burst(x, y, ui.RED, n=16, speed=280)
-        self.fx.text(x, y - 30, self.small.render(label, True, ui.RED))
+        self.fx.text(x, y - 30, self.small.render(tr(label), True, ui.RED))
         self.game.audio.play("miss")
         if self.lives <= 0:
             self.finish()
@@ -134,6 +138,7 @@ class TrainingGame(Scene):
 
     def update(self, dt: float) -> None:
         inp = self.game.input
+        self.clock += dt
         self.fx.update(dt)
         self.shake = max(0.0, self.shake - dt)
         if self.finished:
@@ -170,6 +175,7 @@ class TrainingGame(Scene):
         self.finished = True
         prof = self.game.profile
         prof.bump("trainings")
+        prof.last_training = self.key
         bonus = 1 + 0.05 * (self.level - 1)
         xp = int(self.score * self.cfg["xp_per_point"] * bonus)
         gold = int(self.score * self.cfg["gold_per_point"])
@@ -187,6 +193,7 @@ class TrainingGame(Scene):
         if levels:
             lines.append(f"{label} subiu para o nível {prof.level(self.stat)}!")
             self.game.audio.play("levelup")
+            self.game.audio.duck(1.2)
         from scenes.results import ResultsOverlay
         self.game.scenes.push(ResultsOverlay(self.game, self.cfg["title"], lines,
                                              on_close=lambda: self.game.scenes.pop(fade=True)))
@@ -199,7 +206,7 @@ class TrainingGame(Scene):
             if getattr(self, "_buf", None) is None or self._buf.get_size() != (W, H):
                 self._buf = pygame.Surface((W, H))
             surf = self._buf
-        surf.blit(backdrop.build(self.theme, (W, H), self.PLAYER_POS[1], self.game.assets), (0, 0))
+        self.scenery.draw(surf, self.clock)
         self.draw_player(surf)
         self.draw_objects(surf)
         self.fx.draw(surf)
@@ -211,7 +218,9 @@ class TrainingGame(Scene):
 
     def draw_hud(self, surf: pygame.Surface) -> None:
         W = surf.get_width()
-        ui.text(surf, self.font, self.cfg["title"], (W // 2, 14), anchor="midtop")
+        r = ui.text(surf, self.font, self.cfg["title"], (W // 2 + 16, 14), anchor="midtop")
+        bal = config.load("balance")["stats"][self.stat]
+        surf.blit(icons.stat_icon(self.stat, 28, ui.stat_color(self.stat, bal["color"])), (r.left - 38, 15))
         ui.bar(surf, (W // 2 - 200, 56, 400, 16), 1 - self.progress, ui.BLUE)
         ui.text(surf, self.font, f"{self.score}", (24, 16))
         ui.text(surf, self.small, f"combo {self.combo}  x{self.multiplier}", (24, 54), ui.ACCENT)

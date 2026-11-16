@@ -34,9 +34,19 @@ python main.py
 - **3 slots de save** (menu → *Saves*): jogar, novo jogo, renomear treinador, copiar para outro slot, exportar
   (`%APPDATA%\UCDM\exports\*.ucdmsave`), importar o arquivo mais recente dessa pasta e apagar (segure o botão para confirmar).
   O save antigo continua no Slot 1. Antes de migrar um save de formato antigo, o jogo guarda `slotN.vX.bak`.
-- **Opções** (menu ou Campo de Treino): tela cheia, limite de FPS, volumes, **remapear teclas** (Esc é reservado),
-  dificuldade (fácil/normal/difícil), aviso do golpe imbloqueável mais longo, pausar ao perder o foco e acessibilidade
-  (intensidade dos efeitos, tremor, flashes, congelar no impacto e *reduzir movimento*). Só a chave alterada vai para `settings.json`.
+- **Opções** (menu ou Campo de Treino), em 5 abas:
+  - *Vídeo*: tela cheia, limite de FPS, VSync, contador de FPS e **modo de baixo desempenho** (menos partículas e sem fundos animados).
+  - *Áudio*: volume de música e de efeitos.
+  - *Controles*: **remapear teclas** (Esc é reservado). Controle/gamepad: A confirma/ataca, B esquiva, X defende, Start volta.
+  - *Acessibilidade*: tamanho do texto, alto contraste, paleta para daltonismo (laranja/azul), *reduzir movimento*, intensidade dos efeitos,
+    tremor, flashes, congelar no impacto e aviso do golpe imbloqueável mais longo.
+  - *Jogo*: dificuldade, pausar ao perder o foco, **idioma** (Português/English), aviso de atualização com o jogo aberto,
+    **verificar arquivos do jogo** (com reparo no jogo instalado) e copiar informações do sistema (sem dados pessoais).
+  Só a chave alterada vai para `settings.json`.
+- **Idiomas**: `assets/data/lang/<código>.json` (tabelas "texto em português → tradução"; trechos variáveis com `{}`).
+  Texto sem tradução aparece em português. Mods podem adicionar idiomas em `mods/<mod>/data/lang/`.
+- **Novidades**: depois de atualizar, o menu mostra as notas da versão uma vez. Com o jogo aberto, ele checa a cada 30 min e só *avisa*
+  (botão "Atualizar agora" no menu); nunca reinicia sozinho.
 - **Ajuda**: tutorial na primeira vez (pulável), *Ajuda* no Campo de Treino e **Estatísticas** (parries, esquivas, críticos, recordes, diário da arena).
 - **Sons e músicas** são gerados por `python tools/make_sfx.py` (sem licença). Troque qualquer arquivo em `assets/audio/`
   ou aponte outro em `game.json → audio`.
@@ -51,7 +61,7 @@ scenes/      boot/update, menu, seleção de personagem, hub, arena, overlays
 network/     checagem de versão, download seguro e aplicação de updates via GitHub
 installer/   instalador gráfico, desinstalador e patcher (só stdlib + tkinter) e o script que monta o Release
 assets/      data/*.json (todo o balanceamento), sprites/, audio/, fonts/
-tools/       import_characters.py, make_installer_art.py, make_sfx.py
+tools/       import_characters.py, make_installer_art.py, make_sfx.py, make_thumbs.py
 ```
 
 **Desempenho**

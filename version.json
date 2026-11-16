@@ -1,4 +1,4 @@
 {
-  "version": "0.2.0",
-  "notes": "Atualização Visual e Qualidade de Vida. Efeitos de impacto (congelamento no golpe, tremor, ondas de choque, flash, rastro de esquiva, números de dano animados), sons e músicas, transições novas e botões animados. Três slots de save com seletor (renomear, copiar, exportar/importar, apagar com confirmação), tela de Opções (vídeo, áudio, remapear teclas, dificuldade, acessibilidade), pausa, tutorial, estatísticas e diário da arena. Seu save atual continua no Slot 1."
+  "version": "0.3.0",
+  "notes": "Mais conteúdo visual e de qualidade de vida. Fundos com camadas em movimento e partículas ambiente, miniaturas e cartões animados na seleção de personagem, ícones de atributo e zoom no nocaute. Sons com variação de tom. Opções novas: idioma (Português e English), tamanho do texto, alto contraste, paleta para daltonismo, modo de baixo desempenho e controle/gamepad. Botão Treinar de novo no hub, aviso de atualização com o jogo aberto, novidades da versão no menu, verificação e reparo dos arquivos do jogo e cópia das informações do sistema."
 }

@@ -87,6 +87,7 @@ class Fighter(Entity):
         self.flash = 0.0
         self.anim_t = random.random() * 10
         self._flash_cache: dict = {}
+        self.ghosts_on = True               # desligado no modo de baixo desempenho
         self.ghosts: list[list] = []         # rastro de esquiva: [x, y, vida, superfície]
         self._ghost_cd = 0.0
 
@@ -256,7 +257,7 @@ class Fighter(Entity):
             img.set_alpha(140)
 
         # rastro de esquiva (até 5 "fantasmas" que somem)
-        if s == "dodge" and self._ghost_cd <= 0 and len(self.ghosts) < 5:
+        if s == "dodge" and self.ghosts_on and self._ghost_cd <= 0 and len(self.ghosts) < 5:
             self._ghost_cd = 0.045
             self.ghosts.append([self.pos.x, self.pos.y, 0.22, img.copy()])
         for gx, gy, life, gimg in self.ghosts:

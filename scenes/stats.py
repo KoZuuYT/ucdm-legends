@@ -12,6 +12,7 @@ class StatsScene(Scene):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.t = 0.0
+        self.scenery = backdrop.Scenery(game, "night", 600)
 
     def update(self, dt: float) -> None:
         self.t += dt
@@ -24,7 +25,7 @@ class StatsScene(Scene):
         W, H = surf.get_size()
         a = self.game.assets
         p = self.game.profile
-        surf.blit(backdrop.build("night", (W, H), 600, a), (0, 0))
+        self.scenery.draw(surf, self.t)
         ui.text(surf, a.font(52), "Estatísticas", (W // 2, 24), ui.ACCENT, "midtop")
         c = p.counters
         ui.panel(surf, (40, 100, 560, 560))

@@ -171,8 +171,32 @@ def music() -> dict[str, list[float]]:
     }
 
 
+PITCHED = ("crit", "parry", "miss", "coin", "click", "hover", "confirm", "back", "levelup", "ko", "pause")
+PITCH_FACTORS = (1.0, 0.93, 1.08)     # 3 variações de tom (o jogo sorteia uma por vez)
+
+
+def shift(samples: list[float], factor: float) -> list[float]:
+    """Muda o tom (e a duração) por reamostragem linear."""
+    n = int(len(samples) / factor)
+    out = []
+    for i in range(n):
+        pos = i * factor
+        j = int(pos)
+        frac = pos - j
+        a = samples[j]
+        b = samples[j + 1] if j + 1 < len(samples) else 0.0
+        out.append(a + (b - a) * frac)
+    return out
+
+
 def main() -> None:
+    for old in (OUT / "sfx").glob("*.wav"):
+        old.unlink()
     for name, data in sfx().items():
+        if name in PITCHED:
+            for k, f in enumerate(PITCH_FACTORS):
+                _write(OUT / "sfx" / f"{name}{k + 1}.wav", shift(data, f))
+            continue
         _write(OUT / "sfx" / f"{name}.wav", data)
     for name, data in music().items():
         _write(OUT / "music" / f"{name}.wav", data)

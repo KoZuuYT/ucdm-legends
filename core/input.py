@@ -12,6 +12,11 @@ import pygame
 
 DIRECTIONS = ("left", "right", "up", "down")
 
+# Gamepad (layout Xbox/SDL): A confirma/ataca, B esquiva, X defende, Y ataca, LB defende, RB esquiva, Start/Back voltam.
+GAMEPAD_BUTTONS = {0: ("confirm", "attack"), 1: ("dodge",), 2: ("block",), 3: ("attack",), 4: ("block",),
+                   5: ("dodge",), 6: ("back",), 7: ("back",)}
+STICK_DEADZONE = 0.5
+
 
 @dataclass
 class Pointer:
@@ -40,6 +45,8 @@ class InputManager:
         self.display = display
         self._key_to_actions: dict[int, list[str]] = {}
         self.bindings: dict[str, list[str]] = {}
+        self._pads: dict[int, "pygame.joystick.JoystickType"] = {}    # mantém os controles vivos
+        self._pad_dirs: dict[str, set[str]] = {"hat": set(), "stick": set()}
         self.capture = False                 # True: próxima tecla vira `captured` (tela de rebind)
         self.captured: str | None = None
         self.set_bindings(bindings)
@@ -186,8 +193,55 @@ class InputManager:
             self.taps.append(pos)
         # senão foi um "arrasto" (scroll), tratado via drag_delta
 
+    def _pad_update_dirs(self, source: str, dirs: set[str]) -> None:
+        """Direções do controle (hat e analógico) viram as mesmas ações do teclado."""
+        before = set().union(*self._pad_dirs.values())
+        self._pad_dirs[source] = dirs
+        after = set().union(*self._pad_dirs.values())
+        for d in after - before:
+            self._press(d)
+        for d in before - after:
+            self._release(d)
+
+    def _process_pad(self, event: pygame.event.Event) -> bool:
+        t = event.type
+        if t == pygame.JOYDEVICEADDED:
+            try:
+                pad = pygame.joystick.Joystick(event.device_index)
+                self._pads[pad.get_instance_id()] = pad
+            except pygame.error:
+                pass
+        elif t == pygame.JOYDEVICEREMOVED:
+            self._pads.pop(getattr(event, "instance_id", -1), None)
+            self._pad_update_dirs("hat", set())
+            self._pad_update_dirs("stick", set())
+        elif t in (pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+            self.touch_mode = False
+            for a in GAMEPAD_BUTTONS.get(event.button, ()):
+                (self._press if t == pygame.JOYBUTTONDOWN else self._release)(a)
+        elif t == pygame.JOYHATMOTION:
+            self.touch_mode = False
+            x, y = event.value
+            self._pad_update_dirs("hat", {d for d, on in (("left", x < 0), ("right", x > 0), ("up", y > 0), ("down", y < 0)) if on})
+        elif t == pygame.JOYAXISMOTION and event.axis in (0, 1):
+            cur = {d for d in self._pad_dirs["stick"]}
+            if event.axis == 0:
+                cur -= {"left", "right"}
+                if abs(event.value) > STICK_DEADZONE:
+                    cur.add("right" if event.value > 0 else "left")
+            else:
+                cur -= {"up", "down"}
+                if abs(event.value) > STICK_DEADZONE:
+                    cur.add("down" if event.value > 0 else "up")
+            self._pad_update_dirs("stick", cur)
+        else:
+            return False
+        return True
+
     def process(self, event: pygame.event.Event) -> None:
         t = event.type
+        if self._process_pad(event):
+            return
         if t == pygame.QUIT:
             self.quit_requested = True
         elif t == pygame.KEYDOWN:

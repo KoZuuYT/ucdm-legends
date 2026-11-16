@@ -7,10 +7,10 @@ import json
 
 import pygame
 
-from core import paths, settings, ui
+from core import i18n, paths, settings, sysinfo, ui
 from core.scene import Scene
 
-TABS = ("Vídeo", "Áudio", "Controles", "Jogo")
+TABS = ("Vídeo", "Áudio", "Controles", "Acessibilidade", "Jogo")
 BIND_ACTIONS = (("left", "Esquerda"), ("right", "Direita"), ("up", "Cima"), ("down", "Baixo"),
                 ("attack", "Atacar"), ("block", "Defender"), ("dodge", "Esquivar"), ("confirm", "Confirmar"))
 RESERVED = {"escape"}
@@ -86,7 +86,6 @@ class OptionsScene(Scene):
 
     # --- montagem ---------------------------------------------------------------------------
     def _build(self) -> None:
-        g = self.game
         if self.tab == 0:
             self.rows = [
                 Row("Tela cheia", "bool", "display.fullscreen"),
@@ -94,23 +93,38 @@ class OptionsScene(Scene):
                                                                           for v in FPS_CHOICES]),
                 Row("VSync", "bool", "display.vsync", note="vale ao reiniciar o jogo"),
                 Row("Contador de FPS", "bool", "display.show_fps", note="também no F3"),
+                Row("Modo de baixo desempenho", "bool", "performance.low_mode",
+                    note="menos partículas, sem animações de fundo"),
             ]
         elif self.tab == 1:
             self.rows = [Row("Música", "slider", "audio.music_volume"), Row("Efeitos", "slider", "audio.sfx_volume")]
         elif self.tab == 2:
             self.rows = [Row(label, "bind", key=action) for action, label in BIND_ACTIONS]
+            self.rows.append(Row("Controle: A confirma/ataca · B esquiva · X defende · Start volta", "info"))
             self.rows.append(Row("Restaurar teclas padrão", "action", action=self._reset_keys))
-        else:
+        elif self.tab == 3:
             self.rows = [
-                Row("Dificuldade", "choice", "gameplay.difficulty", choices=list(DIFFICULTY),
-                    note="muda dano do inimigo e janela de parry"),
-                Row("Aviso do golpe (!!) mais longo", "bool", "gameplay.extended_warning"),
-                Row("Pausar ao perder o foco", "bool", "gameplay.auto_pause"),
+                Row("Tamanho do texto", "choice", "accessibility.text_scale",
+                    choices=[(0.9, "Pequeno"), (1.0, "Normal"), (1.12, "Grande")]),
+                Row("Alto contraste", "bool", "accessibility.high_contrast", note="contorno e bordas mais fortes"),
+                Row("Paleta para daltonismo", "bool", "accessibility.colorblind", note="laranja/azul em vez de vermelho/verde"),
+                Row("Reduzir movimento", "bool", "feedback.reduce_motion", note="desliga tremor, flash, zoom e fundos animados"),
                 Row("Intensidade dos efeitos", "slider", "feedback.intensity", lo=0.0, hi=1.5, step=0.25),
                 Row("Tremor de tela", "bool", "feedback.screen_shake"),
                 Row("Flashes de tela", "bool", "feedback.flash"),
                 Row("Congelar no impacto", "bool", "feedback.hitstop"),
-                Row("Reduzir movimento", "bool", "feedback.reduce_motion", note="desliga tremor, flash e câmera lenta"),
+                Row("Aviso do golpe (!!) mais longo", "bool", "gameplay.extended_warning"),
+            ]
+        else:
+            langs = i18n.available()
+            self.rows = [
+                Row("Dificuldade", "choice", "gameplay.difficulty", choices=list(DIFFICULTY),
+                    note="muda dano do inimigo e janela de parry"),
+                Row("Pausar ao perder o foco", "bool", "gameplay.auto_pause"),
+                Row("Idioma", "choice", "language", choices=langs, note="textos sem tradução ficam em português"),
+                Row("Avisar de atualizações com o jogo aberto", "bool", "update.background_check"),
+                Row("Verificar arquivos do jogo", "action", action=self._integrity),
+                Row("Copiar informações do sistema", "action", action=self._sysinfo),
                 Row("Ver tutorial", "action", action=self._help),
                 Row("Créditos", "action", action=self._credits),
             ]
@@ -135,6 +149,18 @@ class OptionsScene(Scene):
     def _credits(self) -> None:
         from scenes.help import CreditsOverlay
         self.game.scenes.push(CreditsOverlay(self.game))
+
+    def _integrity(self) -> None:
+        from scenes.integrity import IntegrityOverlay
+        self.game.scenes.push(IntegrityOverlay(self.game))
+
+    def _sysinfo(self) -> None:
+        text = sysinfo.collect(self.game)
+        if sysinfo.copy_to_clipboard(text):
+            self.game.feedback.toast("Informações copiadas para a área de transferência.", ui.GREEN, 3.5)
+        else:
+            path = sysinfo.save_to_file(text)
+            self.game.feedback.toast(f"Salvo em logs/{path.name}", ui.GREEN, 3.5)
 
     def _reset_tab(self) -> None:
         for r in self.rows:
@@ -270,7 +296,7 @@ class OptionsScene(Scene):
             ui.sfx("click")
 
     def _tab_rects(self) -> list[pygame.Rect]:
-        return [pygame.Rect(150 + i * 246, 130, 236, 52) for i in range(len(TABS))]
+        return [pygame.Rect(150 + i * 197, 130, 187, 52) for i in range(len(TABS))]
 
     @staticmethod
     def _slider_rect(r: Row) -> pygame.Rect:
@@ -291,7 +317,7 @@ class OptionsScene(Scene):
             pygame.draw.rect(surf, (90, 80, 46) if sel else (44, 46, 62), rect, border_radius=10)
             pygame.draw.rect(surf, ui.ACCENT if (sel and self.in_tabs) else (120, 120, 140), rect,
                              3 if (sel and self.in_tabs) else 1, border_radius=10)
-            ui.text(surf, a.font(28), TABS[i], rect.center, ui.WHITE if sel else (180, 180, 190), "center")
+            ui.text(surf, a.font(22), TABS[i], rect.center, ui.WHITE if sel else (180, 180, 190), "center")
         small = a.font(18, bold=False)
         for i, r in enumerate(self.rows):
             focused = i == self.focus and not self.in_tabs
@@ -335,6 +361,8 @@ class OptionsScene(Scene):
             pygame.draw.rect(surf, ui.ACCENT, fill, border_radius=8)
             pygame.draw.circle(surf, ui.WHITE, (fill.right, track.centery), 12)
             ui.text(surf, font, f"{int(round(v * 100))}%", (right, r.rect.centery), anchor="midright")
+        elif r.kind == "info":
+            pass
         elif r.kind == "bind":
             for slot in (0, 1):
                 box = pygame.Rect(r.rect.x + 560 + slot * 200, r.rect.centery - 17, 180, 34)

@@ -185,8 +185,10 @@ def _read_manifest(d: Path) -> set[str]:
 
 def write_manifest(root: Path, version: str) -> Path:
     files = sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file() and p.name != MANIFEST)
+    # "hashes" (sha256 de cada arquivo) permite ao jogo verificar a instalação; manifests antigos só têm "files".
+    hashes = {rel: sha256_file(root / rel) for rel in files}
     out = root / MANIFEST
-    out.write_text(json.dumps({"version": version, "files": files}, indent=1), encoding="utf-8")
+    out.write_text(json.dumps({"version": version, "files": files, "hashes": hashes}, indent=1), encoding="utf-8")
     return out
 
 

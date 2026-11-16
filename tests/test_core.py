@@ -216,6 +216,7 @@ class SettingsAndInstallerTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 sc.uninstall(d / "ocupada", False, log=lambda m: None)    # nunca apaga pasta que não é do jogo
             self.assertTrue((d / "ocupada" / "foto.jpg").exists())
+        (sc.user_dir() / "settings.json").unlink(missing_ok=True)      # outros testes compartilham a pasta de usuário
         sc.save_settings({"display": {"vsync": False}})
         sc.save_settings({"audio": {"music_volume": 0.1}})
         saved = json.loads((sc.user_dir() / "settings.json").read_text(encoding="utf-8"))

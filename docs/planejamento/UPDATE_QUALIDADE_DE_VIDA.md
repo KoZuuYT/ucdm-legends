@@ -4,14 +4,17 @@ Objetivo: tirar atrito do dia a dia do jogador. Menos clique perdido, menos medo
 progresso, mais controle sobre o jogo (saves, opções, teclas, acessibilidade) e informação clara
 sobre o que está acontecendo.
 
-> **Status (v0.2.0, sem release publicada):** implementado: 3 slots com seletor (renomear, copiar, exportar/importar,
-> apagar segurando o botão), backup por versão e recuperação pelo `.bak`, indicador "Salvo", tela de Opções
-> (vídeo, áudio, rebind de teclas, dificuldade, aviso estendido, acessibilidade), pausa (Esc e perda de foco),
-> saída com confirmação, tutorial da primeira vez + Ajuda, estatísticas, recordes e diário da arena, créditos.
-> **Ficou para depois:** atualização em segundo plano, notas da versão no menu, verificação de integridade dos assets,
-> botão "copiar informações do sistema", modo de baixo desempenho, tamanho de texto/paleta daltônica/alto contraste,
-> idiomas, "Treinar de novo" no hub, navegação por gamepad e confirmar "Novo jogo" sobre slot usado (o seletor só
-> permite novo jogo em slot vazio, então a sobrescrita não acontece). Importar usa o arquivo mais recente de `exports/`.
+> **Status (v0.2.0 e v0.3.0):** o plano foi implementado por completo, com as diferenças listadas no fim deste aviso.
+> v0.2.0: 3 slots com seletor, backup por versão, recuperação pelo `.bak`, "Salvo", Opções, rebind, pausa, saída com confirmação,
+> tutorial, Ajuda, estatísticas, recordes, diário da arena e créditos.
+> v0.3.0: atualização em segundo plano (só avisa), novidades da versão no menu, verificação de integridade com reparo (`network/integrity.py`,
+> `scenes/integrity.py`; o `manifest.json` agora tem SHA-256 de cada arquivo), copiar informações do sistema (`core/sysinfo.py`, sem dados
+> pessoais), modo de baixo desempenho, tamanho do texto, alto contraste, paleta para daltonismo, idiomas (`core/i18n.py` + `lang/en.json`),
+> "Treinar de novo" no hub e navegação por controle/gamepad.
+> **Diferenças:** "Novo jogo" só existe em slot vazio (apagar exige segurar o botão), então não há sobrescrita a confirmar;
+> importar usa o `.ucdmsave` mais recente de `exports/` (sem seletor de arquivo); a tradução em inglês cobre os menus, o tutorial, as
+> estatísticas e os treinos, e o que não tiver tradução aparece em português; o reparo e a verificação de hashes só funcionam no jogo instalado
+> e em versões geradas a partir da v0.3.0 (manifests antigos só confirmam se os arquivos existem).
 
 Planejamento original:
 

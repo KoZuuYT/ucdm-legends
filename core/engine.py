@@ -5,7 +5,7 @@ import time
 
 import pygame
 
-from core import config, paths, settings, ui
+from core import config, i18n, paths, settings, ui
 from core.display import Display
 from core.events import EventBus
 from core.feedback import Feedback
@@ -43,10 +43,14 @@ class Game:
         self.save = SaveManager(self.slot, on_saved=self.feedback.saved)
         self.profile = None  # entities.progression.Profile, definido no menu
         ui.sound_hook = self.audio.play   # botões tocam hover/click sem conhecer o jogo
+        self._apply_look()
 
         self.tick_rate = disp.get("tick_rate", 60)
         self.fps_cap = disp.get("fps_cap", 144) or 0   # 0 = sem limite
         self.show_debug = bool(disp.get("show_fps", False))
+        self.update_notice: str | None = None       # versão nova encontrada pela checagem em segundo plano
+        self._bg_task = None
+        self._bg_timer = float(self.cfg.get("update", {}).get("background_minutes", 30)) * 60
         self.running = False
         self.time = 0.0
         self.fps = 0.0
@@ -61,6 +65,18 @@ class Game:
         self.save = self._SaveManager(slot, on_saved=self.feedback.saved)
         settings.set_value("last_slot", slot)
 
+    @property
+    def low_perf(self) -> bool:
+        return bool(self.cfg.get("performance", {}).get("low_mode", False))
+
+    def _apply_look(self) -> None:
+        """Idioma, tamanho de texto, contraste e paleta (Opções -> Acessibilidade)."""
+        acc = self.cfg.get("accessibility", {})
+        i18n.set_language(self.cfg.get("language", i18n.DEFAULT))
+        ui.apply_accessibility(colorblind_mode=acc.get("colorblind", False),
+                               high_contrast_mode=acc.get("high_contrast", False))
+        self.assets.set_font_scale(acc.get("text_scale", 1.0))
+
     def apply_settings(self) -> None:
         """Relê settings.json e aplica o que dá para mudar sem reiniciar."""
         self.cfg = config.load("game", reload=True)
@@ -73,6 +89,27 @@ class Game:
         self.audio.apply_volumes()
         self.feedback.reload(self.cfg)
         self.input.set_bindings(self.cfg["input"])
+        self._apply_look()
+
+    def _background_update(self, dt: float) -> None:
+        """A cada N minutos checa se há versão nova (thread). Só AVISA: nunca baixa nem reinicia sozinho."""
+        cfg = self.cfg.get("update", {})
+        if self.headless or not cfg.get("background_check", True) or self.update_notice:
+            return
+        task = self._bg_task
+        if task is not None:
+            if task.state == "available" and task.info:
+                self.update_notice = task.info.version
+                self.feedback.toast(f"Versão {task.info.version} disponível! Veja no menu principal.", (255, 196, 64), 5.0)
+            if task.state in ("none", "error", "available", "idle"):
+                self._bg_task = None
+            return
+        self._bg_timer -= dt
+        if self._bg_timer <= 0:
+            from network.updater import UpdateTask
+            self._bg_timer = float(cfg.get("background_minutes", 30)) * 60
+            self._bg_task = UpdateTask(cfg)
+            self._bg_task.start_check()
 
     def run(self, first_scene: Scene, *, max_frames: int | None = None) -> None:
         self.scenes.push(first_scene)
@@ -106,6 +143,7 @@ class Game:
             # Lógica a 60 Hz fixos. Ações "pressed" valem só no 1º passo do frame.
             self.feedback.update(frame_dt)
             self.audio.update(frame_dt)
+            self._background_update(frame_dt)
             if self.profile is not None:
                 self.profile.playtime += frame_dt
             scale = self.feedback.time_scale(frame_dt)   # hitstop / câmera lenta (só visual)

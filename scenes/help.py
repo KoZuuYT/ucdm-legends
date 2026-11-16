@@ -46,6 +46,7 @@ class HelpOverlay(_Panel):
             "",
             "Nos treinos, use as setas conforme a seta que aparecer.",
             "Dá para remapear as teclas em Opções > Controles.",
+            "Controle: A confirma/ataca · B esquiva · X defende · Start volta",
         ]
 
     def _combat(self) -> list[str]:

@@ -163,6 +163,10 @@ class SaveSlotsTest(unittest.TestCase):
 
 
 class SettingsApiTest(unittest.TestCase):
+    def setUp(self):
+        paths.SETTINGS_FILE.unlink(missing_ok=True)
+        config.load("game", reload=True)
+
     def tearDown(self):
         paths.SETTINGS_FILE.unlink(missing_ok=True)
         config.load("game", reload=True)
@@ -258,6 +262,10 @@ class GameFlowTest(unittest.TestCase):
         from entities.progression import Profile
         cls.game = Game(headless=True)
         cls.game.profile = Profile(character="kozu")
+
+    def setUp(self):
+        paths.SETTINGS_FILE.unlink(missing_ok=True)
+        self.game.apply_settings()
 
     def tearDown(self):
         paths.SETTINGS_FILE.unlink(missing_ok=True)

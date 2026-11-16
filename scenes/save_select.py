@@ -86,9 +86,7 @@ class SaveSelectScene(Scene):
             s = self.sums[i]
             if s is not None:   # miniatura do personagem do slot
                 try:
-                    img = a.image_h(roster.character(s["character"])["sprite"], 96)
-                    if img.get_width() > 110:
-                        img = a.image_h(roster.character(s["character"])["sprite"], int(96 * 110 / img.get_width()))
+                    img = a.image_h(a.thumb_path(roster.character(s["character"])), 100)
                     surf.blit(img, img.get_rect(midright=(b.rect.right - 24, b.rect.centery)))
                 except (KeyError, StopIteration):
                     pass

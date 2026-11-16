@@ -3,6 +3,7 @@ from typing import Callable
 
 import pygame
 
+from core.i18n import tr
 from core.input import InputManager
 
 WHITE = (240, 240, 240)
@@ -21,14 +22,39 @@ def sfx(name: str) -> None:
         sound_hook(name)
 
 
+# --- acessibilidade -------------------------------------------------------------------------
+_DEFAULT_PALETTE = {"RED": RED, "GREEN": GREEN, "BLUE": BLUE}
+_COLORBLIND = {"RED": (213, 94, 0), "GREEN": (86, 180, 233), "BLUE": (0, 114, 178)}      # Okabe-Ito
+_STAT_CB = {"strength": (213, 94, 0), "defense": (0, 114, 178), "agility": (86, 180, 233), "focus": (240, 228, 66)}
+high_contrast = False
+colorblind = False
+
+
+def apply_accessibility(*, colorblind_mode: bool, high_contrast_mode: bool) -> None:
+    """Troca a paleta (vermelho/verde -> laranja/azul) e liga contorno/bordas mais fortes."""
+    global RED, GREEN, BLUE, high_contrast, colorblind
+    colorblind, high_contrast = bool(colorblind_mode), bool(high_contrast_mode)
+    pal = _COLORBLIND if colorblind else _DEFAULT_PALETTE
+    RED, GREEN, BLUE = pal["RED"], pal["GREEN"], pal["BLUE"]
+
+
+def stat_color(stat: str, base) -> tuple:
+    return _STAT_CB.get(stat, tuple(base)) if colorblind else tuple(base)
+
+
 def _mix(a, b, k):
     return tuple(int(x + (y - x) * k) for x, y in zip(a, b))
 
 
 def text(surf, font, msg, pos, color=WHITE, anchor="topleft", shadow=True):
+    msg = tr(msg) if isinstance(msg, str) else msg
     img = font.render(str(msg), True, color)
     rect = img.get_rect(**{anchor: pos})
-    if shadow:
+    if high_contrast:       # contorno preto em volta: legível em qualquer fundo
+        dark = font.render(str(msg), True, (0, 0, 0))
+        for dx, dy in ((-2, 0), (2, 0), (0, -2), (0, 2), (2, 2)):
+            surf.blit(dark, rect.move(dx, dy))
+    elif shadow:
         surf.blit(font.render(str(msg), True, (0, 0, 0)), rect.move(2, 2))
     surf.blit(img, rect)
     return rect
@@ -46,11 +72,13 @@ def bar(surf, rect, frac, color, back=(40, 40, 50), border=WHITE, ghost: float |
     inner.width = int(inner.width * max(0.0, min(1.0, frac)))
     if inner.width > 0:
         pygame.draw.rect(surf, color, inner, border_radius=3)
-    pygame.draw.rect(surf, border, rect, 2, border_radius=4)
+    pygame.draw.rect(surf, border, rect, 4 if high_contrast else 2, border_radius=4)
 
 
 def panel(surf, rect, color=(20, 22, 32, 210)):
     rect = pygame.Rect(rect)
+    if high_contrast:
+        color = (*color[:3], 255)
     s = pygame.Surface(rect.size, pygame.SRCALPHA)
     pygame.draw.rect(s, color, s.get_rect(), border_radius=12)
     pygame.draw.rect(s, (255, 255, 255, 60), s.get_rect(), 2, border_radius=12)

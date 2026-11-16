@@ -3,7 +3,7 @@ import math
 
 import pygame
 
-from core import config, ui
+from core import config, icons, ui
 from core.scene import Scene
 from entities import roster
 from entities.progression import STATS, weapon_cost, xp_to_next
@@ -16,6 +16,7 @@ class HubScene(Scene):
         super().__init__(game)
         self.t = 0.0
         self.toast = ("", 0.0)
+        self.scenery = backdrop.Scenery(game, "meadow", 600)
         self._build()
 
     def _build(self) -> None:
@@ -27,24 +28,28 @@ class HubScene(Scene):
         for i, stat in enumerate(STATS):
             key = bal[stat]["trained_by"]
             if key in REGISTRY:
-                buttons.append(ui.Button((x0 + (i % 2) * 300, y0 + (i // 2) * 96, 280, 80), mg[key]["title"],
+                buttons.append(ui.Button((x0 + (i % 2) * 300, y0 + (i // 2) * 82, 280, 72), mg[key]["title"],
                                          lambda k=key: self._train(k), sub=f"{bal[stat]['label']} nv {p.level(stat)}"))
         enemies = roster.enemies()
         if p.arena_stage < len(enemies):
             e = enemies[p.arena_stage]
             sub = f"Luta {p.arena_stage + 1}/{len(enemies)}: {roster.character(e['character'])['name']}"
-            buttons.append(ui.Button((x0, y0 + 210, 580, 90), "ARENA", self._arena, sub=sub))
+            buttons.append(ui.Button((x0, y0 + 166, 580, 80), "ARENA", self._arena, sub=sub))
         else:
-            buttons.append(ui.Button((x0, y0 + 210, 580, 90), "ARENA (revanche)", self._arena,
+            buttons.append(ui.Button((x0, y0 + 166, 580, 80), "ARENA (revanche)", self._arena,
                                      sub="Campeão! Enfrente o chefe de novo"))
         cost = weapon_cost(p.weapon_level)
-        buttons.append(ui.Button((x0, y0 + 320, 280, 70), f"Arma nv {p.weapon_level + 1}", self._upgrade,
+        buttons.append(ui.Button((x0, y0 + 256, 280, 62), f"Arma nv {p.weapon_level + 1}", self._upgrade,
                                  enabled=p.gold >= cost, sub=f"{cost} ouro"))
-        buttons.append(ui.Button((x0 + 300, y0 + 320, 280, 70), "Trocar lutador", self._change_char))
-        buttons.append(ui.Button((x0, y0 + 396, 280, 52), "Estatísticas", self._stats))
-        buttons.append(ui.Button((x0 + 300, y0 + 396, 280, 52), "Ajuda", self._help))
-        buttons.append(ui.Button((x0, y0 + 458, 280, 52), "Opções", self._options))
-        buttons.append(ui.Button((x0 + 300, y0 + 458, 280, 52), "Menu principal", self._to_menu))
+        buttons.append(ui.Button((x0 + 300, y0 + 256, 280, 62), "Trocar lutador", self._change_char))
+        last = p.last_training if p.last_training in REGISTRY else ""
+        again = mg[last]["title"] if last else ""
+        buttons.append(ui.Button((x0, y0 + 326, 580, 52), "Treinar de novo", lambda: self._train(last), enabled=bool(last),
+                                 sub=again))
+        buttons.append(ui.Button((x0, y0 + 386, 280, 52), "Estatísticas", self._stats))
+        buttons.append(ui.Button((x0 + 300, y0 + 386, 280, 52), "Ajuda", self._help))
+        buttons.append(ui.Button((x0, y0 + 446, 280, 52), "Opções", self._options))
+        buttons.append(ui.Button((x0 + 300, y0 + 446, 280, 52), "Menu principal", self._to_menu))
         focus = self.menu.focus if hasattr(self, "menu") else 0
         self.menu = ui.Menu(buttons, columns=2)
         self.menu.focus = min(focus, len(buttons) - 1)
@@ -116,7 +121,7 @@ class HubScene(Scene):
         W, H = surf.get_size()
         a = self.game.assets
         p = self.game.profile
-        surf.blit(backdrop.build("meadow", (W, H), 600, a), (0, 0))
+        self.scenery.draw(surf, self.t)
         ch = roster.character(p.character)
         img = a.image_h(ch["sprite"], 300)
         if img.get_width() > 340:
@@ -131,8 +136,10 @@ class HubScene(Scene):
         for i, stat in enumerate(STATS):
             s = p.stats[stat]
             y = 116 + i * 48
-            ui.text(surf, a.font(20), f"{bal[stat]['label']}  nv {s.level}", (44, y))
-            ui.bar(surf, (44, y + 24, 360, 14), s.xp / xp_to_next(s.level), tuple(bal[stat]["color"]))
+            col = ui.stat_color(stat, bal[stat]["color"])
+            surf.blit(icons.stat_icon(stat, 22, col), (44, y - 1))
+            ui.text(surf, a.font(20), f"{bal[stat]['label']}  nv {s.level}", (74, y))
+            ui.bar(surf, (44, y + 24, 360, 14), s.xp / xp_to_next(s.level), col)
 
         ui.text(surf, a.font(40), "Campo de Treino", (760, 80), ui.WHITE, "midtop")
         self.menu.draw(surf, a.font(28), a.font(18, bold=False))

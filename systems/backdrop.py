@@ -62,3 +62,68 @@ def build(theme: str, size: tuple[int, int], ground_y: int, assets=None) -> pyga
             surf = surf.convert()
     _cache[key] = surf
     return surf
+
+
+# --- parallax em camadas + partículas ambiente ---------------------------------------------------
+PAD = 220          # folga lateral das colinas (deslocamento máximo do parallax)
+_layer_cache: dict[tuple, tuple] = {}
+
+
+def _layers(theme: str, size: tuple[int, int], ground_y: int):
+    key = (theme, size, ground_y)
+    got = _layer_cache.get(key)
+    if got is None:
+        t = THEMES.get(theme, THEMES["meadow"])
+        w, h = size
+        sky = _gradient(size, *t["sky"])
+        hills = []
+        for i, c in enumerate(t["hills"]):
+            surf = _hills(w + 2 * PAD, h, c, ground_y - 120 + i * 60, 60 - i * 15, seed=hash(theme) + i)
+            hills.append((surf, 0.18 + 0.22 * i))       # colina de trás se move menos
+        if pygame.display.get_surface():
+            sky = sky.convert()
+            hills = [(s.convert_alpha(), f) for s, f in hills]
+        got = (sky, hills, t["ground"])
+        _layer_cache[key] = got
+    return got
+
+
+def draw(surf: pygame.Surface, theme: str, ground_y: int, assets=None, scroll: float = 0.0, t: float = 0.0,
+         parallax: bool = True) -> None:
+    """Desenha o cenário. Com `parallax`, as colinas deslizam em velocidades diferentes (scroll + balanço suave
+    em função de t). Arte própria em sprites/backgrounds/<tema>.png tem prioridade e fica estática."""
+    size = surf.get_size()
+    if not parallax or (assets is not None and assets.resolve(f"sprites/backgrounds/{theme}.png")):
+        surf.blit(build(theme, size, ground_y, assets), (0, 0))
+        return
+    sky, hills, ground = _layers(theme, size, ground_y)
+    w, h = size
+    surf.blit(sky, (0, 0))
+    sway = math.sin(t * 0.25) * PAD * 0.7
+    for layer, factor in hills:
+        off = max(-PAD, min(PAD, (scroll + sway) * factor))
+        surf.blit(layer, (-PAD - off, 0))
+    surf.fill(ground, (0, ground_y, w, h - ground_y))
+    pygame.draw.line(surf, [max(0, v - 30) for v in ground], (0, ground_y), (w, ground_y), 4)
+
+
+class Scenery:
+    """Cenário de uma cena: parallax + partículas ambiente, respeitando 'reduzir movimento' e baixo desempenho."""
+
+    def __init__(self, game, theme: str, ground_y: int, size: tuple[int, int] | None = None, ambient: bool = True) -> None:
+        from systems.ambient import Ambient
+        self.game, self.theme, self.ground_y = game, theme, ground_y
+        size = size or (game.display.width, game.display.height)
+        self.amb = Ambient(theme, size) if ambient else None
+
+    @property
+    def still(self) -> bool:
+        return self.game.low_perf or self.game.feedback.reduce_motion
+
+    def draw(self, surf: pygame.Surface, t: float, scroll: float = 0.0) -> None:
+        draw(surf, self.theme, self.ground_y, self.game.assets, scroll, t, parallax=not self.still)
+        self.draw_ambient(surf, t, scroll)
+
+    def draw_ambient(self, surf: pygame.Surface, t: float, scroll: float = 0.0) -> None:
+        if self.amb is not None and not self.still:
+            self.amb.draw(surf, t, scroll)

@@ -47,6 +47,7 @@ class PauseOverlay(Scene):
 
     def update(self, dt: float) -> None:
         self.t += dt
+        self.game.audio.duck(0.3)      # música mais baixa enquanto pausado
         if self.t < self.GRACE:
             return
         if self.game.input.pressed("back"):

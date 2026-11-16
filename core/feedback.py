@@ -9,6 +9,7 @@ from collections import deque
 import pygame
 
 from core import config
+from core.i18n import tr
 
 _SCALE_MIN = 0.02
 
@@ -111,8 +112,8 @@ class Feedback:
         self.saved_timer = max(0.0, self.saved_timer - real_dt)
         for t in self.toasts:
             t.life -= real_dt
-        while self.toasts and self.toasts[0].life <= 0:
-            self.toasts.popleft()
+        if any(t.life <= 0 for t in self.toasts):      # vidas diferentes: o vencido pode não ser o primeiro
+            self.toasts = deque((t for t in self.toasts if t.life > 0), maxlen=4)
 
     def draw(self, surf: pygame.Surface, font) -> None:
         w, h = surf.get_size()
@@ -124,8 +125,8 @@ class Feedback:
             surf.blit(self._overlay, (0, 0))
         y = h - 24
         for t in reversed(self.toasts):
-            k = min(1.0, t.life / 0.35, (t.total - t.life) / 0.2 + 0.001)
-            img = font.render(t.msg, True, t.color)
+            k = max(0.0, min(1.0, t.life / 0.35, (t.total - t.life) / 0.2 + 0.001))
+            img = font.render(tr(t.msg), True, t.color)
             box = img.get_rect().inflate(36, 18)
             box.midbottom = (w // 2, y + int((1 - k) * 18))
             s = pygame.Surface(box.size, pygame.SRCALPHA)
@@ -137,7 +138,7 @@ class Feedback:
             y -= box.h + 8
         if self.saved_timer > 0:
             a = int(255 * min(1.0, self.saved_timer / 0.5))
-            img = font.render("Salvo", True, (120, 230, 140))
+            img = font.render(tr("Salvo"), True, (120, 230, 140))
             img.set_alpha(a)
             r = img.get_rect(topright=(w - 14, 10))
             surf.blit(img, r)

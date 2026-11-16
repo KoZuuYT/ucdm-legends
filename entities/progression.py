@@ -45,6 +45,7 @@ class Profile:
     playtime: float = 0.0               # segundos jogados neste save
     name: str = ""                      # nome do treinador (opcional, renomeável no seletor de saves)
     seen_help: bool = False             # já viu o tutorial inicial?
+    last_training: str = ""             # último treino jogado ("Treinar de novo" no hub)
     counters: dict[str, int] = field(default_factory=dict)   # estatísticas do treinador
     stats: dict[str, StatProgress] = field(default_factory=lambda: {s: StatProgress() for s in STATS})
 
@@ -66,7 +67,7 @@ class Profile:
         return {
             "character": self.character, "gold": self.gold, "weapon_level": self.weapon_level,
             "arena_stage": self.arena_stage, "wins": self.wins, "best_scores": self.best_scores,
-            "playtime": round(self.playtime, 1), "name": self.name, "seen_help": self.seen_help,
+            "playtime": round(self.playtime, 1), "name": self.name, "seen_help": self.seen_help, "last_training": self.last_training,
             "counters": self.counters,
             "stats": {k: {"level": v.level, "xp": v.xp} for k, v in self.stats.items()},
         }
@@ -77,7 +78,7 @@ class Profile:
                 weapon_level=d.get("weapon_level", 1), arena_stage=d.get("arena_stage", 0),
                 wins=d.get("wins", 0), best_scores=d.get("best_scores", {}),
                 playtime=float(d.get("playtime", 0.0)), name=str(d.get("name", ""))[:16],
-                seen_help=bool(d.get("seen_help", False)), counters=dict(d.get("counters", {})))
+                seen_help=bool(d.get("seen_help", False)), last_training=str(d.get("last_training", "")), counters=dict(d.get("counters", {})))
         for k in STATS:
             s = d.get("stats", {}).get(k, {})
             p.stats[k] = StatProgress(s.get("level", 1), s.get("xp", 0))

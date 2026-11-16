@@ -14,12 +14,14 @@ import random
 import pygame
 
 from core import config, ui
+from core.i18n import tr
 from core.input import VirtualButton
 from core.scene import Scene
 from entities import roster
 from entities.ai import EnemyBrain
 from systems import backdrop
 from systems.culling import Camera, SpatialGrid
+from systems.tween import ease_in_out_sine
 from systems.particles import ParticleSystem
 
 WORLD_W, GROUND_Y = 3200, 600
@@ -49,6 +51,12 @@ class ArenaScene(Scene):
         self.camera.view.center = (mid, GROUND_Y - 260)
         self.fx = ParticleSystem(500)
         self.fx.scale = 0.0 if game.feedback.intensity <= 0 else min(1.5, game.feedback.intensity)
+        if game.low_perf:
+            self.fx.scale *= 0.4
+            self.player.ghosts_on = self.enemy.ghosts_on = False
+        self.scenery = backdrop.Scenery(game, "arena", GROUND_Y, ambient=True)
+        self._buf: pygame.Surface | None = None
+        self._zoom_focus = (0.5, 0.6)
         self.fb = game.feedback
         self.big_font = game.assets.font(46)
         self.ghost_p = self.ghost_e = 1.0       # barras "fantasma" de vida (escorrem após o dano)
@@ -247,7 +255,7 @@ class ArenaScene(Scene):
                     prof.bump("crits")
 
     def _float(self, x, y, msg, color, font=None) -> None:
-        self.fx.text(x, y, (font or self.dmg_font).render(msg, True, color))
+        self.fx.text(x, y, (font or self.dmg_font).render(tr(msg), True, color))
 
     def _finish(self) -> None:
         prof = self.game.profile
@@ -276,12 +284,38 @@ class ArenaScene(Scene):
                                              on_close=lambda: self.game.scenes.pop(fade=True), color=color))
 
     # --- render -------------------------------------------------------------------------
+    def _zoom(self) -> float:
+        """Zoom do mundo (não do HUD): leve aproximação no KO que volta ao normal."""
+        if self.result is None or self.fb.reduce_motion or self.fb.intensity <= 0 or self.game.low_perf:
+            return 1.0
+        return 1.0 + 0.08 * min(1.0, self.fb.intensity) * math.sin(math.pi * ease_in_out_sine(min(1.0, self.over / 1.4)))
+
     def draw(self, surf: pygame.Surface) -> None:
+        z = self._zoom()
+        if z > 1.003:
+            W, H = surf.get_size()
+            if self._buf is None or self._buf.get_size() != (W, H):
+                self._buf = pygame.Surface((W, H))
+            self._draw_world(self._buf)
+            ko = self.enemy if self.result == "win" else self.player
+            fx, fy = self.camera.to_screen(ko.pos.x, ko.pos.y - ko.height * 0.5)
+            cw, ch = int(W / z), int(H / z)
+            crop = pygame.Rect(0, 0, cw, ch)
+            crop.center = (int(fx), int(fy))
+            crop.clamp_ip(self._buf.get_rect())
+            pygame.transform.smoothscale(self._buf.subsurface(crop), (W, H), surf)
+        else:
+            self._draw_world(surf)
+        self._hud(surf)
+        self.game.input.draw_virtual_buttons(surf, self.font)
+
+    def _draw_world(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
         cam = self.camera
         # fundo com parallax barato: 1 blit de superfície cacheada
         bg = backdrop.build("arena", (W + 400, H), GROUND_Y - 40, self.game.assets)
         surf.blit(bg, (-max(0.0, min(400.0, cam.view.x * 0.2)), 0))
+        self.scenery.draw_ambient(surf, self.now, cam.view.x)
         gy = cam.to_screen(0, GROUND_Y)[1]
         surf.fill((175, 150, 110), (0, gy - 40, W, H))
         pygame.draw.line(surf, (130, 105, 75), (0, gy - 40), (W, gy - 40), 4)
@@ -308,13 +342,12 @@ class ArenaScene(Scene):
         for f in sorted((self.player, self.enemy), key=lambda f: f.state == "strike"):
             f.draw(surf, cam, self.game.assets, self.font)
         self.fx.draw(surf, cam)
-        self._hud(surf)
-        self.game.input.draw_virtual_buttons(surf, self.font)
 
     def _danger_vignette(self, surf: pygame.Surface) -> None:
         """Borda vermelha pulsando enquanto o inimigo prepara um golpe imbloqueável (máx. ~1,5 Hz)."""
         e = self.enemy
-        if not (e.state == "windup" and e.attack is not None and e.attack.unblockable) or self.fb.intensity <= 0:
+        if not (e.state == "windup" and e.attack is not None and e.attack.unblockable) or self.fb.intensity <= 0 \
+                or self.game.low_perf:
             return
         W, H = surf.get_size()
         if self._vignette is None or self._vignette.get_size() != (W, H):

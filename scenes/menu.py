@@ -1,4 +1,5 @@
 """Menu principal."""
+import json
 import math
 import random
 
@@ -25,6 +26,7 @@ class MenuScene(Scene):
         self.t = 0.0
         self.version = _read_version()
         chars = roster.characters()
+        self.scenery = backdrop.Scenery(game, "dusk", 620)
         self.parade = random.sample(chars, k=min(7, len(chars)))
         self._build()
 
@@ -33,6 +35,10 @@ class MenuScene(Scene):
         focus = self.menu.focus if hasattr(self, "menu") else 0
         buttons = []
         y = 330
+        from network.updater import can_self_update
+        if self.game.update_notice and can_self_update():
+            buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Atualizar agora", self._update_now))
+            y += 68
         if self.game.save.exists():
             buttons.append(ui.Button((W // 2 - 170, y, 340, 58), "Continuar", self._continue))
             y += 68
@@ -42,8 +48,29 @@ class MenuScene(Scene):
         self.menu = ui.Menu(buttons)
         self.menu.focus = min(focus, len(buttons) - 1)
 
+    def _update_now(self) -> None:
+        from scenes.boot import BootScene
+        self.game.scenes.reset(BootScene(self.game))
+
+    def _show_news(self) -> None:
+        """Depois de atualizar, mostra as novidades uma vez (a versão vista fica em settings.json)."""
+        from core import settings
+        from scenes.news import NewsOverlay
+        if self.version == "dev" or self.game.cfg.get("last_seen_version") == self.version:
+            return
+        notes = ""
+        try:
+            notes = json.loads(paths.VERSION_FILE.read_text(encoding="utf-8")).get("notes", "")
+        except (OSError, ValueError):
+            pass
+        settings.set_value("last_seen_version", self.version)
+        self.game.cfg["last_seen_version"] = self.version
+        if notes:
+            self.game.scenes.push(NewsOverlay(self.game, self.version, notes))
+
     def enter(self) -> None:
         self.game.audio.music("menu")
+        self._show_news()
 
     def resume(self) -> None:
         self.game.audio.music("menu")
@@ -80,7 +107,7 @@ class MenuScene(Scene):
 
     def draw(self, surf: pygame.Surface) -> None:
         W, H = surf.get_size()
-        surf.blit(backdrop.build("dusk", (W, H), 620, self.game.assets), (0, 0))
+        self.scenery.draw(surf, self.t)
         for i, c in enumerate(self.parade):
             x = 90 + i * (W - 180) / max(1, len(self.parade) - 1)
             y = 640 + 8 * math.sin(self.t * 3 + i)
@@ -89,5 +116,10 @@ class MenuScene(Scene):
         title = self.game.cfg["title"]
         ui.text(surf, self.game.assets.font(96), title, (W // 2, 110 + 6 * math.sin(self.t * 2)), ui.ACCENT, "midtop")
         ui.text(surf, self.game.assets.font(26), "Treine. Lute. Evolua.", (W // 2, 230), anchor="midtop")
+        if self.game.update_notice:
+            from network.updater import can_self_update
+            msg = (f"Nova versão {self.game.update_notice} disponível!" if can_self_update()
+                   else f"Nova versão {self.game.update_notice} disponível (use git pull)")
+            ui.text(surf, self.game.assets.font(22), msg, (W // 2, 282), ui.GREEN, "midtop")
         self.menu.draw(surf, self.game.assets.font(32))
         ui.text(surf, self.game.assets.font(18), f"v{self.version}", (W - 12, H - 10), (200, 200, 200), "bottomright")

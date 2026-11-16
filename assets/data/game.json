@@ -52,34 +52,78 @@
     "sfx_volume": 0.8,
     "music_volume": 0.5,
     "sfx": {
-      "hit": [
-        "audio/sfx/hit1.wav",
-        "audio/sfx/hit2.wav",
-        "audio/sfx/hit3.wav"
+      "back": [
+        "audio/sfx/back1.wav",
+        "audio/sfx/back2.wav",
+        "audio/sfx/back3.wav"
       ],
       "block": [
         "audio/sfx/block1.wav",
         "audio/sfx/block2.wav",
         "audio/sfx/block3.wav"
       ],
+      "click": [
+        "audio/sfx/click1.wav",
+        "audio/sfx/click2.wav",
+        "audio/sfx/click3.wav"
+      ],
+      "coin": [
+        "audio/sfx/coin1.wav",
+        "audio/sfx/coin2.wav",
+        "audio/sfx/coin3.wav"
+      ],
+      "confirm": [
+        "audio/sfx/confirm1.wav",
+        "audio/sfx/confirm2.wav",
+        "audio/sfx/confirm3.wav"
+      ],
+      "crit": [
+        "audio/sfx/crit1.wav",
+        "audio/sfx/crit2.wav",
+        "audio/sfx/crit3.wav"
+      ],
+      "hit": [
+        "audio/sfx/hit1.wav",
+        "audio/sfx/hit2.wav",
+        "audio/sfx/hit3.wav"
+      ],
+      "hover": [
+        "audio/sfx/hover1.wav",
+        "audio/sfx/hover2.wav",
+        "audio/sfx/hover3.wav"
+      ],
+      "ko": [
+        "audio/sfx/ko1.wav",
+        "audio/sfx/ko2.wav",
+        "audio/sfx/ko3.wav"
+      ],
+      "levelup": [
+        "audio/sfx/levelup1.wav",
+        "audio/sfx/levelup2.wav",
+        "audio/sfx/levelup3.wav"
+      ],
+      "miss": [
+        "audio/sfx/miss1.wav",
+        "audio/sfx/miss2.wav",
+        "audio/sfx/miss3.wav"
+      ],
+      "parry": [
+        "audio/sfx/parry1.wav",
+        "audio/sfx/parry2.wav",
+        "audio/sfx/parry3.wav"
+      ],
+      "pause": [
+        "audio/sfx/pause1.wav",
+        "audio/sfx/pause2.wav",
+        "audio/sfx/pause3.wav"
+      ],
+      "save": "audio/sfx/save.wav",
+      "warning": "audio/sfx/warning.wav",
       "whoosh": [
         "audio/sfx/whoosh1.wav",
         "audio/sfx/whoosh2.wav",
         "audio/sfx/whoosh3.wav"
-      ],
-      "crit": "audio/sfx/crit.wav",
-      "parry": "audio/sfx/parry.wav",
-      "miss": "audio/sfx/miss.wav",
-      "coin": "audio/sfx/coin.wav",
-      "levelup": "audio/sfx/levelup.wav",
-      "click": "audio/sfx/click.wav",
-      "hover": "audio/sfx/hover.wav",
-      "confirm": "audio/sfx/confirm.wav",
-      "back": "audio/sfx/back.wav",
-      "ko": "audio/sfx/ko.wav",
-      "warning": "audio/sfx/warning.wav",
-      "pause": "audio/sfx/pause.wav",
-      "save": "audio/sfx/save.wav"
+      ]
     },
     "music": {
       "menu": "audio/music/menu.wav",
@@ -94,7 +138,9 @@
     "repo": "KoZuuYT/ucdm-legends",
     "branch": "main",
     "asset_pattern": "UCDM-{platform}-v{version}.zip",
-    "timeout": 6
+    "timeout": 6,
+    "background_check": true,
+    "background_minutes": 30
   },
   "default_character": "kozu",
   "gameplay": {
@@ -102,5 +148,14 @@
     "extended_warning": false,
     "auto_pause": true
   },
-  "feedback": {}
+  "feedback": {},
+  "language": "pt-BR",
+  "accessibility": {
+    "text_scale": 1.0,
+    "colorblind": false,
+    "high_contrast": false
+  },
+  "performance": {
+    "low_mode": false
+  }
 }

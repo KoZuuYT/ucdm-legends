@@ -6,6 +6,7 @@ import random
 import pygame
 
 from core import ui
+from core.i18n import tr
 from minigames.base import TrainingGame, register
 
 
@@ -38,7 +39,7 @@ class FocusTraining(TrainingGame):
                     hit = (o, d)
             if hit is None:
                 self.combo = 0
-                self.fx.text(pos[0], pos[1], self.small.render("FORA", True, (180, 180, 180)), 0.4)
+                self.fx.text(pos[0], pos[1], self.small.render(tr("FORA"), True, (180, 180, 180)), 0.4)
                 continue
             o, d = hit
             o.done = True

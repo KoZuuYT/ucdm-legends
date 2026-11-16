@@ -23,6 +23,7 @@ class AssetManager:
         self._fonts: dict[tuple, pygame.font.Font] = {}
         self._sounds: dict[str, "pygame.mixer.Sound | None"] = {}
         self._missing: set[str] = set()
+        self.font_scale = 1.0
 
     # --- resolução de caminhos --------------------------------------------------------
     def resolve(self, rel: str) -> Path | None:
@@ -89,6 +90,11 @@ class AssetManager:
             self._scaled_bytes -= ow * oh * 4
         return surf
 
+    def thumb_path(self, char: dict) -> str:
+        """Miniatura do personagem (assets/sprites/thumbs/<id>.png) ou, se não existir, a arte inteira."""
+        rel = f"sprites/thumbs/{char['id']}.png"
+        return rel if self.resolve(rel) else char["sprite"]
+
     def unload(self, prefix: str) -> None:
         """Libera imagens originais (ex.: ao sair da tela de seleção de personagem)."""
         for k in [k for k in self._images if k.startswith(prefix)]:
@@ -103,7 +109,14 @@ class AssetManager:
         return s
 
     # --- fontes / sons -----------------------------------------------------------------
+    def set_font_scale(self, scale: float) -> None:
+        scale = max(0.8, min(1.4, float(scale)))
+        if scale != self.font_scale:
+            self.font_scale = scale
+            self._fonts.clear()
+
     def font(self, size: int, name: str | None = None, bold: bool = True) -> pygame.font.Font:
+        size = max(8, round(size * self.font_scale))
         key = (name, size, bold)
         f = self._fonts.get(key)
         if f is None:
